@@ -14,12 +14,7 @@ public class BarUI : MonoBehaviour
     public float maxValue = 100;
 
     [Header("Settings")]
-    public bool addPrefix;
-    public string prefix = "";
-    public bool addSuffix;
-    public string suffix = "%";
     public float delayedFillSpeed = 0.5f;
-    [Range(0, 5)] public int decimals = 0;
     public BarDirection barDirection = BarDirection.Left;
 
     [Header("References")]
@@ -28,8 +23,9 @@ public class BarUI : MonoBehaviour
     [SerializeField] private TextMeshProUGUI textObject;
 
     private Coroutine delayedRoutine;
+    private float oldValue;
 
-    void Start()
+    private void Start()
     {
         SetBarDirection();
     }
@@ -45,67 +41,57 @@ public class BarUI : MonoBehaviour
     }
 #endif
 
+    //* Cập nhật giao diện
     public void UpdateUI()
     {
-        if (barImage != null) { barImage.fillAmount = currentValue / maxValue; }
-        if (delayedBarImage != null && delayedRoutine == null)  delayedBarImage.fillAmount = barImage.fillAmount;
-        if (textObject != null) { UpdateText(textObject); }
+        barImage.fillAmount = currentValue / maxValue;
+        textObject.text = currentValue.ToString("F0");
     }
 
-    void UpdateText(TextMeshProUGUI txt)
+    //* Thiết lập hướng di chuyển của thanh 
+    private void SetBarDirection()
     {
-        string valueText = currentValue.ToString("F" + decimals);
+        barImage.type = Image.Type.Filled;
 
-        if (addPrefix)
-            valueText = prefix + valueText;
-
-        if (addSuffix)
-            valueText += suffix;
-
-        txt.text = valueText;
-    }
-
-    void SetBarDirection()
-    {
-        if (barImage != null)
+        if (barDirection == BarDirection.Left)
         {
-            barImage.type = Image.Type.Filled;
-
-            if (barDirection == BarDirection.Left)
-            {
-                barImage.fillMethod = Image.FillMethod.Horizontal;
-                barImage.fillOrigin = 0;
-            }
-            else if (barDirection == BarDirection.Right)
-            {
-                barImage.fillMethod = Image.FillMethod.Horizontal;
-                barImage.fillOrigin = 1;
-            }
-            else if (barDirection == BarDirection.Top)
-            {
-                barImage.fillMethod = Image.FillMethod.Vertical;
-                barImage.fillOrigin = 1;
-            }
-            else if (barDirection == BarDirection.Bottom)
-            {
-                barImage.fillMethod = Image.FillMethod.Vertical;
-                barImage.fillOrigin = 0;
-            }
+            barImage.fillMethod = Image.FillMethod.Horizontal;
+            barImage.fillOrigin = 0;
+        }
+        else if (barDirection == BarDirection.Right)
+        {
+            barImage.fillMethod = Image.FillMethod.Horizontal;
+            barImage.fillOrigin = 1;
+        }
+        else if (barDirection == BarDirection.Top)
+        {
+            barImage.fillMethod = Image.FillMethod.Vertical;
+            barImage.fillOrigin = 1;
+        }
+        else if (barDirection == BarDirection.Bottom)
+        {
+            barImage.fillMethod = Image.FillMethod.Vertical;
+            barImage.fillOrigin = 0;
         }
     }
 
+    //* Thiết lập giá trị của thanh
     public void SetValue(float newValue)
     {
-        if (delayedRoutine != null)
-            StopCoroutine(delayedRoutine);
+        if(delayedRoutine != null ) StopCoroutine(delayedRoutine);
 
-        currentValue = newValue;
+        oldValue = currentValue;
+        currentValue = Mathf.Clamp(newValue, 0, maxValue);
+
         UpdateUI();
 
-        if (delayedBarImage != null)
-            delayedRoutine = StartCoroutine(AnimateDelayedBar(newValue));
+        if (currentValue >= oldValue)
+            delayedBarImage.fillAmount = barImage.fillAmount;
+        else
+            delayedRoutine = StartCoroutine(AnimateDelayedBar(currentValue));
     }
 
+    //* Thiết lập giá trị thanh với độ trễ
     private IEnumerator AnimateDelayedBar(float targetValue)
     {
         float startFill = delayedBarImage.fillAmount;
@@ -120,5 +106,6 @@ public class BarUI : MonoBehaviour
         }
 
         delayedBarImage.fillAmount = endFill;
+        delayedRoutine = null;
     }
 }

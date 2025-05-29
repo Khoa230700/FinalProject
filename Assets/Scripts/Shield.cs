@@ -11,73 +11,68 @@ public class Shield : MonoBehaviour
 
     [Header("Regeneration")]
     public bool useRegen;
-    public float regenRate = 5f;
-    public float regenDelay = 3f;
-    // public float secPerRegen = 1f;
+    public float regenRate;
+    public float regenDelay;
+    public float secPerRegen;
 
     [Header("References")]
-    [SerializeField] private BarUI bar;
+    [SerializeField] private BarUI barUI;
+
+    private Coroutine regenRoutine;
 
     private void Start()
     {
-        currentShield = maxShield;
-        if (useRegen) StartCoroutine(RegenRoutine());
-        UpdateUI();
+        UpdateShield(maxShield);
     }
 
-    //Test
+    //* Test
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.S))
-            RestoreShield(Random.Range(10f, 30f));
+            UpdateShield(Random.Range(10f, 30f));
     }
 
+    //* Nhận sát thương và trả về lượng sát thương dư thừa
     public float TakeDamage(float damage)
     {
-        StopAllCoroutines();
-        if (useRegen) StartCoroutine(RegenRoutine());
+        //* Khởi động tái tạo khi nhận sát thương
+        if (regenRoutine != null) StopCoroutine(regenRoutine);
+        if (useRegen) regenRoutine = StartCoroutine(RegenRoutine());
 
-        float damageAbsorbed = Mathf.Min(damage, currentShield);
-        currentShield = Mathf.Clamp(currentShield - damageAbsorbed, 0, maxShield);
-        UpdateUI();
+        if (currentShield <= 0) return damage;
 
-        return damage - damageAbsorbed;
+        float damageAbsorbed = Mathf.Min(damage, currentShield); //* Sát thương hấp thụ bởi lá chắn
+        UpdateShield(-damageAbsorbed);
+
+        return damage - damageAbsorbed; //* Sát thương dư thừa
     }
 
-    public void RestoreShield(float amount)
+    //* Tái tạo lá chắn theo thời gian
+    private IEnumerator RegenRoutine()
+    {
+        yield return new WaitForSeconds(regenDelay);
+
+        while (useRegen && currentShield < maxShield)
+        {
+            yield return new WaitForSeconds(secPerRegen);
+
+            UpdateShield(regenRate);
+        }
+
+        regenRoutine = null;
+    }
+
+    //* Hồi lá chắn (+ hồi, - trừ)
+    public void UpdateShield(float amount)
     {
         currentShield = Mathf.Clamp(currentShield + amount, 0, maxShield);
         UpdateUI();
     }
 
-    private IEnumerator RegenRoutine()
-    {
-        while (useRegen)
-        {
-            if (currentShield < maxShield)
-            {
-                yield return new WaitForSeconds(regenDelay);
-
-                while (currentShield < maxShield)
-                {
-                    currentShield = Mathf.Clamp(currentShield + regenRate, 0, maxShield);
-                    UpdateUI();
-
-                    yield return null;
-                    // yield return new WaitForSeconds(secPerRegen);
-                }
-            }
-            else
-            {
-                yield return null;
-            }
-        }
-    }
-
     private void UpdateUI()
     {
-        bar?.SetValue(currentShield);
+        barUI.SetValue(currentShield);
     }
-    
+
     public bool HasShield() => currentShield > 0;
 }

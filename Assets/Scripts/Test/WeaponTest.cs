@@ -20,14 +20,14 @@ public class WeaponTest : MonoBehaviour
     [Header("Settings")]
     public float fireRate = 0.2f;
     public float reloadTime = 2f;
+    public FireMode currentFireMode = FireMode.SemiAuto;
 
     [Header("References")]
     public WeaponUI weaponUI;
-
-    public FireMode currentFireMode = FireMode.SemiAuto;
+    public Sprite weaponSprite;
+    
     private float nextFireTime = 0f;
     private bool isReloading = false;
-    public Sprite weaponSprite;
 
     private void Start()
     {
@@ -80,7 +80,6 @@ public class WeaponTest : MonoBehaviour
     {
         if (currentAmmo <= 0 || totalAmmo <= 0) return;
 
-        Debug.Log("Bum!");
         currentAmmo--;
         weaponUI.UpdateAmmoUI(currentAmmo, totalAmmo);
     }
