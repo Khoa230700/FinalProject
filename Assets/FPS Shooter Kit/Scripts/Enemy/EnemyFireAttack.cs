@@ -5,21 +5,21 @@ using UnityEngine;
 public class EnemyFireAttack : MonoBehaviour
 {
 
-	public int Damage = 10;
+	//public int Damage = 10;
 
-	void OnParticleCollision (GameObject other)
-	{
+	//void OnParticleCollision (GameObject other)
+	//{
 
 	
-		if (other.tag.Equals ("Player")) {
+	//	if (other.tag.Equals ("Player")) {
 
-			Health playerHealth = other.GetComponent<Health> ();
+	//		Health playerHealth = other.GetComponent<Health> ();
 
-			playerHealth.SetDamage (Damage);
+	//		playerHealth.SetDamage (Damage);
 
-		}
+	//	}
 
-	}
+	//}
 
 
 
