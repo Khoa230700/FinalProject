@@ -23,17 +23,6 @@ public class PlayerHealth : HealthBase
         shield ??= GetComponent<Shield>();
     }
 
-    //* Test
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Space))
-            TakeDamage(200f);
-        if (Input.GetKeyDown(KeyCode.X))
-            TakeDamage(Random.Range(10f, 30f), 30f, Random.insideUnitSphere * 5f); // 30% xuyên lá chắn, điểm va chạm ngẫu nhiên 
-        if (Input.GetKeyDown(KeyCode.H))
-            UpdateHealth(Random.Range(10f, 30f));
-    }
-
     //* Nhận sát thương qua lá chắn và tính toán sát thương còn lại, thêm khả năng xuyên lá chắn , thêm vào điểm va chạm
     public override void TakeDamage(float damage, float penetrationPercent = 0f, Vector3 hitPoint = default)
     {
