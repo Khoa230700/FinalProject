@@ -73,3 +73,6 @@ crashlytics-build.properties
 .vscode/settings.json
 .vscode/launch.json
 .vscode/extensions.json
+Assets/Plugins
+Assets/DemoAssets
+Assets/DemoAssets.meta

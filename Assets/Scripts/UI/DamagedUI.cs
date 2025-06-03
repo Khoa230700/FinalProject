@@ -16,12 +16,12 @@ public class DamagedUI : MonoBehaviour
 
     private Transform player;
     private Vector3 lastHitPoint;
-    private Health playerHealth;
+    private PlayerHealth playerHealth;
 
     private void Start()
     {
         player ??= GameObject.FindGameObjectWithTag("Player").transform;
-        playerHealth = player.GetComponent<Health>();
+        playerHealth = player.GetComponent<PlayerHealth>();
         playerHealth?.OnTakeDamage.AddListener(OnTakeDamage);
     }
 

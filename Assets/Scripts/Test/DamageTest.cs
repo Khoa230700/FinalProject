@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class DamageTest : MonoBehaviour
 {
-    public Health targetHealth;
+    public PlayerHealth targetHealth;
     public Transform firePoint;
 
     private void Start()
