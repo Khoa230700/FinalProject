@@ -263,7 +263,7 @@ GameObject:
   - component: {fileID: 1086719144612967398}
   - component: {fileID: 8799410863753456906}
   m_Layer: 5
-  m_Name: Damaged
+  m_Name: DAMAGED
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -313,7 +313,6 @@ MonoBehaviour:
     image: {fileID: 4687758621449062905}
     minAlpha: 0.4
     fadeInSpeed: 25
-    fadeOutSpeed: 0.3
+    fadeOutSpeed: 1
     fadeOutPause: 0.5
   indicatorDistance: 128
-  player: {fileID: 0}

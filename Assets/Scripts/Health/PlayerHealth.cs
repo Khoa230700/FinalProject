@@ -3,12 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-public class Health : MonoBehaviour
+public class PlayerHealth : HealthBase
 {
-    [Header("Values")]
-    public float maxHealth = 100;
-    private float currentHealth;
-
     [Header("Regeneration")]
     public bool useRegen;
     public float regenRate;
@@ -19,30 +15,16 @@ public class Health : MonoBehaviour
     [SerializeField] private BarUI barUI;
     [SerializeField] private Shield shield;
 
-    // Events
-    public UnityEvent<float, Vector3> OnTakeDamage;
-
     private Coroutine regenRoutine;
 
-    private void Start()
+    protected override void Start()
     {
+        base.Start();
         shield ??= GetComponent<Shield>();
-        UpdateHealth(maxHealth);
-    }
-
-    //* Test
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Space))
-            TakeDamage(200f);
-        if (Input.GetKeyDown(KeyCode.X))
-            TakeDamage(Random.Range(10f, 30f), 30f, Random.insideUnitSphere * 5f); // 30% xuyên lá chắn, điểm va chạm ngẫu nhiên 
-        if (Input.GetKeyDown(KeyCode.H))
-            UpdateHealth(Random.Range(10f, 30f));
     }
 
     //* Nhận sát thương qua lá chắn và tính toán sát thương còn lại, thêm khả năng xuyên lá chắn , thêm vào điểm va chạm
-    public void TakeDamage(float damage, float penetrationPercent = 0f, Vector3 hitPoint = default)
+    public override void TakeDamage(float damage, float penetrationPercent = 0f, Vector3 hitPoint = default)
     {
         //* Khởi động tái tạo khi nhận sát thương
         if (regenRoutine != null) StopCoroutine(regenRoutine);
@@ -82,22 +64,22 @@ public class Health : MonoBehaviour
     }
 
     //* Hồi máu (+ hồi, - trừ)
-    private void UpdateHealth(float amount)
+    protected override void UpdateHealth(float amount)
     {
         currentHealth = Mathf.Clamp(currentHealth + amount, 0, maxHealth);
         UpdateUI();
 
         if (currentHealth <= 0)
-            Death();
+            Die();
+    }
+
+    protected override void Die()
+    {
+        Debug.Log("Die!");
     }
 
     private void UpdateUI()
     {
         barUI.SetValue(currentHealth);
-    }
-
-    private void Death()
-    {
-        Debug.Log("DEATH!");
     }
 }
