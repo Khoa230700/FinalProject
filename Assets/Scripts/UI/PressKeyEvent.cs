@@ -22,4 +22,6 @@ public class PressKeyEvent : MonoBehaviour
             isPressed = !isPressed;
         }
     }
+
+    public void SetIsPressed(bool value) => isPressed = value;
 }
