@@ -49,6 +49,7 @@ public class WeaponUI : MonoBehaviour
     private void Start()
     {
         weaponTest ??= FindFirstObjectByType<WeaponTest>();
+        weaponTest = FindObjectOfType<WeaponTest>();
         CreateBulletUI();
     }
 

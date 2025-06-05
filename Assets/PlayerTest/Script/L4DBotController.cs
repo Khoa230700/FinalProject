@@ -7,6 +7,7 @@ public class L4DBotController : MonoBehaviour
     [SerializeField] Transform player;
     [SerializeField] Transform firePoint;
     [SerializeField] GameObject bulletPrefab;
+    [SerializeField] ParticleSystem bulletParticleSystem;
 
     [Header("AI Settings")]
     [SerializeField] float followDistance = 3f;
@@ -42,6 +43,7 @@ public class L4DBotController : MonoBehaviour
 
             if (fireCooldown <= 0f)
             {
+                bulletParticleSystem.Play();
                 animator.SetTrigger("shoot");
                 Shoot(target.transform);
                 fireCooldown = fireRate;
@@ -54,7 +56,7 @@ public class L4DBotController : MonoBehaviour
             {
                 agent.SetDestination(player.position);
 
-                // ✅ Tính hướng di chuyển tương đối với bot
+                
                 Vector3 velocity = agent.velocity;
                 Vector3 localVelocity = transform.InverseTransformDirection(velocity);
                 float inputX = localVelocity.x;
@@ -100,9 +102,11 @@ public class L4DBotController : MonoBehaviour
         {
             Vector3 direction = (target.position - firePoint.position).normalized;
             float distance = Vector3.Distance(firePoint.position, target.position);
+            int enemyLayerMask = LayerMask.GetMask("Enemy"); 
             Debug.DrawRay(firePoint.position, direction * distance, Color.red);
-            if (Physics.Raycast(firePoint.position, direction, out RaycastHit hit, distance))
+            if (Physics.Raycast(firePoint.position, direction, out RaycastHit hit, distance, enemyLayerMask))
             {
+               
                 return hit.collider.CompareTag("Enemy");
             }
 

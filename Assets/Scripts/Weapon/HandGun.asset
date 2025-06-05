@@ -26,7 +26,7 @@ MonoBehaviour:
   bulletSpeed: 0
   penetrationPower: 0
   weight: 0
-  bulletPrefab: {fileID: 0}
+  bulletPrefab: {fileID: 4040807289565466490, guid: de2a25e019c35df4eb2123b292c812f6, type: 3}
   shootSound: {fileID: 0}
   hasScope: 0
   scopeZoom: 0
