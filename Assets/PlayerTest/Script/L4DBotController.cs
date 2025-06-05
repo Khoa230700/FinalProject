@@ -31,6 +31,7 @@ public class L4DBotController : MonoBehaviour
 
         if (target != null)
         {
+            Debug.Log(target.name + " is in range");
             agent.SetDestination(transform.position);
             transform.LookAt(target.transform);
 
