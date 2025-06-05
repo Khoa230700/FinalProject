@@ -52,12 +52,22 @@ public class suicideEnemy : MonoBehaviour
 
     void Attack()
     {
-        if (Time.time - lastAttackTime >= attackCooldown)
+        //if (Time.time - lastAttackTime >= attackCooldown)
+        //{
+        //    lastAttackTime = Time.time;
+        //    // damage player()
+        //    Debug.Log("Enemy attacks the player!");
+        //}
+
+        Collider[] colliders = Physics.OverlapSphere(transform.position, 4f);
+        foreach (Collider collider in colliders)
         {
-            lastAttackTime = Time.time;
-            // damage player()
-            Debug.Log("Enemy attacks the player!");
+            if (collider.GetComponent<testPlayerHealth>())
+            {
+                collider.GetComponent<testPlayerHealth>().TakeDamage(50);
+            }
         }
+
         enemyAnimation.SetTrigger("attack");
     }
 }

@@ -280,7 +280,7 @@ public class NewEnemyAI : MonoBehaviour
             Debug.Log(gameObject.name + " tấn công " + player.name + " gây " + attackDamage + " sát thương.");
 
 
-            player.GetComponent<PlayerHealth>().TakeDamage(attackDamage);
+            player.GetComponent<testPlayerHealth>().TakeDamage(attackDamage);
 
             nextAttackTime = Time.time + 1f / attackSpeed;
         }
