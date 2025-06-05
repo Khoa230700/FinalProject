@@ -24,12 +24,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2794851134456352335}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.002835231, y: -0.0167737, z: 0.0038935244, w: 0.99984777}
-  m_LocalPosition: {x: -0.197, y: 1.312, z: 0.331}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalRotation: {x: 0.10460498, y: -0.61238724, z: -0.74059767, w: -0.25603694}
+  m_LocalPosition: {x: 85.15699, y: 20.138525, z: 72.16588}
+  m_LocalScale: {x: 436.4412, y: 436.4412, z: 436.44122}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 7881061019437602800}
+  m_Father: {fileID: 7872443456676310956}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6937015245796298300
 GameObject:
@@ -850,7 +850,7 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:
-    - targetCorrespondingSourceObject: {fileID: 4422410900214070, guid: 6d647e891c47dff439f6cbe6aa8e2014, type: 3}
+    - targetCorrespondingSourceObject: {fileID: 4530572953758058, guid: 6d647e891c47dff439f6cbe6aa8e2014, type: 3}
       insertIndex: -1
       addedObject: {fileID: 7088050623866143815}
     m_AddedComponents:
@@ -867,6 +867,11 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 686851909392243525}
   m_SourcePrefab: {fileID: 100100000, guid: 6d647e891c47dff439f6cbe6aa8e2014, type: 3}
+--- !u!4 &7872443456676310956 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4530572953758058, guid: 6d647e891c47dff439f6cbe6aa8e2014, type: 3}
+  m_PrefabInstance: {fileID: 7876955267953559238}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &7878478308636993138 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1525377213014196, guid: 6d647e891c47dff439f6cbe6aa8e2014, type: 3}
@@ -959,6 +964,7 @@ MonoBehaviour:
   player: {fileID: 0}
   firePoint: {fileID: 7088050623866143815}
   bulletPrefab: {fileID: 4040807289565466490, guid: de2a25e019c35df4eb2123b292c812f6, type: 3}
+  bulletParticleSystem: {fileID: 0}
   followDistance: 3
   detectionRange: 15
   fireRate: 1
