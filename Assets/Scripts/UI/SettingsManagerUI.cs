@@ -18,6 +18,13 @@ public class SettingsManagerUI : MonoBehaviour
     private GameObject currentButton;
     private GameObject nextButton;
 
+    //* Animator
+    string panelIn = "In";
+    string panelOut = "Out";
+    string buttonIn = "Normal to Pressed";
+    string buttonOut = "Pressed to Dissolve";
+    string buttonNormal = "Pressed to Normal";
+
     public void OpenFirstPanel()
     {
         if (currentIndex != 0)
@@ -29,8 +36,8 @@ public class SettingsManagerUI : MonoBehaviour
             currentPanel = panels[currentIndex].panel;
             currentButton = panels[currentIndex].button;
 
-            currentPanel.GetComponent<Animator>().Play("In");
-            currentButton.GetComponent<Animator>().Play("In");
+            currentPanel.GetComponent<Animator>().Play(panelIn);
+            currentButton.GetComponent<Animator>().Play(buttonIn);
         }
     }
 
@@ -56,10 +63,10 @@ public class SettingsManagerUI : MonoBehaviour
             currentIndex = newIndex;
 
             //* Animator
-            currentPanel.GetComponent<Animator>().Play("Out");
-            currentButton.GetComponent<Animator>().Play("Out");
-            nextPanel.GetComponent<Animator>().Play("In");
-            nextButton.GetComponent<Animator>().Play("In");
+            currentPanel.GetComponent<Animator>().Play(panelOut);
+            currentButton.GetComponent<Animator>().Play(buttonOut);
+            nextPanel.GetComponent<Animator>().Play(panelIn);
+            nextButton.GetComponent<Animator>().Play(buttonIn);
         }
     }
 
@@ -75,13 +82,11 @@ public class SettingsManagerUI : MonoBehaviour
             nextPanel = panels[currentIndex].panel;
             nextButton = panels[currentIndex].button;
 
-            currentPanel.GetComponent<Animator>().Play("Out");
-            // currentButtonAnimator = currentButton.GetComponent<Animator>();
-            // currentButtonAnimator.Play(buttonFadeNormal);
+            currentPanel.GetComponent<Animator>().Play(panelOut);
+            currentButton.GetComponent<Animator>().Play(buttonOut);
 
-            nextPanel.GetComponent<Animator>().Play("In");
-            // nextButtonAnimator = nextButton.GetComponent<Animator>();
-            // nextButtonAnimator.Play(buttonFadeIn);
+            nextPanel.GetComponent<Animator>().Play(panelIn);
+            nextButton.GetComponent<Animator>().Play(buttonIn);
         }
     }
 
@@ -95,13 +100,11 @@ public class SettingsManagerUI : MonoBehaviour
             nextPanel = panels[currentIndex].panel;
             nextButton = panels[currentIndex].button;
 
-            currentPanel.GetComponent<Animator>().Play("Out");
-            // currentButtonAnimator = currentButton.GetComponent<Animator>();
-            // currentButtonAnimator.Play(buttonFadeNormal);
+            currentPanel.GetComponent<Animator>().Play(panelOut);
+            currentButton.GetComponent<Animator>().Play(buttonOut);
 
-            nextPanel.GetComponent<Animator>().Play("In");
-            // nextButtonAnimator = nextButton.GetComponent<Animator>();
-            // nextButtonAnimator.Play(buttonFadeIn);
+            nextPanel.GetComponent<Animator>().Play(panelIn);
+            nextButton.GetComponent<Animator>().Play(buttonIn);
         }
     }
 }
