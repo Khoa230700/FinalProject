@@ -19,7 +19,7 @@ public class HorizontalSelectorUI : MonoBehaviour
     [Header("Item")]
     [SerializeField] private List<ItemSelector> itemSelectors = new();
 
-    private int index = 0;
+    private int index = 0, previousIndex;
     private TextMeshProUGUI text, textHelper;
     private Animator animator;
     private GameObject onObj, offObj;
@@ -31,22 +31,17 @@ public class HorizontalSelectorUI : MonoBehaviour
         textHelper ??= transform.Find("Text Helper").GetComponent<TextMeshProUGUI>();
         animator ??= GetComponent<Animator>();
 
-        if (saveValue)
+        if (saveValue && PlayerPrefs.HasKey(selectorTag + stringPrefs))
         {
-            if (PlayerPrefs.HasKey(selectorTag + stringPrefs))
-            {
-                defaultIndex = PlayerPrefs.GetInt(selectorTag + stringPrefs);
-            }
-            else
-            {
-                PlayerPrefs.SetInt(selectorTag + stringPrefs, defaultIndex);
-            }
+            defaultIndex = PlayerPrefs.GetInt(selectorTag + stringPrefs);
+        }
+        else
+        {
+            PlayerPrefs.SetInt(selectorTag + stringPrefs, defaultIndex);
         }
 
-        text.text = itemSelectors[defaultIndex].title;
-        textHelper.text = text.text;
+        UpdateText();
         index = defaultIndex;
-
         CreateIndicatorUI();
     }
 
@@ -59,65 +54,77 @@ public class HorizontalSelectorUI : MonoBehaviour
 
         for (int i = 0; i < itemSelectors.Count; i++)
         {
-            GameObject go = Instantiate(indicatorPrefab, new Vector3(0, 0, 0), Quaternion.identity);
-            go.transform.SetParent(indicatorParent, false);
+            GameObject go = Instantiate(indicatorPrefab, indicatorParent);
             go.name = itemSelectors[i].title;
 
-            onObj = go.transform.Find("On").gameObject;
-            offObj = go.transform.Find("Off").gameObject;
+            onObj = go.transform.Find("On")?.gameObject;
+            offObj = go.transform.Find("Off")?.gameObject;
 
-            if (i == index)
+            if (onObj && offObj)
             {
-                onObj.SetActive(true);
-                offObj.SetActive(false);
-            }
-            else
-            {
-                onObj.SetActive(false);
-                offObj.SetActive(true);
+                onObj.SetActive(i == index);
+                offObj.SetActive(!(i == index));
             }
         }
     }
 
     public void BackClick()
     {
-        if (index != 0)
-        {
-            textHelper.text = text.text;
+        if (itemSelectors.Count == 0) return;
 
-            if (index == 0) index = itemSelectors.Count - 1;
-            else index--;
+        textHelper.text = text.text;
+        previousIndex = index;
 
-            text.text = itemSelectors[index].title;
-
-            itemSelectors[index].OnValueChange?.Invoke();
-
-            animator.Play(null);
-            animator.StopPlayback();
-            animator.Play("Next");
-
-            if (saveValue) PlayerPrefs.SetInt(selectorTag + stringPrefs, index);
-        }
+        if (index > 0) index--;
+        if (index != previousIndex) UpdateSelection("Back");
     }
 
     public void NextClick()
     {
-        if (index != itemSelectors.Count - 1)
+        if (itemSelectors.Count == 0) return;
+
+        textHelper.text = text.text;
+        previousIndex = index;
+
+        if (index < itemSelectors.Count - 1) index++;
+        if (index != previousIndex) UpdateSelection("Next");
+    }
+
+    private void UpdateSelection(string animationName)
+    {
+        UpdateText();
+        itemSelectors[index].OnValueChange?.Invoke();
+        UpdateIndicator();
+
+        animator.Play(null);
+        animator.StopPlayback();
+        animator.Play(animationName);
+
+        if (saveValue) PlayerPrefs.SetInt(selectorTag + stringPrefs, index);
+    }
+
+    private void UpdateText()
+    {
+        if (itemSelectors.Count > 0)
         {
-            textHelper.text = text.text;
-
-            if (index + 1 >= itemSelectors.Count) index = 0;
-            else index++;
-
             text.text = itemSelectors[index].title;
+            textHelper.text = text.text;
+        }
+    }
 
-            itemSelectors[index].OnValueChange?.Invoke();
+    public void UpdateIndicator()
+    {
+        for (int i = 0; i < itemSelectors.Count; i++)
+        {
+            Transform child = indicatorParent.GetChild(i);
+            onObj = child.Find("On")?.gameObject;
+            offObj = child.Find("Off")?.gameObject;
 
-            animator.Play(null);
-            animator.StopPlayback();
-            animator.Play("Next");
-
-            if (saveValue) PlayerPrefs.SetInt(selectorTag + stringPrefs, index);
+            if (onObj && offObj)
+            {
+                onObj.SetActive(i == index);
+                offObj.SetActive(!(i == index));
+            }
         }
     }
 }
