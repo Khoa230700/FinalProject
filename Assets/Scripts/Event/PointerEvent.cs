@@ -8,7 +8,7 @@ public class PointerEvent : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
 {
     [Header("Events")]
     [SerializeField] private UnityEvent enterEvent;
-    [SerializeField] private UnityEvent enteEvent;
+    [SerializeField] private UnityEvent exitEvent;
 
     public void OnPointerEnter(PointerEventData eventData)
     {
@@ -17,6 +17,6 @@ public class PointerEvent : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
 
     public void OnPointerExit(PointerEventData eventData)
     {
-        enteEvent?.Invoke();
+        exitEvent?.Invoke();
     }
 }
