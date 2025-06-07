@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SettingsManagerUI : MonoBehaviour
+public class SettingsUI : MonoBehaviour
 {
     [Header("Panel List")]
     [SerializeField] private List<PanelOfSettings> panels = new();
