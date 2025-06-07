@@ -151,9 +151,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9b3bb26fb7a23c441a57d699dce5b15c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  blurUIKey: 27
-  backgroundBlurUI: {fileID: 0}
-  pauseAnimator: {fileID: 6047162523273379218}
+  hotkey: 0
+  pressEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &4473285593781966297
 GameObject:
   m_ObjectHideFlags: 0
