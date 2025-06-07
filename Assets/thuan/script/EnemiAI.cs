@@ -58,6 +58,7 @@ public class EnemiAI : MonoBehaviour
         {
             lastAttackTime = Time.time;
             // damage player()
+            //player.GetComponent<HealthBase>().TakeDamage(10);
             Debug.Log("Enemy attacks the player!");
         }
         enemyAnimation.SetTrigger("attack");
