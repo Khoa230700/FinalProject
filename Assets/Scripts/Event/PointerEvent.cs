@@ -6,17 +6,17 @@ using UnityEngine.EventSystems;
 
 public class PointerEvent : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
-    [Header("Action")]
-    [SerializeField] private UnityEvent enterAction;
-    [SerializeField] private UnityEvent exitAction;
+    [Header("Events")]
+    [SerializeField] private UnityEvent enterEvent;
+    [SerializeField] private UnityEvent enteEvent;
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        enterAction?.Invoke();
+        enterEvent?.Invoke();
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
-        exitAction?.Invoke();
+        enteEvent?.Invoke();
     }
 }
