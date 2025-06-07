@@ -18,8 +18,15 @@ public class PressKeyEvent : MonoBehaviour
     {
         if (Input.GetKeyDown(hotkey))
         {
-            (isPressed ? pressActionOff : pressActionOn)?.Invoke();
-            isPressed = !isPressed;
+            if (pressActionOn.GetPersistentEventCount() > 0 && pressActionOff.GetPersistentEventCount() > 0)
+            {
+                (isPressed ? pressActionOff : pressActionOn)?.Invoke();
+                isPressed = !isPressed;
+            }
+            else
+            {
+                pressActionOn?.Invoke();
+            }
         }
     }
 
