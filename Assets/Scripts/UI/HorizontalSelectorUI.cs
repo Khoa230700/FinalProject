@@ -78,6 +78,48 @@ public class HorizontalSelectorUI : MonoBehaviour
             }
         }
     }
+
+    public void BackClick()
+    {
+        if (index != 0)
+        {
+            textHelper.text = text.text;
+
+            if (index == 0) index = itemSelectors.Count - 1;
+            else index--;
+
+            text.text = itemSelectors[index].title;
+
+            itemSelectors[index].OnValueChange?.Invoke();
+
+            animator.Play(null);
+            animator.StopPlayback();
+            animator.Play("Next");
+
+            if (saveValue) PlayerPrefs.SetInt(selectorTag + stringPrefs, index);
+        }
+    }
+
+    public void NextClick()
+    {
+        if (index != itemSelectors.Count - 1)
+        {
+            textHelper.text = text.text;
+
+            if (index + 1 >= itemSelectors.Count) index = 0;
+            else index++;
+
+            text.text = itemSelectors[index].title;
+
+            itemSelectors[index].OnValueChange?.Invoke();
+
+            animator.Play(null);
+            animator.StopPlayback();
+            animator.Play("Next");
+
+            if (saveValue) PlayerPrefs.SetInt(selectorTag + stringPrefs, index);
+        }
+    }
 }
 
 [Serializable]
