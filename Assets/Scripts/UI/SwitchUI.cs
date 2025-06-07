@@ -8,7 +8,7 @@ using UnityEngine.UI;
 public class SwitchUI : MonoBehaviour
 {
     [Header("Settings")]
-    public string switchTag = "Switch";
+    public string switchTag = "Tag";
     [SerializeField] private bool isOn;
     [SerializeField] private bool saveValue;
 
@@ -18,6 +18,7 @@ public class SwitchUI : MonoBehaviour
 
     private Animator animator;
     private Button button;
+    private string stringPrefs = "Switch";
 
     private void Start()
     {
@@ -28,27 +29,27 @@ public class SwitchUI : MonoBehaviour
 
         if (saveValue)
         {
-            if (PlayerPrefs.GetString(switchTag + "Switch") == "")
+            if (PlayerPrefs.GetString(switchTag + stringPrefs) == "")
             {
                 if (isOn)
                 {
                     animator.Play("On");
                     isOn = true;
-                    PlayerPrefs.SetString(switchTag + "Switch", "true");
+                    PlayerPrefs.SetString(switchTag + stringPrefs, "true");
                 }
                 else
                 {
                     animator.Play("Off");
                     isOn = false;
-                    PlayerPrefs.SetString(switchTag + "Switch", "false");
+                    PlayerPrefs.SetString(switchTag + stringPrefs, "false");
                 }
             }
-            else if (PlayerPrefs.GetString(switchTag + "Switch") == "true")
+            else if (PlayerPrefs.GetString(switchTag + stringPrefs) == "true")
             {
                 animator.Play("On");
                 isOn = true;
             }
-            else if (PlayerPrefs.GetString(switchTag + "Switch") == "false")
+            else if (PlayerPrefs.GetString(switchTag + stringPrefs) == "false")
             {
                 animator.Play("Off");
                 isOn = false;
@@ -76,14 +77,14 @@ public class SwitchUI : MonoBehaviour
             animator.Play("Off");
             isOn = false;
             OffEvents?.Invoke();
-            if (saveValue) PlayerPrefs.SetString(switchTag + "Switch", "false");
+            if (saveValue) PlayerPrefs.SetString(switchTag + stringPrefs, "false");
         }
         else
         {
             animator.Play("On");
             isOn = true;
             OnEvents?.Invoke();
-            if (saveValue) PlayerPrefs.SetString(switchTag + "Switch", "true");
+            if (saveValue) PlayerPrefs.SetString(switchTag + stringPrefs, "true");
         }
     }
 }
