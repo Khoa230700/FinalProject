@@ -13,14 +13,14 @@ public class PlayerHealth : HealthBase
 
     [Header("References")]
     [SerializeField] private BarUI barUI;
-    [SerializeField] private Shield shield;
+    [SerializeField] private PlayerShield shield;
 
     private Coroutine regenRoutine;
 
     protected override void Start()
     {
         base.Start();
-        shield ??= GetComponent<Shield>();
+        shield ??= GetComponent<PlayerShield>();
     }
 
     //* Nhận sát thương qua lá chắn và tính toán sát thương còn lại, thêm khả năng xuyên lá chắn , thêm vào điểm va chạm
