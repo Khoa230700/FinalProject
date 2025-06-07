@@ -30,10 +30,11 @@ public class L4DBotController : MonoBehaviour
         fireCooldown -= Time.deltaTime;
         GameObject target = FindNearestVisibleZombie();
 
-        if (target != null)
+        if (target != null && Vector3.Distance(transform.position, target.transform.position) <= detectionRange)
         {
             Debug.Log(target.name + " is in range");
             agent.SetDestination(transform.position);
+            
             transform.LookAt(target.transform);
 
            
@@ -43,7 +44,7 @@ public class L4DBotController : MonoBehaviour
 
             if (fireCooldown <= 0f)
             {
-                bulletParticleSystem.Play();
+                
                 animator.SetTrigger("shoot");
                 Shoot(target.transform);
                 fireCooldown = fireRate;
@@ -55,8 +56,6 @@ public class L4DBotController : MonoBehaviour
             if (dist > followDistance)
             {
                 agent.SetDestination(player.position);
-
-                
                 Vector3 velocity = agent.velocity;
                 Vector3 localVelocity = transform.InverseTransformDirection(velocity);
                 float inputX = localVelocity.x;
@@ -69,7 +68,6 @@ public class L4DBotController : MonoBehaviour
             else
             {
                 agent.SetDestination(transform.position);
-
                 animator.SetFloat("Horizontal", 0f);
                 animator.SetFloat("Vertical", 0f);
                 animator.SetBool("isMoving", false);
@@ -115,10 +113,12 @@ public class L4DBotController : MonoBehaviour
 
         void Shoot(Transform target)
         {
-            if (bulletPrefab && firePoint)
+            if (bulletPrefab && firePoint )
             {
                 Vector3 dir = (target.position - firePoint.position).normalized;
                 GameObject bullet = Instantiate(bulletPrefab, firePoint.position, Quaternion.LookRotation(dir));
+                bulletParticleSystem.Play();
+                agent.isStopped = false;
                 Rigidbody rb = bullet.GetComponent<Rigidbody>();
                 rb.linearVelocity = dir * bulletSpeed;
             }
