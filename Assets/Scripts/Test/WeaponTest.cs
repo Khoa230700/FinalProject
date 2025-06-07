@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public enum FireMode
 {
@@ -25,9 +26,10 @@ public class WeaponTest : MonoBehaviour
     [Header("References")]
     public WeaponUI weaponUI;
     public Sprite weaponSprite;
-    
+
     private float nextFireTime = 0f;
     private bool isReloading = false;
+    public bool isShooting = false;
 
     private void Start()
     {
@@ -58,15 +60,21 @@ public class WeaponTest : MonoBehaviour
 
     private void HandleShootingInput()
     {
-        if (currentAmmo <= 0 || totalAmmo <= 0 || currentFireMode == FireMode.Safety)
+        if (isReloading) return;
+
+        if ((currentAmmo <= 0 && totalAmmo <= 0) || currentFireMode == FireMode.Safety)
             return;
 
         if (Input.GetMouseButtonDown(0))
         {
             if (currentFireMode == FireMode.SemiAuto)
+            {
                 FireOnce();
+            }
             else if (currentFireMode == FireMode.Burst)
+            {
                 StartCoroutine(BurstFire(3, 0.1f));
+            }
         }
 
         if (currentFireMode == FireMode.FullAuto && Input.GetMouseButton(0) && Time.time >= nextFireTime)
@@ -76,19 +84,27 @@ public class WeaponTest : MonoBehaviour
         }
     }
 
+    private IEnumerator SetShootingState(float duration)
+    {
+        isShooting = true;
+        yield return new WaitForSeconds(duration);
+        isShooting = false;
+    }
+
     private void FireOnce()
     {
         if (currentAmmo <= 0 || totalAmmo <= 0) return;
 
         currentAmmo--;
         weaponUI.UpdateAmmoUI(currentAmmo, totalAmmo);
+        StartCoroutine(SetShootingState(0.1f));
     }
 
     private IEnumerator BurstFire(int shots, float interval)
     {
         for (int i = 0; i < shots; i++)
         {
-            if (currentAmmo <= 0) yield break;
+            if (currentAmmo <= 0) break;
             FireOnce();
             yield return new WaitForSeconds(interval);
         }
@@ -100,7 +116,6 @@ public class WeaponTest : MonoBehaviour
             yield break;
 
         isReloading = true;
-        Debug.Log("Reloading");
         yield return new WaitForSeconds(reloadTime);
 
         int neededAmmo = maxMagSize - currentAmmo;
@@ -110,7 +125,6 @@ public class WeaponTest : MonoBehaviour
         totalAmmo -= ammoToLoad;
 
         weaponUI.UpdateAmmoUI(currentAmmo, totalAmmo);
-        Debug.Log("Reloaded");
         isReloading = false;
     }
 }
