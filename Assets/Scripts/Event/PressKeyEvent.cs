@@ -8,27 +8,14 @@ public class PressKeyEvent : MonoBehaviour
     [Header("Key")]
     [SerializeField] private KeyCode hotkey;
 
-    [Header("Action")]
-    [SerializeField] private UnityEvent pressActionOn;
-    [SerializeField] private UnityEvent pressActionOff;
-
-    private bool isPressed = false;
+    [Header("Events")]
+    [SerializeField] private UnityEvent pressEvent;
 
     void Update()
     {
         if (Input.GetKeyDown(hotkey))
         {
-            if (pressActionOn.GetPersistentEventCount() > 0 && pressActionOff.GetPersistentEventCount() > 0)
-            {
-                (isPressed ? pressActionOff : pressActionOn)?.Invoke();
-                isPressed = !isPressed;
-            }
-            else
-            {
-                pressActionOn?.Invoke();
-            }
+            pressEvent?.Invoke();
         }
     }
-
-    public void SetIsPressed(bool value) => isPressed = value;
 }
