@@ -18,10 +18,4 @@ public class CanvasManager : MonoBehaviour
     {
         canvasScaler.referenceResolution = new Vector2(canvasScaler.referenceResolution.x, scale);
     }
-
-
-    public void EnableHUD(bool enable)
-    {
-        gameObject.SetActive(enable);
-    }
 }
