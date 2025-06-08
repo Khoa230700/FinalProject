@@ -22,15 +22,17 @@ public class HorizontalSelectorUI : MonoBehaviour
     private TextMeshProUGUI text, textHelper;
     private Animator animator;
     private GameObject onObj, offObj;
-    private string stringPrefs = "HSelector";
+    private string prefsKey;
 
     private void Start()
     {
         text ??= transform.Find("Text").GetComponent<TextMeshProUGUI>();
         textHelper ??= transform.Find("Text Helper").GetComponent<TextMeshProUGUI>();
         animator ??= GetComponent<Animator>();
+        
+        prefsKey = selectorTag + "HSelector";
 
-        index = PlayerPrefs.GetInt(selectorTag + stringPrefs, 0);
+        index = PlayerPrefs.GetInt(prefsKey, 0);
 
         UpdateText();
         CreateIndicatorUI();
@@ -94,7 +96,7 @@ public class HorizontalSelectorUI : MonoBehaviour
         animator.StopPlayback();
         animator.Play(animationName);
 
-        if (saveValue) PlayerPrefs.SetInt(selectorTag + stringPrefs, index);
+        if (saveValue) PlayerPrefs.SetInt(prefsKey, index);
     }
 
     private void UpdateText()
