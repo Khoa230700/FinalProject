@@ -2566,6 +2566,7 @@ GameObject:
   - component: {fileID: 8226704803193698455}
   - component: {fileID: 4546210462559287045}
   - component: {fileID: 288734895742833228}
+  - component: {fileID: 6335866805130626615}
   m_Layer: 5
   m_Name: Canvas - HUD
   m_TagString: Untagged
@@ -2658,6 +2659,19 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
+--- !u!114 &6335866805130626615
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6834629383625490901}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e78c7ecf320b0cd4086a060d6f86248b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  canvasScaler: {fileID: 4546210462559287045}
 --- !u!1 &7185342253985103058
 GameObject:
   m_ObjectHideFlags: 0
