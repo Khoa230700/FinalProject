@@ -8,7 +8,6 @@ using UnityEngine.Events;
 public class HorizontalSelectorUI : MonoBehaviour
 {
     [Header("Settings")]
-    [SerializeField] private int defaultIndex = 0;
     [SerializeField] private string selectorTag = "Tag";
     [SerializeField] private bool saveValue;
 
@@ -31,18 +30,13 @@ public class HorizontalSelectorUI : MonoBehaviour
         textHelper ??= transform.Find("Text Helper").GetComponent<TextMeshProUGUI>();
         animator ??= GetComponent<Animator>();
 
-        if (saveValue && PlayerPrefs.HasKey(selectorTag + stringPrefs))
-        {
-            defaultIndex = PlayerPrefs.GetInt(selectorTag + stringPrefs);
-        }
-        else
-        {
-            PlayerPrefs.SetInt(selectorTag + stringPrefs, defaultIndex);
-        }
+        index = PlayerPrefs.GetInt(selectorTag + stringPrefs, 0);
 
         UpdateText();
-        index = defaultIndex;
         CreateIndicatorUI();
+        
+        if (itemSelectors.Count > 0)
+            itemSelectors[index].OnValueChange?.Invoke();
     }
 
     private void CreateIndicatorUI()
