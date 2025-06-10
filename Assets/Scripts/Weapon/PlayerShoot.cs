@@ -84,10 +84,12 @@ public class PlayerShoot : MonoBehaviour
         armsAnimator.SetTrigger("Shot");
         isShooting = true;
 
-        // Bắn đạn
         GameObject bullet = Instantiate(gunData.bulletPrefab, shootPoint.position, shootPoint.rotation);
-        Rigidbody rb = bullet.GetComponent<Rigidbody>();
-        rb.linearVelocity = shootPoint.forward * gunData.bulletSpeed;
+        BulletRaycast bulletScript = bullet.GetComponent<BulletRaycast>();
+        if (bulletScript != null)
+        {
+            bulletScript.InitFromGunData(gunData, shootPoint);
+        }
 
         // Muzzle Flash
         if (muzzleFlashParticle != null)

@@ -3,10 +3,11 @@ using UnityStandardAssets.Characters.FirstPerson;
 
 public class PlayerLookController : MonoBehaviour
 {
-    public Transform playerBody;         // FPS Player Shooter (CharacterController)
-    public Transform cameraTransform;    // Camera (Camera001)
+    public Transform playerBody;
+    public Transform cameraTransform;
+    public Transform meshTransform;
 
-    private MouseLook mouseLook = new MouseLook();  // Instantiate MouseLook
+    private MouseLook mouseLook = new MouseLook();
 
     void Start()
     {
@@ -15,6 +16,6 @@ public class PlayerLookController : MonoBehaviour
 
     void Update()
     {
-        mouseLook.LookRotation(playerBody, cameraTransform);
+        mouseLook.LookRotation(playerBody, cameraTransform, meshTransform);
     }
 }

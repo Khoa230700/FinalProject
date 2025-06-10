@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 257e4ea5da4d2fe4980a186a43d1210d, type: 3}
+  m_Name: HandGun
+  m_EditorClassIdentifier: 
+  gunName: HandGun
+  gunType: 0
+  damage: 1
+  range: 1
+  fireRate: 1
+  accuracy: 1
+  magazineSize: 7
+  reserveAmmo: 30
+  reloadTime: 1
+  fireMode: 0
+  recoil: 5
+  bulletSpeed: 4
+  penetrationPower: 4
+  weight: 4
+  bulletPrefab: {fileID: 6749693277989217856, guid: dfcafcdd61ac0e447b7e869afc9b8d0c, type: 3}
+  shootSound: {fileID: 0}
+  hasScope: 0
+  scopeZoom: 0
