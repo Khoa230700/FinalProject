@@ -9,6 +9,7 @@ public class KeyBindingUI : MonoBehaviour
 {
     [Header("Settings")]
     [SerializeField] private string actionName;
+    [SerializeField] private bool useNameParent = true;
     [SerializeField] private bool isPrimary;
 
     [Header("Resource")]
@@ -16,10 +17,16 @@ public class KeyBindingUI : MonoBehaviour
     [SerializeField] private KeyBindingPopup popup;
 
     private Button button;
+    private RectTransform parent;
 
     private void Start()
     {
         button = GetComponent<Button>();
+        text = GetComponentInChildren<TextMeshProUGUI>();
+        popup = FindFirstObjectByType<KeyBindingPopup>();
+        parent = transform.parent.GetComponentInParent<RectTransform>();
+
+        if (parent && useNameParent) actionName = parent.name;
 
         UpdateText();
 
@@ -40,7 +47,7 @@ public class KeyBindingUI : MonoBehaviour
     public void UpdateText()
     {
         var binding = KeyBindingManager.Instance.GetKeyBinding(actionName);
-        text.text = FormatKeyCode(isPrimary ? binding.primary : binding.secondary);
+        text.text = binding != null ? FormatKeyCode(isPrimary ? binding.primary : binding.secondary) : "-";
     }
 
     private string FormatKeyCode(KeyCode keyCode)
