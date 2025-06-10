@@ -17,12 +17,29 @@ public class KeyBindingUI : MonoBehaviour
     [SerializeField] private KeyBindingPopup popup;
 
     private string prefsKey = "KeyBinding";
+    private Button button;
 
     private void Start()
     {
+        button = GetComponent<Button>();
+
         LoadKey();
         UpdateText();
 
+        button.onClick.AddListener(OnClick);
+    }
+
+    private void OnClick()
+    {
+        popup?.Show(OnComplete);
+    }
+
+    private void OnComplete(KeyCode keyCode)
+    {
+        SetKey(keyCode);
+        UpdateText();
+
+        if (saveValue) SaveKey(keyCode);
     }
 
     private void SaveKey(KeyCode keyCode)
