@@ -193,7 +193,7 @@ MonoBehaviour:
   m_ScrollSensitivity: 25
   m_Viewport: {fileID: 0}
   m_HorizontalScrollbar: {fileID: 0}
-  m_VerticalScrollbar: {fileID: 0}
+  m_VerticalScrollbar: {fileID: 2796095371673925160}
   m_HorizontalScrollbarVisibility: 0
   m_VerticalScrollbarVisibility: 1
   m_HorizontalScrollbarSpacing: 0
@@ -421,6 +421,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 29487de36efb1284fb077fa249af647f, type: 3}
+--- !u!114 &2796095371673925160 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7094120379339023627, guid: 29487de36efb1284fb077fa249af647f, type: 3}
+  m_PrefabInstance: {fileID: 4953635281671574307}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2a4db7a114972834c8e4117be1d82ba3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!224 &6006466043338767231 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 1721949566800455772, guid: 29487de36efb1284fb077fa249af647f, type: 3}
