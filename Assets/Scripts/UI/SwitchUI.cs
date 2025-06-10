@@ -45,7 +45,7 @@ public class SwitchUI : MonoBehaviour
 
     private void SetState(bool state)
     {
-        isOn = state;Debug.Log("Switch State: " + isOn); // 👈
+        isOn = state;
 
         if (isOn)
         {
