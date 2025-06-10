@@ -31,6 +31,7 @@ public class KeyBindingUI : MonoBehaviour
         UpdateText();
 
         button.onClick.AddListener(OnClick);
+        KeyBindingManager.Instance.OnValueChange += UpdateText;
     }
 
     private void OnClick()
@@ -41,7 +42,6 @@ public class KeyBindingUI : MonoBehaviour
     public void SetKey(KeyCode keyCode)
     {
         KeyBindingManager.Instance.SetKey(actionName, keyCode, isPrimary);
-        UpdateText();
     }
 
     public void UpdateText()

@@ -6,53 +6,67 @@ using UnityEngine.Events;
 
 public class KeyBindingManager : MonoBehaviour
 {
-    #region Singleton
     public static KeyBindingManager Instance;
-    private void Awake()
-    {
-        Instance = this;
-    }
-    #endregion
+
 
     [Header("Settings")]
     [SerializeField] private bool saveValue;
 
     public List<KeyBinding> bindings = new();
+    public event  Action OnValueChange;
 
     private string prefsKey = "KeyBinding";
 
-    private void Start()
+    private void Awake()
     {
+        Instance = this;
         LoadKey();
     }
 
     public void SetKey(string actionName, KeyCode keyCode, bool isPrimary)
     {
-        var binding = bindings.Find(a => a.actionName == actionName);
-        if (binding != null)
+        foreach (var binding in bindings)
         {
-            if (isPrimary) binding.primary = keyCode;
-            else binding.secondary = keyCode;
+            if (binding.primary == keyCode)
+                binding.primary = KeyCode.None;
+
+            if (binding.secondary == keyCode)
+                binding.secondary = KeyCode.None;
+        }
+
+        var currentBinding = bindings.Find(a => a.actionName == actionName);
+        if (currentBinding != null)
+        {
+            if (isPrimary) currentBinding.primary = keyCode;
+            else currentBinding.secondary = keyCode;
         }
         else
         {
-            if (isPrimary) bindings.Add(new KeyBinding(actionName, keyCode, KeyCode.None));
-            else bindings.Add(new KeyBinding(actionName, KeyCode.None, keyCode));
+            if (isPrimary)
+                bindings.Add(new KeyBinding(actionName, keyCode, KeyCode.None));
+            else
+                bindings.Add(new KeyBinding(actionName, KeyCode.None, keyCode));
         }
 
         if (saveValue) SaveKey();
-    }
+
+        OnValueChange?.Invoke();
+}
 
     public void SaveKey()
     {
+        PlayerPrefs.SetInt("Count" + prefsKey, bindings.Count);
+
         for (int i = 0; i < bindings.Count; i++)
         {
             var binding = bindings[i];
-            PlayerPrefs.SetInt(binding.actionName + "Primary" + prefsKey, (int)binding.primary);
-            PlayerPrefs.SetInt(binding.actionName + "Secondary" + prefsKey, (int)binding.secondary);
+
+            PlayerPrefs.SetString($"Binding{i}_Name" + prefsKey, binding.actionName);
+            PlayerPrefs.SetInt($"Binding{i}_Primary" + prefsKey, (int)binding.primary);
+            PlayerPrefs.SetInt($"Binding{i}_Secondary" + prefsKey, (int)binding.secondary);
         }
 
-        PlayerPrefs.SetInt("Count" + prefsKey, bindings.Count);
+        PlayerPrefs.Save();
     }
 
     public void LoadKey()
@@ -60,15 +74,22 @@ public class KeyBindingManager : MonoBehaviour
         bindings.Clear();
 
         int count = PlayerPrefs.GetInt("Count" + prefsKey, 0);
-        
+
         for (int i = 0; i < count; i++)
         {
-            var binding = bindings[i];
-            KeyCode primary = (KeyCode)PlayerPrefs.GetInt(binding.actionName + "Primary" + prefsKey, (int)binding.primary);
-            KeyCode secondary = (KeyCode)PlayerPrefs.GetInt(binding.actionName + "Secondary" + prefsKey, (int)binding.secondary);
-            
-            bindings.Add(new KeyBinding(binding.actionName, primary, secondary));
+            string actionName = PlayerPrefs.GetString($"Binding{i}_Name" + prefsKey, $"Action{i}");
+
+            KeyCode primary = (KeyCode)PlayerPrefs.GetInt($"Binding{i}_Primary" + prefsKey, (int)KeyCode.None);
+            KeyCode secondary = (KeyCode)PlayerPrefs.GetInt($"Binding{i}_Secondary" + prefsKey, (int)KeyCode.None);
+
+            bindings.Add(new KeyBinding(actionName, primary, secondary));
         }
+    }
+
+    public bool GetKeyUp(string actionName)
+    {
+        var binding = bindings.Find(a => a.actionName == actionName);
+        return Input.GetKeyUp(binding.primary) || Input.GetKeyUp(binding.secondary);
     }
 
     public bool GetKeyDown(string actionName)
@@ -83,13 +104,18 @@ public class KeyBindingManager : MonoBehaviour
         return Input.GetKey(binding.primary) || Input.GetKey(binding.secondary);
     }
 
-    public bool GetKeyUp(string actionName)
+    public float GetAxis(string axisName)
     {
-        var binding = bindings.Find(a => a.actionName == actionName);
-        return Input.GetKeyUp(binding.primary) || Input.GetKeyUp(binding.secondary);
+        return 0;
     }
 
     public KeyBinding GetKeyBinding(string actionName) => bindings.Find(a => a.actionName == actionName);
+
+    public void DeleteKey()
+    {
+        PlayerPrefs.DeleteAll();
+        PlayerPrefs.Save();
+    }
 }
 
 [Serializable]
