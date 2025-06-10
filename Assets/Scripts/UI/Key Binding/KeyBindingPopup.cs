@@ -28,7 +28,7 @@ public class KeyBindingPopup : MonoBehaviour
                         return;
                     }
 
-                    CompleteListen(keyCode);
+                    Complete(keyCode);
                     return;
                 }
             }
@@ -49,7 +49,7 @@ public class KeyBindingPopup : MonoBehaviour
         animator.Play("Out");
     }
 
-    private void CompleteListen(KeyCode keyCode)
+    private void Complete(KeyCode keyCode)
     {
         Hide();
         OnComplete?.Invoke(keyCode);
