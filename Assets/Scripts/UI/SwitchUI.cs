@@ -1,6 +1,4 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -8,7 +6,7 @@ using UnityEngine.UI;
 public class SwitchUI : MonoBehaviour
 {
     [Header("Settings")]
-    public string switchTag = "Switch";
+    public string switchTag = "Tag";
     [SerializeField] private bool isOn;
     [SerializeField] private bool saveValue;
 
@@ -18,72 +16,48 @@ public class SwitchUI : MonoBehaviour
 
     private Animator animator;
     private Button button;
+    private string prefsKey;
 
     private void Start()
     {
-        animator ??= GetComponent<Animator>();
-        button ??= GetComponent<Button>();
-
+        animator = GetComponent<Animator>();
+        button = GetComponent<Button>();
         button.onClick.AddListener(AnimateSwitch);
+
+        prefsKey = switchTag + "Switch";
 
         if (saveValue)
         {
-            if (PlayerPrefs.GetString(switchTag + "Switch") == "")
-            {
-                if (isOn)
-                {
-                    animator.Play("On");
-                    isOn = true;
-                    PlayerPrefs.SetString(switchTag + "Switch", "true");
-                }
-                else
-                {
-                    animator.Play("Off");
-                    isOn = false;
-                    PlayerPrefs.SetString(switchTag + "Switch", "false");
-                }
-            }
-            else if (PlayerPrefs.GetString(switchTag + "Switch") == "true")
-            {
-                animator.Play("On");
-                isOn = true;
-            }
-            else if (PlayerPrefs.GetString(switchTag + "Switch") == "false")
-            {
-                animator.Play("Off");
-                isOn = false;
-            }
+            string savedValue = PlayerPrefs.GetString(prefsKey, isOn ? "true" : "false");
+            bool savedState = savedValue == "true";
+            SetState(savedState);
         }
         else
         {
-            if (isOn)
-            {
-                animator.Play("On");
-                isOn = true;
-            }
-            else
-            {
-                animator.Play("Off");
-                isOn = false;
-            }
+            SetState(isOn);
         }
     }
 
     public void AnimateSwitch()
     {
+        SetState(!isOn);
+    }
+
+    private void SetState(bool state)
+    {
+        isOn = state;
+
         if (isOn)
         {
-            animator.Play("Off");
-            isOn = false;
-            OffEvents?.Invoke();
-            if (saveValue) PlayerPrefs.SetString(switchTag + "Switch", "false");
+            animator.Play("On");
+            OnEvents?.Invoke();
+            if (saveValue) PlayerPrefs.SetString(prefsKey, "true");
         }
         else
         {
-            animator.Play("On");
-            isOn = true;
-            OnEvents?.Invoke();
-            if (saveValue) PlayerPrefs.SetString(switchTag + "Switch", "true");
+            animator.Play("Off");
+            OffEvents?.Invoke();
+            if (saveValue) PlayerPrefs.SetString(prefsKey, "false");
         }
     }
 }
