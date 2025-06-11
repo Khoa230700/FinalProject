@@ -1,10 +1,12 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class KeyBindingPopup : MonoBehaviour
 {
+    [SerializeField] private TextMeshProUGUI descriptionText;
     private Animator animator;
     private bool isListen;
     private Action<KeyCode> OnComplete;
@@ -35,10 +37,10 @@ public class KeyBindingPopup : MonoBehaviour
         }
     }
 
-    public void Show(Action<KeyCode> callback)
+    public void Show(Action<KeyCode> callback, string keyName)
     {
         OnComplete = callback;
-
+        descriptionText.text = "Press a key for " + keyName.ToUpper();
         animator.Play("In");
         isListen = true;
     }

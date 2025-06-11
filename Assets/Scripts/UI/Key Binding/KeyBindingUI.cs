@@ -36,7 +36,7 @@ public class KeyBindingUI : MonoBehaviour
 
     private void OnClick()
     {
-        popup?.Show(SetKey);
+        popup?.Show(SetKey, actionName);
     }
 
     public void SetKey(KeyCode keyCode)

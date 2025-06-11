@@ -7,7 +7,7 @@ using UnityEngine.UI;
 public class SliderUI : MonoBehaviour
 {
     [Header("Settings")]
-    [SerializeField] private string sliderTag = "Tag";
+    public string sliderTag = "Tag";
     [SerializeField] private float defaultValue = 1;
     [SerializeField] private bool saveValue;
     [SerializeField] private bool showValue = true;
