@@ -4,11 +4,12 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 
-public class PointerEvent : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+public class PointerEvent : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
 {
     [Header("Events")]
     [SerializeField] private UnityEvent enterEvent;
     [SerializeField] private UnityEvent exitEvent;
+    [SerializeField] private UnityEvent clickEvent;
 
     public void OnPointerEnter(PointerEventData eventData)
     {
@@ -18,5 +19,10 @@ public class PointerEvent : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
     public void OnPointerExit(PointerEventData eventData)
     {
         exitEvent?.Invoke();
+    }
+
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        clickEvent?.Invoke();
     }
 }

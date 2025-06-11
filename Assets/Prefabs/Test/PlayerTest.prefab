@@ -11,6 +11,8 @@ GameObject:
   - component: {fileID: 3860438605545948238}
   - component: {fileID: 4470788797049568400}
   - component: {fileID: 7787291619498121856}
+  - component: {fileID: 1818085409914981347}
+  - component: {fileID: 248706730070282823}
   m_Layer: 0
   m_Name: PlayerTest
   m_TagString: Player
@@ -64,12 +66,46 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHealth: 100
+  OnTakeDamage:
+    m_PersistentCalls:
+      m_Calls: []
   useRegen: 1
   regenRate: 5
   regenDelay: 3
   secPerRegen: 1
   barUI: {fileID: 0}
   shield: {fileID: 4470788797049568400}
-  OnTakeDamage:
-    m_PersistentCalls:
-      m_Calls: []
+--- !u!114 &1818085409914981347
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8170647305585213030}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 57f2bca1324f681439bc2c1407aa01f4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isMoving: 0
+--- !u!114 &248706730070282823
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8170647305585213030}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb7cda532186dfb4097ebcfe46384cf3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  currentAmmo: 0
+  maxMagSize: 30
+  totalAmmo: 90
+  fireRate: 0.2
+  reloadTime: 0
+  currentFireMode: 1
+  weaponUI: {fileID: 0}
+  weaponSprite: {fileID: 21300000, guid: 14b09dcf4e435da4e93a85177165b8e6, type: 3}
+  isShooting: 0

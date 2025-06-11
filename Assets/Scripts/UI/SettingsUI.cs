@@ -23,7 +23,6 @@ public class SettingsUI : MonoBehaviour
     string panelOut = "Out";
     string buttonIn = "Normal to Pressed";
     string buttonOut = "Pressed to Dissolve";
-    string buttonNormal = "Pressed to Normal";
 
     public void OpenFirstPanel()
     {
