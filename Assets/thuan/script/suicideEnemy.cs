@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -69,5 +70,11 @@ public class suicideEnemy : MonoBehaviour
         }
 
         enemyAnimation.SetTrigger("attack");
+        StartCoroutine(DestroyAfterDelay());
+    }
+    IEnumerator DestroyAfterDelay()
+    {
+        yield return new WaitForSeconds(2);
+        Destroy(gameObject);
     }
 }
