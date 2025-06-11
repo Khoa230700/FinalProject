@@ -88,6 +88,7 @@ GameObject:
   - component: {fileID: 7061905906512606826}
   - component: {fileID: 3973414045644889834}
   - component: {fileID: 2676140981892234019}
+  - component: {fileID: 8965301555708741260}
   m_Layer: 5
   m_Name: Switch
   m_TagString: Untagged
@@ -205,6 +206,20 @@ MonoBehaviour:
   OffEvents:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &8965301555708741260
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 609876907942008405}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 73a8b4b198f015a4eb3c61fe72ae99a9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isSoundOnHover: 1
+  isSoundOnClick: 1
 --- !u!1 &2864827813884855248
 GameObject:
   m_ObjectHideFlags: 0

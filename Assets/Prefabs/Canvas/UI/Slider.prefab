@@ -508,6 +508,7 @@ GameObject:
   - component: {fileID: 8640331029555487561}
   - component: {fileID: 7855939901276163320}
   - component: {fileID: 847739345402218155}
+  - component: {fileID: 8066635595213997140}
   m_Layer: 5
   m_Name: Slider
   m_TagString: Untagged
@@ -536,7 +537,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
-  m_AnchoredPosition: {x: -1520, y: -460}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 350, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &8640331029555487561
@@ -629,6 +630,20 @@ MonoBehaviour:
   saveValue: 0
   showValue: 1
   valueText: {fileID: 8960824682737321911}
+--- !u!114 &8066635595213997140
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5187934858509015885}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 73a8b4b198f015a4eb3c61fe72ae99a9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isSoundOnHover: 1
+  isSoundOnClick: 1
 --- !u!1 &6289783010106101829
 GameObject:
   m_ObjectHideFlags: 0
