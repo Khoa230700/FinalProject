@@ -22,8 +22,8 @@ public class KeyBindingUI : MonoBehaviour
     private void Start()
     {
         button = GetComponent<Button>();
-        text = GetComponentInChildren<TextMeshProUGUI>();
-        popup = FindFirstObjectByType<KeyBindingPopup>();
+        text ??= GetComponentInChildren<TextMeshProUGUI>();
+        popup ??= FindFirstObjectByType<KeyBindingPopup>();
         parent = transform.parent.GetComponentInParent<RectTransform>();
 
         if (parent && useNameParent) actionName = parent.name;
