@@ -13,9 +13,10 @@ public class KeyBindingManager : MonoBehaviour
     [SerializeField] private bool saveValue;
 
     public List<KeyBinding> bindings = new();
-    public event  Action OnValueChange;
+    public event Action OnValueChange;
 
     private string prefsKey = "KeyBinding";
+    private int count;
 
     private void Awake()
     {
@@ -37,8 +38,10 @@ public class KeyBindingManager : MonoBehaviour
         var currentBinding = bindings.Find(a => a.actionName == actionName);
         if (currentBinding != null)
         {
-            if (isPrimary) currentBinding.primary = keyCode;
-            else currentBinding.secondary = keyCode;
+            if (isPrimary)
+                currentBinding.primary = keyCode;
+            else
+                currentBinding.secondary = keyCode;
         }
         else
         {
@@ -51,7 +54,7 @@ public class KeyBindingManager : MonoBehaviour
         if (saveValue) SaveKey();
 
         OnValueChange?.Invoke();
-}
+    }
 
     public void SaveKey()
     {
@@ -61,9 +64,9 @@ public class KeyBindingManager : MonoBehaviour
         {
             var binding = bindings[i];
 
-            PlayerPrefs.SetString($"Binding{i}_Name" + prefsKey, binding.actionName);
-            PlayerPrefs.SetInt($"Binding{i}_Primary" + prefsKey, (int)binding.primary);
-            PlayerPrefs.SetInt($"Binding{i}_Secondary" + prefsKey, (int)binding.secondary);
+            PlayerPrefs.SetString($"{i}_Action" + prefsKey, binding.actionName);
+            PlayerPrefs.SetInt($"{i}_Primary" + prefsKey, (int)binding.primary);
+            PlayerPrefs.SetInt($"{i}_Secondary" + prefsKey, (int)binding.secondary);
         }
 
         PlayerPrefs.Save();
@@ -73,14 +76,14 @@ public class KeyBindingManager : MonoBehaviour
     {
         bindings.Clear();
 
-        int count = PlayerPrefs.GetInt("Count" + prefsKey, 0);
+        count = PlayerPrefs.GetInt("Count" + prefsKey, 0);
 
         for (int i = 0; i < count; i++)
         {
-            string actionName = PlayerPrefs.GetString($"Binding{i}_Name" + prefsKey, $"Action{i}");
+            string actionName = PlayerPrefs.GetString($"{i}_Action" + prefsKey, $"Action{i}");
 
-            KeyCode primary = (KeyCode)PlayerPrefs.GetInt($"Binding{i}_Primary" + prefsKey, (int)KeyCode.None);
-            KeyCode secondary = (KeyCode)PlayerPrefs.GetInt($"Binding{i}_Secondary" + prefsKey, (int)KeyCode.None);
+            KeyCode primary = (KeyCode)PlayerPrefs.GetInt($"{i}_Primary" + prefsKey, (int)KeyCode.None);
+            KeyCode secondary = (KeyCode)PlayerPrefs.GetInt($"{i}_Secondary" + prefsKey, (int)KeyCode.None);
 
             bindings.Add(new KeyBinding(actionName, primary, secondary));
         }
@@ -106,16 +109,22 @@ public class KeyBindingManager : MonoBehaviour
 
     public float GetAxis(string axisName)
     {
-        return 0;
+        switch (axisName)
+        {
+            case "Horizontal":
+                if (GetKey("MoveLeft")) return -1f;
+                if (GetKey("MoveRight")) return 1f;
+                return 0f;
+            case "Vertical":
+                if (GetKey("MoveDown")) return -1f;
+                if (GetKey("MoveUp")) return 1f;
+                return 0f;
+            default:
+                return 0f;
+        }
     }
 
     public KeyBinding GetKeyBinding(string actionName) => bindings.Find(a => a.actionName == actionName);
-
-    public void DeleteKey()
-    {
-        PlayerPrefs.DeleteAll();
-        PlayerPrefs.Save();
-    }
 }
 
 [Serializable]
