@@ -5,6 +5,8 @@ public class PlayerShoot : MonoBehaviour
     public GunData gunData;
     public Transform shootPoint;
     public Animator armsAnimator;
+    public WeaponUI weaponUI;
+
 
     private int currentAmmo;
     private float nextTimeToFire = 0f;
@@ -22,6 +24,9 @@ public class PlayerShoot : MonoBehaviour
     void Start()
     {
         currentAmmo = gunData.magazineSize;
+        weaponUI.SetFireMode(gunData.fireMode);
+        weaponUI.SetWeaponSprite(gunData.gunSprite);
+        weaponUI.UpdateAmmoUI(currentAmmo, 100);
     }
 
     void Update()
@@ -118,6 +123,8 @@ public class PlayerShoot : MonoBehaviour
         {
             AudioSource.PlayClipAtPoint(gunData.shootSound, shootPoint.position);
         }
+
+        weaponUI.UpdateAmmoUI(currentAmmo, 100);
     }
 
 
@@ -126,5 +133,6 @@ public class PlayerShoot : MonoBehaviour
         armsAnimator.SetTrigger("Recharge");
         isRecharge = true;
         currentAmmo = gunData.magazineSize;
+        weaponUI.UpdateAmmoUI(currentAmmo, 100);
     }
 }
