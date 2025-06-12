@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -8,8 +9,7 @@ public class suicideEnemy : MonoBehaviour
     Animator enemyAnimation;
 
 
-    public float maxHealth = 100f;
-    public float currentHealth;
+    
     public int attackDamage = 15;
     public float attackSpeed = 1.5f;
     private float nextAttackTime = 0f;
@@ -69,5 +69,11 @@ public class suicideEnemy : MonoBehaviour
         }
 
         enemyAnimation.SetTrigger("attack");
+        StartCoroutine(DestroyAfterDelay());
+    }
+    IEnumerator DestroyAfterDelay()
+    {
+        yield return new WaitForSeconds(1);
+        Destroy(gameObject);
     }
 }
