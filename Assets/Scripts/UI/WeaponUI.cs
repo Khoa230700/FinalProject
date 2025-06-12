@@ -13,14 +13,14 @@ public struct FireModeSprite
     public Sprite FullAutoModeSprite;
     public Sprite BurstModeSprite;
 
-    public void SetFireModeSprite(FireMode mode)
+    public void SetFireModeSprite(GunFireMode mode)
     {
         FireModeImage.sprite = mode switch
         {
-            FireMode.Safety => SafetyModeSprite,
-            FireMode.SemiAuto => SemiAutoModeSprite,
-            FireMode.FullAuto => FullAutoModeSprite,
-            FireMode.Burst => BurstModeSprite,
+            GunFireMode.Safety => SafetyModeSprite,
+            GunFireMode.SemiAuto => SemiAutoModeSprite,
+            GunFireMode.FullAuto => FullAutoModeSprite,
+            GunFireMode.Burst => BurstModeSprite,
             _ => FireModeImage.sprite
         };
     }
@@ -42,13 +42,16 @@ public class WeaponUI : MonoBehaviour
     [SerializeField] private Image BulletImage;
     [SerializeField] private FireModeSprite fireMode;
     [SerializeField] private TextMeshProUGUI storageTxt;
-    [SerializeField] private WeaponTest weaponTest;
 
     private readonly List<Image> bulletImages = new();
+    private PlayerShoot playerShoot;
+    private GunData gunData;
 
     private void Start()
     {
-        weaponTest ??= FindFirstObjectByType<WeaponTest>();
+        playerShoot = GameObject.FindGameObjectWithTag("Player").GetComponentInChildren<PlayerShoot>();
+        gunData = playerShoot.gunData;
+
         CreateBulletUI();
     }
 
@@ -60,7 +63,7 @@ public class WeaponUI : MonoBehaviour
 
         bulletImages.Clear();
 
-        for (int i = 0; i < weaponTest.maxMagSize; i++)
+        for (int i = 0; i < gunData.magazineSize; i++)
         {
             var bullet = Instantiate(BulletImage, BulletsGroup.transform);
             bullet.color = NormalBulletColor;
@@ -71,10 +74,10 @@ public class WeaponUI : MonoBehaviour
     //* Cập nhật giao diện người dùng với số lượng đạn hiện tại và tổng số đạn
     public void UpdateAmmoUI(int currentAmmo, int totalAmmo)
     {
-        currentAmmo = Mathf.Clamp(currentAmmo, 0, weaponTest.maxMagSize);
+        currentAmmo = Mathf.Clamp(currentAmmo, 0, gunData.reserveAmmo);
         storageTxt.text = totalAmmo.ToString();
 
-        bool isLowAmmo = currentAmmo <= weaponTest.maxMagSize * (lowAmmoPercent / 100f);
+        bool isLowAmmo = currentAmmo <= gunData.magazineSize * (lowAmmoPercent / 100f);
 
         //* Cập nhật màu sắc của các hình ảnh viên đạn dựa trên số lượng đạn hiện tại
         for (int i = 0; i < bulletImages.Count; i++)
@@ -85,6 +88,6 @@ public class WeaponUI : MonoBehaviour
         }
     }
 
-    public void SetFireMode(FireMode mode) => fireMode.SetFireModeSprite(mode);
+    public void SetFireMode(GunFireMode mode) => fireMode.SetFireModeSprite(mode);
     public void SetWeaponSprite(Sprite weaponSprite) => weaponImage.sprite = weaponSprite;
 }
