@@ -16,36 +16,22 @@ public class EnemyM : MonoBehaviour
     public void TakeDamage(float amount)
     {
         currentHealth -= amount;
-        currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth); // Đảm bảo máu không âm hoặc vượt tối đa
+        currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth); 
         Debug.Log(gameObject.name + " nhận " + amount + " sát thương. Máu hiện tại: " + currentHealth);
-        // UpdateHealthBar();
+        
 
         if (currentHealth <= 0)
         {
-            animator.SetBool("isAlive",false);
+            //animator.SetBool("isAlive",false);
             StopAttack();
             StartCoroutine(Die());
         }
     }
 
-    //void Die()
-    //{
-    //    Debug.Log(gameObject.name + " đã chết!");
-
-    //    Destroy(gameObject);
-    //    // Tạm thời: gameObject.SetActive(false);
-    //}
-
-    // void UpdateHealthBar()
-    // {
-    //     if (healthBar != null)
-    //     {
-    //         healthBar.fillAmount = currentHealth / maxHealth;
-    //     }
-    // }
+    
     IEnumerator Die()
     {
-        
+        animator.SetBool("isAlive", false);
         yield return new WaitForSeconds(2);
         Destroy(gameObject);
     }

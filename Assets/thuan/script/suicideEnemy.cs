@@ -9,8 +9,7 @@ public class suicideEnemy : MonoBehaviour
     Animator enemyAnimation;
 
 
-    public float maxHealth = 100f;
-    public float currentHealth;
+    
     public int attackDamage = 15;
     public float attackSpeed = 1.5f;
     private float nextAttackTime = 0f;
