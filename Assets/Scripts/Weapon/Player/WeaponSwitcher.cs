@@ -1,8 +1,11 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System;
+using System.Collections;
 
 public class WeaponSwitcher : MonoBehaviour
 {
+    public WeaponUI weaponUI;
     [SerializeField] private List<GameObject> weaponList = new List<GameObject>();
 
     private int currentWeaponIndex = 0;
@@ -29,6 +32,7 @@ public class WeaponSwitcher : MonoBehaviour
         }
 
         currentWeaponIndex = index;
+        UpdateWeaponUI(index);
     }
 
     void ActivateWeapon(int index)
@@ -37,5 +41,33 @@ public class WeaponSwitcher : MonoBehaviour
         {
             weaponList[i].SetActive(i == index);
         }
+
+        UpdateWeaponUI(index);
+    }
+
+    public void UpdateWeaponUI(int index)
+    {
+        var activateWeapon = weaponList[index];
+        var playerShoot = activateWeapon.GetComponentInChildren<PlayerShoot>();
+
+        if (playerShoot != null)
+        {
+            playerShoot.weaponUI = weaponUI;
+            weaponUI.gunData = playerShoot.gunData;
+
+            weaponUI.SetFireMode(playerShoot.gunData.fireMode);
+            weaponUI.SetWeaponSprite(playerShoot.gunData.gunSprite);
+
+            weaponUI.CreateBulletUI();
+
+            StartCoroutine(DelayUpdateUI(playerShoot));
+        }
+    }
+
+    private IEnumerator DelayUpdateUI(PlayerShoot playerShoot)
+    {
+        yield return null;
+
+        weaponUI.UpdateAmmoUI(playerShoot.currentAmmo, playerShoot.gunData.reserveAmmo);
     }
 }

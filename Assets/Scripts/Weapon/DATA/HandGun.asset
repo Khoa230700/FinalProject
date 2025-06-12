@@ -26,6 +26,7 @@ MonoBehaviour:
   bulletSpeed: 4
   penetrationPower: 4
   weight: 4
+  gunSprite: {fileID: 21300000, guid: 91dea8ec0cf657d4e95f33dba2fb7e0a, type: 3}
   bulletPrefab: {fileID: 6749693277989217856, guid: dfcafcdd61ac0e447b7e869afc9b8d0c, type: 3}
   shootSound: {fileID: 0}
   tracerPrefab: {fileID: 6749693277989217856, guid: dfcafcdd61ac0e447b7e869afc9b8d0c, type: 3}

@@ -32,18 +32,18 @@ public class PlayerMovement : MonoBehaviour
         }
 
         // Input
-        float moveX = Input.GetAxis("Horizontal");
-        float moveZ = Input.GetAxis("Vertical");
+        float moveX = KeyBindingManager.Instance.GetAxis("Horizontal");
+        float moveZ = KeyBindingManager.Instance.GetAxis("Vertical");
 
         Vector3 move = transform.right * moveX + transform.forward * moveZ;
 
         // Check running
-        float currentSpeed = Input.GetKey(KeyCode.LeftShift) ? playerStats.runSpeed : playerStats.walkSpeed;
+        float currentSpeed = KeyBindingManager.Instance.GetKey("Run") ? playerStats.runSpeed : playerStats.walkSpeed;
 
         controller.Move(move * currentSpeed * Time.deltaTime);
 
         // Jump
-        if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
+        if (KeyBindingManager.Instance.GetKeyDown("Jump") && isGrounded)
         {
             velocity.y = Mathf.Sqrt(playerStats.jumpHeight * -2f * playerStats.gravity);
         }

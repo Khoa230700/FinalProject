@@ -5,8 +5,9 @@ public class PlayerShoot : MonoBehaviour
     public GunData gunData;
     public Transform shootPoint;
     public Animator armsAnimator;
+    [HideInInspector] public WeaponUI weaponUI;
 
-    private int currentAmmo;
+    public int currentAmmo; // Chỉnh sửa chỗ 
     private float nextTimeToFire = 0f;
 
     //private bool isShooting = false;
@@ -129,6 +130,8 @@ public class PlayerShoot : MonoBehaviour
                 hitbox.ownerHealthSystem.TakeDamage(finalDamage);
             }
         }
+
+        weaponUI.UpdateAmmoUI(currentAmmo, gunData.reserveAmmo);
     }
 
 
@@ -137,5 +140,6 @@ public class PlayerShoot : MonoBehaviour
         armsAnimator.SetTrigger("Recharge");
         isRecharge = true;
         currentAmmo = gunData.magazineSize;
+        weaponUI.UpdateAmmoUI(currentAmmo, gunData.reserveAmmo);
     }
 }
