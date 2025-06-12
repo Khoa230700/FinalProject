@@ -1,10 +1,11 @@
 ﻿using UnityEngine;
+using System.Collections;
 
 public class EnemyM : MonoBehaviour
 {
     public float maxHealth = 100f;
     public float currentHealth;
-    // public Image healthBar; // Tùy chọn: thanh máu UI
+    public Animator animator;
 
     void Start()
     {
@@ -21,16 +22,19 @@ public class EnemyM : MonoBehaviour
 
         if (currentHealth <= 0)
         {
-            Die();
+            animator.SetBool("isAlive",false);
+            StopAttack();
+            StartCoroutine(Die());
         }
     }
 
-    void Die()
-    {
-        Debug.Log(gameObject.name + " đã chết!");
-        // Thêm logic game over, hồi sinh, v.v.
-        // Tạm thời: gameObject.SetActive(false);
-    }
+    //void Die()
+    //{
+    //    Debug.Log(gameObject.name + " đã chết!");
+
+    //    Destroy(gameObject);
+    //    // Tạm thời: gameObject.SetActive(false);
+    //}
 
     // void UpdateHealthBar()
     // {
@@ -39,5 +43,27 @@ public class EnemyM : MonoBehaviour
     //         healthBar.fillAmount = currentHealth / maxHealth;
     //     }
     // }
+    IEnumerator Die()
+    {
+        
+        yield return new WaitForSeconds(2);
+        Destroy(gameObject);
+    }
+
+
+    public void StopAttack()
+    {
+        var attackScripts = new MonoBehaviour[]
+        {
+            GetComponent<EnemiAI>(),
+            GetComponent<RangeEnemy>(),
+            GetComponent<suicideEnemy>()
+        };
+        foreach (var script in attackScripts)
+        {
+            if (script != null)
+                script.enabled = false;
+        }
+    }
 }
 

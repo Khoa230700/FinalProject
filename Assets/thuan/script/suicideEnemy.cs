@@ -74,7 +74,7 @@ public class suicideEnemy : MonoBehaviour
     }
     IEnumerator DestroyAfterDelay()
     {
-        yield return new WaitForSeconds(2);
+        yield return new WaitForSeconds(1);
         Destroy(gameObject);
     }
 }
