@@ -8,19 +8,19 @@ using UnityEngine.UI;
 public struct FireModeSprite
 {
     public Image FireModeImage;
-    public Sprite SafetyModeSprite;
-    public Sprite SemiAutoModeSprite;
-    public Sprite FullAutoModeSprite;
-    public Sprite BurstModeSprite;
+    public Sprite safetyModeSprite;
+    public Sprite semiAutoModeSprite;
+    public Sprite fullAutoModeSprite;
+    public Sprite burstModeSprite;
 
     public void SetFireModeSprite(GunFireMode mode)
     {
         FireModeImage.sprite = mode switch
         {
-            GunFireMode.Safety => SafetyModeSprite,
-            GunFireMode.SemiAuto => SemiAutoModeSprite,
-            GunFireMode.FullAuto => FullAutoModeSprite,
-            GunFireMode.Burst => BurstModeSprite,
+            GunFireMode.Safety => safetyModeSprite,
+            GunFireMode.SemiAuto => semiAutoModeSprite,
+            GunFireMode.FullAuto => fullAutoModeSprite,
+            GunFireMode.Burst => burstModeSprite,
             _ => FireModeImage.sprite
         };
     }
@@ -32,41 +32,32 @@ public class WeaponUI : MonoBehaviour
     [Range(0, 100)] public float lowAmmoPercent;
 
     [Header("Color")]
-    public Color NormalBulletColor = Color.white;
-    public Color LowAmmoBulletColor = Color.red;
-    public Color BulletConsumedColor = Color.black;
+    public Color normalBulletColor = Color.white;
+    public Color lowAmmoBulletColor = Color.red;
+    public Color bulletConsumedColor = Color.black;
 
     [Header("References")]
     [SerializeField] private Image weaponImage;
-    [SerializeField] private GridLayoutGroup BulletsGroup;
-    [SerializeField] private Image BulletImage;
+    [SerializeField] private GridLayoutGroup bulletsGroup;
+    [SerializeField] private Image pfBulletImage;
     [SerializeField] private FireModeSprite fireMode;
     [SerializeField] private TextMeshProUGUI storageTxt;
 
-    private readonly List<Image> bulletImages = new();
-    private PlayerShoot playerShoot;
-    private GunData gunData;
-
-    private void Start()
-    {
-        playerShoot = GameObject.FindGameObjectWithTag("Player").GetComponentInChildren<PlayerShoot>();
-        gunData = playerShoot.gunData;
-
-        CreateBulletUI();
-    }
+    [HideInInspector] public GunData gunData;
+    [SerializeField] private List<Image> bulletImages = new();
 
     //* Tạo hình ảnh các viên đạn trong giao diện người dùng
-    private void CreateBulletUI()
+    public void CreateBulletUI()
     {
-        foreach (Transform child in BulletsGroup.transform)
+        foreach (Transform child in bulletsGroup.transform)
             Destroy(child.gameObject);
 
         bulletImages.Clear();
 
         for (int i = 0; i < gunData.magazineSize; i++)
         {
-            var bullet = Instantiate(BulletImage, BulletsGroup.transform);
-            bullet.color = NormalBulletColor;
+            var bullet = Instantiate(pfBulletImage, bulletsGroup.transform);
+            bullet.color = normalBulletColor;
             bulletImages.Add(bullet);
         }
     }
@@ -74,7 +65,7 @@ public class WeaponUI : MonoBehaviour
     //* Cập nhật giao diện người dùng với số lượng đạn hiện tại và tổng số đạn
     public void UpdateAmmoUI(int currentAmmo, int totalAmmo)
     {
-        currentAmmo = Mathf.Clamp(currentAmmo, 0, gunData.reserveAmmo);
+        currentAmmo = Mathf.Clamp(currentAmmo, 0, totalAmmo);
         storageTxt.text = totalAmmo.ToString();
 
         bool isLowAmmo = currentAmmo <= gunData.magazineSize * (lowAmmoPercent / 100f);
@@ -83,8 +74,8 @@ public class WeaponUI : MonoBehaviour
         for (int i = 0; i < bulletImages.Count; i++)
         {
             bulletImages[i].color = i < currentAmmo
-                ? (isLowAmmo ? LowAmmoBulletColor : NormalBulletColor)
-                : BulletConsumedColor;
+                ? (isLowAmmo ? lowAmmoBulletColor : normalBulletColor)
+                : bulletConsumedColor;
         }
     }
 
