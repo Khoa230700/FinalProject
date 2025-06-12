@@ -9,15 +9,16 @@ public class MeshMouseLook : MonoBehaviour
 
     private float pitch = 0f; // X - nhìn lên/xuống
     private float yaw = 0f;   // Y - quay trái/phải
-
-    void Start()
+    private bool isShow = true;
+    void Awake()
     {
-        Cursor.lockState = CursorLockMode.Locked; // Ẩn và khoá chuột vào giữa màn hình
-        Cursor.visible = false;
+        HideCursor();
     }
 
     void Update()
     {
+        if (isShow) return;
+
         float mouseX = Input.GetAxis("Mouse X") * sensitivityX;
         float mouseY = Input.GetAxis("Mouse Y") * sensitivityY;
 
@@ -26,5 +27,19 @@ public class MeshMouseLook : MonoBehaviour
         pitch = Mathf.Clamp(pitch, minPitch, maxPitch);
 
         transform.localRotation = Quaternion.Euler(pitch, yaw, 0f);
+    }
+
+    public void ShowCursor()
+    {
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
+        isShow = true;
+    }
+
+    public void HideCursor()
+    {
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
+        isShow = false;
     }
 }
