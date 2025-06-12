@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public enum GunType { Pistol, Rifle, Shotgun, Sniper, SMG, LMG }
 public enum GunFireMode { SemiAuto, FullAuto, Burst }
@@ -26,6 +26,7 @@ public class GunData : ScriptableObject
     [Header("Visuals & Audio")]
     public GameObject bulletPrefab;
     public AudioClip shootSound;
+    public GameObject tracerPrefab; // ✅ thêm dòng này
 
     [Header("Scope")]
     public bool hasScope;

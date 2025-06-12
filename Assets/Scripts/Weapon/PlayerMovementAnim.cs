@@ -3,22 +3,25 @@
 public class PlayerMovementAnim : MonoBehaviour
 {
     [SerializeField] private Animator armsAnimator;
+    [SerializeField] private PlayerShoot playerShoot;
 
     private bool isWalking = false;
     private bool isRunning = false;
 
     void Update()
     {
+        // Nếu đang bắn thì không thực hiện chuyển đổi run/walk
+        if (playerShoot != null && playerShoot.IsShooting)
+            return;
+
         bool isMoving = Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.A) ||
                         Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.D);
-
         bool isRunningInput = Input.GetKey(KeyCode.LeftShift);
 
         if (isMoving)
         {
             if (isRunningInput)
             {
-                // Đang nhấn shift + di chuyển => chạy
                 if (!isRunning)
                 {
                     armsAnimator.SetTrigger("Run");
@@ -28,7 +31,6 @@ public class PlayerMovementAnim : MonoBehaviour
             }
             else
             {
-                // Chỉ di chuyển, không shift => đi bộ
                 if (!isWalking)
                 {
                     armsAnimator.SetTrigger("Walk");
@@ -39,7 +41,6 @@ public class PlayerMovementAnim : MonoBehaviour
         }
         else
         {
-            // Không nhấn gì => Idle
             if (isWalking || isRunning)
             {
                 armsAnimator.SetTrigger("Idle");

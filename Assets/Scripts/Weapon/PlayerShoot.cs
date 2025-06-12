@@ -9,8 +9,13 @@ public class PlayerShoot : MonoBehaviour
     private int currentAmmo;
     private float nextTimeToFire = 0f;
 
-    private bool isShooting = false;
+    //private bool isShooting = false;
     private bool isRecharge = false;
+
+    private bool isShootingAnimation = false;
+    private bool isHoldingFire = false;
+
+    public bool IsShooting => isShootingAnimation || isHoldingFire;
 
     [SerializeField] private ParticleSystem muzzleFlashParticle;
 
@@ -21,19 +26,28 @@ public class PlayerShoot : MonoBehaviour
 
     void Update()
     {
+        // Kiểm tra input
         if (gunData.fireMode == GunFireMode.FullAuto)
         {
-            if (!isRecharge && Input.GetButton("Fire1") && Time.time >= nextTimeToFire)
+            isHoldingFire = Input.GetButton("Fire1"); // giữ trạng thái nhấn chuột
+
+            if (!isRecharge && isHoldingFire && Time.time >= nextTimeToFire)
             {
                 TryShoot();
             }
         }
         else if (gunData.fireMode == GunFireMode.SemiAuto)
         {
+            isHoldingFire = Input.GetButton("Fire1");
+
             if (!isRecharge && Input.GetButtonDown("Fire1") && Time.time >= nextTimeToFire)
             {
                 TryShoot();
             }
+        }
+        else
+        {
+            isHoldingFire = false; // không bắn
         }
 
         if (Input.GetKeyDown(KeyCode.R) && !isRecharge)
@@ -41,12 +55,12 @@ public class PlayerShoot : MonoBehaviour
             Reload();
         }
 
-        if (isShooting)
+        if (isShootingAnimation)
         {
             AnimatorStateInfo stateInfo = armsAnimator.GetCurrentAnimatorStateInfo(0);
             if (stateInfo.IsName("Shot") && stateInfo.normalizedTime >= 0.01f)
             {
-                isShooting = false;
+                isShootingAnimation = false;
                 armsAnimator.ResetTrigger("Shot");
                 armsAnimator.SetTrigger("Idle");
             }
@@ -80,15 +94,17 @@ public class PlayerShoot : MonoBehaviour
     void Shoot()
     {
         currentAmmo--;
-
         armsAnimator.SetTrigger("Shot");
-        isShooting = true;
+        isShootingAnimation = true;
 
-        GameObject bullet = Instantiate(gunData.bulletPrefab, shootPoint.position, shootPoint.rotation);
-        BulletRaycast bulletScript = bullet.GetComponent<BulletRaycast>();
-        if (bulletScript != null)
+        if (gunData.tracerPrefab != null)
         {
-            bulletScript.InitFromGunData(gunData, shootPoint);
+            GameObject tracer = Instantiate(gunData.tracerPrefab);
+            BulletTracer bt = tracer.GetComponent<BulletTracer>();
+            if (bt != null)
+            {
+                bt.Init(shootPoint.position, shootPoint.forward);
+            }
         }
 
         // Muzzle Flash
