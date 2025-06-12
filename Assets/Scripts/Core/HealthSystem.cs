@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using UnityEngine;
 
 public abstract class BaseHealthSystem : MonoBehaviour
@@ -21,6 +21,7 @@ public abstract class BaseHealthSystem : MonoBehaviour
 
     public virtual void TakeDamage(float damage)
     {
+        Debug.Log($"{gameObject.name} nhận {damage} sát thương");
         float remainingDamage = damage;
         if(armor > 0)
         {
