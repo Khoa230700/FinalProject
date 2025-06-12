@@ -109,16 +109,27 @@ public class PlayerShoot : MonoBehaviour
             }
         }
 
-        // Muzzle Flash
         if (muzzleFlashParticle != null)
-        {
             muzzleFlashParticle.Play();
-        }
 
-        // Âm thanh
         if (gunData.shootSound)
-        {
             AudioSource.PlayClipAtPoint(gunData.shootSound, shootPoint.position);
+
+        Ray ray = new Ray(shootPoint.position, shootPoint.forward);
+        if (Physics.Raycast(ray, out RaycastHit hit, 100f)) 
+        {
+            Hitbox hitbox = hit.collider.GetComponent<Hitbox>();
+            if (hitbox != null && hitbox.ownerHealthSystem != null)
+            {
+                bool isHeadshot = hitbox.hitboxType == Hitbox.HitboxType.Head;
+                bool isWeakspot = hitbox.hitboxType == Hitbox.HitboxType.WeakSpot;
+
+                float finalDamage = gunData.damage;
+                if (isWeakspot) finalDamage = 9999f;
+                else if (isHeadshot) finalDamage *= 2f;
+
+                hitbox.ownerHealthSystem.TakeDamage(finalDamage);
+            }
         }
 
         weaponUI.UpdateAmmoUI(currentAmmo, gunData.reserveAmmo);
