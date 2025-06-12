@@ -4,14 +4,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-public enum FireMode
-{
-    Safety,
-    SemiAuto,
-    FullAuto,
-    Burst
-}
-
 public class WeaponTest : MonoBehaviour
 {
     [Header("Ammo")]
@@ -21,7 +13,7 @@ public class WeaponTest : MonoBehaviour
     [Header("Settings")]
     public float fireRate = 0.2f;
     public float reloadTime = 2f;
-    public FireMode currentFireMode = FireMode.SemiAuto;
+    public GunFireMode currentFireMode = GunFireMode.SemiAuto;
 
     [Header("References")]
     public WeaponUI weaponUI;
@@ -55,29 +47,29 @@ public class WeaponTest : MonoBehaviour
         HandleShootingInput();
     }
 
-    private FireMode GetNextFireMode(FireMode current) =>
-        (FireMode)(((int)current + 1) % Enum.GetNames(typeof(FireMode)).Length);
+    private GunFireMode GetNextFireMode(GunFireMode current) =>
+        (GunFireMode)(((int)current + 1) % Enum.GetNames(typeof(GunFireMode)).Length);
 
     private void HandleShootingInput()
     {
         if (isReloading) return;
 
-        if ((currentAmmo <= 0 && totalAmmo <= 0) || currentFireMode == FireMode.Safety)
+        if ((currentAmmo <= 0 && totalAmmo <= 0) || currentFireMode == GunFireMode.Safety)
             return;
 
         if (Input.GetMouseButtonDown(0))
         {
-            if (currentFireMode == FireMode.SemiAuto)
+            if (currentFireMode == GunFireMode.SemiAuto)
             {
                 FireOnce();
             }
-            else if (currentFireMode == FireMode.Burst)
+            else if (currentFireMode == GunFireMode.Burst)
             {
                 StartCoroutine(BurstFire(3, 0.1f));
             }
         }
 
-        if (currentFireMode == FireMode.FullAuto && Input.GetMouseButton(0) && Time.time >= nextFireTime)
+        if (currentFireMode == GunFireMode.FullAuto && Input.GetMouseButton(0) && Time.time >= nextFireTime)
         {
             FireOnce();
             nextFireTime = Time.time + fireRate;
