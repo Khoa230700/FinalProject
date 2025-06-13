@@ -112,12 +112,12 @@ public class KeyBindingManager : MonoBehaviour
         switch (axisName)
         {
             case "Horizontal":
-                if (GetKey("MoveLeft")) return -1f;
-                if (GetKey("MoveRight")) return 1f;
+                if (GetKey("Move Left")) return -1f;
+                if (GetKey("Move Right")) return 1f;
                 return 0f;
             case "Vertical":
-                if (GetKey("MoveDown")) return -1f;
-                if (GetKey("MoveUp")) return 1f;
+                if (GetKey("Move Backward")) return -1f;
+                if (GetKey("Move Forward")) return 1f;
                 return 0f;
             default:
                 return 0f;

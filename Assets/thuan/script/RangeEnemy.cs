@@ -69,5 +69,8 @@ public class RangeEnemy : MonoBehaviour
         // You can add animations and damage logic here
         Debug.Log("Enemy uses melee attack!");
         animator.SetTrigger("meleeattack");
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+        var health = player.GetComponent<PlayerHealth>();
+        health.TakeDamage(0.1f, 0, transform.position);
     }
 }

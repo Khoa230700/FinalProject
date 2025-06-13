@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 
 public enum GunType { Pistol, Rifle, Shotgun, Sniper, SMG, LMG }
-public enum GunFireMode { SemiAuto, FullAuto, Burst }
+public enum GunFireMode { SemiAuto, FullAuto, Burst, Safety }
 
 [CreateAssetMenu(fileName = "NewGunData", menuName = "Gun/Gun Data")]
 public class GunData : ScriptableObject
@@ -24,6 +24,7 @@ public class GunData : ScriptableObject
     public float weight;
 
     [Header("Visuals & Audio")]
+    public Sprite gunSprite;
     public GameObject bulletPrefab;
     public AudioClip shootSound;
     public GameObject tracerPrefab; // ✅ thêm dòng này
