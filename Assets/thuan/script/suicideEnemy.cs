@@ -8,7 +8,7 @@ public class suicideEnemy : MonoBehaviour
     NavMeshAgent agent;
     Animator enemyAnimation;
 
-
+    public ParticleSystem particle;
     
     public int attackDamage = 15;
     public float attackSpeed = 1.5f;
@@ -19,6 +19,8 @@ public class suicideEnemy : MonoBehaviour
     public float attackRange = 2f;
     public float chaseRange = 10f;
 
+    public GameObject explosion;
+    public float explosionlifetime = 1f;
 
     void Start()
     {
@@ -68,6 +70,8 @@ public class suicideEnemy : MonoBehaviour
             }
         }
 
+        GameObject explo = Instantiate(explosion, transform.position, transform.rotation);
+        Destroy(explo, explosionlifetime);
         enemyAnimation.SetTrigger("attack");
         StartCoroutine(DestroyAfterDelay());
     }
