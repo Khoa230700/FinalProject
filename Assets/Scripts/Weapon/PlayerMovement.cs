@@ -52,4 +52,8 @@ public class PlayerMovement : MonoBehaviour
         velocity.y += playerStats.gravity * Time.deltaTime;
         controller.Move(velocity * Time.deltaTime);
     }
+
+    public bool IsMoving() => KeyBindingManager.Instance.GetAxis("Horizontal") != 0f || KeyBindingManager.Instance.GetAxis("Vertical") != 0f;
+    public bool IsRunning() => KeyBindingManager.Instance.GetKey("Run") && IsMoving();
+    public bool IsGrounded() => isGrounded;
 }

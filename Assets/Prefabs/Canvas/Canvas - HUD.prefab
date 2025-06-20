@@ -265,7 +265,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: -32}
   m_SizeDelta: {x: 2, y: 28}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!222 &4296938619173645625
@@ -764,7 +764,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 32, y: 0}
   m_SizeDelta: {x: 28, y: 2}
   m_Pivot: {x: 1, y: 0.5}
 --- !u!222 &8855291616994481417
@@ -1273,9 +1273,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 93aa22d4c15c3ea4e8dd756ea439f68d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  baseDistance: 0
-  maxDistance: 64
-  changeSpeed: 25
+  distance: 32
   top: {fileID: 4175550043829664132}
   down: {fileID: 4479282533935744370}
   left: {fileID: 6351417405661952784}
@@ -1880,7 +1878,7 @@ MonoBehaviour:
     FullAutoModeSprite: {fileID: 21300000, guid: e06c5e8a44af05041acb51eca267a500, type: 3}
     BurstModeSprite: {fileID: 21300000, guid: 2cebf0c90412d5043b017631d161b738, type: 3}
   storageTxt: {fileID: 5643452311230791621}
-  weaponTest: {fileID: 0}
+  gunData: {fileID: 0}
 --- !u!1 &4934205745471963456
 GameObject:
   m_ObjectHideFlags: 0
@@ -1916,7 +1914,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 32}
   m_SizeDelta: {x: 2, y: 28}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!222 &1978195028902949258
@@ -2007,7 +2005,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: -32, y: 0}
   m_SizeDelta: {x: 28, y: 2}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!222 &2428502797738346902
@@ -3273,6 +3271,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3d7f32711de23fc4a935dd4e86903d65, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  applyUsePunch: 1
+  playerMovement: {fileID: 0}
+  playerShoot: {fileID: 0}
   canvasGroup: {fileID: 1214612907037308686}
   staticCrosshair: {fileID: 8638274891728498826}
   dynamicCrosshair: {fileID: 8204647806904703443}
