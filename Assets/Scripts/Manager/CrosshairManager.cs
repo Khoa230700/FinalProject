@@ -5,13 +5,12 @@ using UnityEngine.UI;
 
 public class CrosshairManager : MonoBehaviour
 {
-    
     [Header("Settings")]
-    private float unitScale = 10f;
-    [SerializeField] private bool applyUsePunch = true;
+    [SerializeField] private float dynamicScale = 10f;
 
     [Header("References")]
     [SerializeField] private PlayerMovement playerMovement;
+    [SerializeField] private Camera playerCamera;
     [SerializeField] private PlayerShoot playerShoot;
     [SerializeField] private CanvasGroup canvasGroup;
     [SerializeField] private GameObject staticCrosshair;
@@ -19,6 +18,85 @@ public class CrosshairManager : MonoBehaviour
 
     private CrosshairData currentCrosshair;
 
+    private void Update()
+    {
+        if (currentCrosshair == null) return;
+
+        bool onLook = IsLookingAtEnemy();
+
+        switch (currentCrosshair.type)
+        {
+            case CrosshairType.Dynamic:
+                UpdateDynamicCrosshair(onLook);
+                break;
+
+            case CrosshairType.Static:
+                UpdateStaticCrosshair(onLook);
+                break;
+        }
+    }
+
+    private void UpdateStaticCrosshair(bool onLook)
+    {
+        if (!staticCrosshair) return;
+
+        staticCrosshair.SetActive(true);
+        staticCrosshair.GetComponent<Image>().color = onLook
+                ? currentCrosshair.enemyColor
+                : currentCrosshair.normalColor;
+    }
+
+    private void UpdateDynamicCrosshair(bool onEntity)
+    {
+        if (!dynamicCrosshair) return;
+
+        var dynamic = currentCrosshair.dynamicCrosshair;
+
+        float targetScale = GetScale(dynamic);
+        float targetDistance = targetScale * dynamicScale;
+        float newDistance = Mathf.MoveTowards(dynamicCrosshair.distance, targetDistance, Time.deltaTime * dynamic.moveSpeed * dynamicScale);
+
+        dynamicCrosshair.SetColor(onEntity ? currentCrosshair.enemyColor : currentCrosshair.normalColor);
+        dynamicCrosshair.SetDistance(newDistance);
+        BounceScale();
+    }
+
+    private void BounceScale()
+    {
+        if (currentCrosshair == null || currentCrosshair.type != CrosshairType.Dynamic || !playerShoot.IsShooting)
+            return;
+
+        var dynamic = currentCrosshair.dynamicCrosshair;
+
+        float targetScale = GetScale(dynamic);
+        float targetDistance = targetScale * dynamic.bounceSize * dynamicScale;
+        float smoothed = Mathf.Lerp(dynamicCrosshair.distance, targetDistance, Time.deltaTime * 20f);
+        
+        dynamicCrosshair.SetDistance(smoothed);
+    }
+
+    private float GetScale(DynamicCrosshairSettings dynamic)
+    {
+        if (!playerMovement.IsGrounded())
+            return dynamic.jumpScale;
+
+        if (playerMovement.IsRunning())
+            return dynamic.runScale;
+
+        if (playerMovement.IsMoving())
+            return dynamic.moveScale;
+
+        return dynamic.idleScale;
+    }
+
+    private bool IsLookingAtEnemy()
+    {
+        if (Physics.Raycast(playerCamera.transform.position, playerCamera.transform.forward, out RaycastHit hit, 100f))
+        {
+            return hit.collider.CompareTag("Enemy");
+        }
+        return false;
+    }
 
     public void SetCrosshairData(CrosshairData data)
     {
@@ -26,87 +104,10 @@ public class CrosshairManager : MonoBehaviour
 
         staticCrosshair.SetActive(data.type == CrosshairType.Static);
         dynamicCrosshair.gameObject.SetActive(data.type == CrosshairType.Dynamic);
-
-        if (data.type == CrosshairType.Dynamic)
-        {
-            float startDistance = data.dynamicCrosshair.idleScale * unitScale;
-            dynamicCrosshair.SetDistance(startDistance);
-        }
     }
 
-    private void Update()
+    public void SetPlayerShoot(PlayerShoot shoot)
     {
-        if (currentCrosshair == null) return;
-
-        bool onEntity = false;
-        if (Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward, out RaycastHit hit, 100f))
-        {
-            if (hit.collider.gameObject.tag == "Enemy")
-                onEntity = true;
-        }
-
-        if (currentCrosshair.type == CrosshairType.Dynamic && dynamicCrosshair != null)
-        {
-            UpdateDynamicCrosshair(onEntity);
-            if (applyUsePunch) ApplyUsePunch();
-        }
-        else if (currentCrosshair.type == CrosshairType.Static && staticCrosshair != null)
-        {
-            staticCrosshair.SetActive(true);
-            var image = staticCrosshair.GetComponent<Image>();
-            if (image != null)
-            {
-                image.color = onEntity
-                    ? currentCrosshair.onEntityColor
-                    : currentCrosshair.normalColor;
-            }
-        }
-    }
-
-    private void UpdateDynamicCrosshair(bool onEntity)
-    {
-        var dynamic = currentCrosshair.dynamicCrosshair;
-
-        // Color change
-        dynamicCrosshair.SetColor(onEntity ? currentCrosshair.onEntityColor : currentCrosshair.normalColor);
-
-        // Distance based on player state
-        float targetDistance = dynamic.idleScale;
-
-        if (!playerMovement.IsGrounded())
-            targetDistance = dynamic.jumpScale;
-        else if (playerMovement.IsRunning())
-            targetDistance = dynamic.runScale;
-        else if (playerMovement.IsMoving())
-            targetDistance = dynamic.moveScale;
-
-        float current = dynamicCrosshair.distance;
-        float moveSpeed = dynamic.moveSpeed;
-
-        float newDistance = Mathf.MoveTowards(current, targetDistance * unitScale, Time.deltaTime * moveSpeed * unitScale);
-        dynamicCrosshair.SetDistance(newDistance);
-    }
-
-    private void ApplyUsePunch()
-    {
-        if (currentCrosshair == null || currentCrosshair.type != CrosshairType.Dynamic || !playerShoot.IsShooting)
-            return;
-
-        var dynamic = currentCrosshair.dynamicCrosshair;
-
-        float targetDistance = dynamic.idleScale;
-
-        if (!playerMovement.IsGrounded())
-            targetDistance = dynamic.jumpScale;
-        else if (playerMovement.IsRunning())
-            targetDistance = dynamic.runScale;
-        else if (playerMovement.IsMoving())
-            targetDistance = dynamic.moveScale;
-
-        // Punch effect
-        float target = targetDistance * dynamic.punchSize * unitScale;
-
-        float smoothed = Mathf.Lerp(dynamicCrosshair.distance, target, Time.deltaTime * 20f);
-        dynamicCrosshair.SetDistance(smoothed);
+        playerShoot = shoot;
     }
 }
