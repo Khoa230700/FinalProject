@@ -27,7 +27,6 @@ public class DynamicCrosshairSettings
 {
     [Range(0f, 3f)] public float idleScale = 1f;
     [Range(0f, 3f)] public float moveScale = 1.2f;
-    [Range(0f, 3f)] public float runScale = 1.5f;
     [Range(0f, 3f)] public float jumpScale = 1.8f;
     [Range(0f, 10f)] public float bounceSize = 2f;
     [Range(0f, 20f)] public float moveSpeed = 3f;
