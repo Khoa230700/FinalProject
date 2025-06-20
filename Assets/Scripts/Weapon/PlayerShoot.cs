@@ -16,7 +16,8 @@ public class PlayerShoot : MonoBehaviour
     private bool isShootingAnimation = false;
     private bool isHoldingFire = false;
 
-    public bool IsShooting => isShootingAnimation || isHoldingFire;
+    public bool IsShooting => isShootingAnimation;
+    // public bool IsShooting => isShootingAnimation || isHoldingFire;
 
     [SerializeField] private ParticleSystem muzzleFlashParticle;
 
