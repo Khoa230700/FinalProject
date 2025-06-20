@@ -49,15 +49,16 @@ public class WeaponSwitcher : MonoBehaviour
     {
         var activateWeapon = weaponList[index];
         var playerShoot = activateWeapon.GetComponentInChildren<PlayerShoot>();
+        var crosshairManager = FindAnyObjectByType<CrosshairManager>();
 
         if (playerShoot != null)
         {
             playerShoot.weaponUI = weaponUI;
             weaponUI.gunData = playerShoot.gunData;
+            crosshairManager.SetCrosshairData(playerShoot.gunData.crosshairData);
 
             weaponUI.SetFireMode(playerShoot.gunData.fireMode);
             weaponUI.SetWeaponSprite(playerShoot.gunData.gunSprite);
-
             weaponUI.CreateBulletUI();
 
             StartCoroutine(DelayUpdateUI(playerShoot));
