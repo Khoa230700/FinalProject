@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -11,16 +12,19 @@ public class CrosshairManager : MonoBehaviour
     [Header("References")]
     [SerializeField] private PlayerMovement playerMovement;
     [SerializeField] private Camera playerCamera;
-    [SerializeField] private PlayerShoot playerShoot;
     [SerializeField] private CanvasGroup canvasGroup;
+    [SerializeField] private GameObject runCrosshair;
     [SerializeField] private GameObject staticCrosshair;
     [SerializeField] private DynamicCrosshair dynamicCrosshair;
 
+    private PlayerShoot playerShoot;
     private CrosshairData currentCrosshair;
 
     private void Update()
     {
         if (currentCrosshair == null) return;
+
+        UpdateRunCrosshair();
 
         bool onLook = IsLookingAtEnemy();
 
@@ -34,6 +38,24 @@ public class CrosshairManager : MonoBehaviour
                 UpdateStaticCrosshair(onLook);
                 break;
         }
+    }
+
+    private void UpdateRunCrosshair()
+    {
+        if (playerMovement.IsRunning())
+        {
+            runCrosshair.SetActive(true);
+            staticCrosshair.SetActive(false);
+            dynamicCrosshair.gameObject.SetActive(false);
+        }
+        else
+        {
+            runCrosshair.SetActive(false);
+            staticCrosshair.SetActive(currentCrosshair.type == CrosshairType.Static);
+            dynamicCrosshair.gameObject.SetActive(currentCrosshair.type == CrosshairType.Dynamic);
+        }
+
+        return;
     }
 
     private void UpdateStaticCrosshair(bool onLook)
@@ -80,9 +102,6 @@ public class CrosshairManager : MonoBehaviour
         if (!playerMovement.IsGrounded())
             return dynamic.jumpScale;
 
-        if (playerMovement.IsRunning())
-            return dynamic.runScale;
-
         if (playerMovement.IsMoving())
             return dynamic.moveScale;
 
@@ -103,6 +122,10 @@ public class CrosshairManager : MonoBehaviour
         currentCrosshair = data;
 
         staticCrosshair.SetActive(data.type == CrosshairType.Static);
+        var image = staticCrosshair.GetComponent<Image>();
+        image.color = data.normalColor;
+        image.sprite = data.staticCrosshair.sprite;
+
         dynamicCrosshair.gameObject.SetActive(data.type == CrosshairType.Dynamic);
     }
 
