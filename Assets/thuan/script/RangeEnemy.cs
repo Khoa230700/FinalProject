@@ -60,17 +60,29 @@ public class RangeEnemy : MonoBehaviour
             nextFireTime = Time.time + 1f / fireRate;
             var bullet = Instantiate(rangedProjectile, firePoint.position, firePoint.rotation);
             bullet.GetComponent<Rigidbody>().AddForce(firePoint.forward * bulletSpeed);
+            
         }
         animator.SetTrigger("rangeattack");
     }
 
+    //void MeleeAttack()
+    //{
+        
+    //    Debug.Log("Enemy uses melee attack!");
+    //    animator.SetTrigger("meleeattack");
+    //    GameObject player = GameObject.FindGameObjectWithTag("Player");
+    //    var health = player.GetComponent<PlayerHealth>();
+    //    health.TakeDamage(0.1f, 0, transform.position);
+
+    //}
     void MeleeAttack()
     {
-        // You can add animations and damage logic here
+
         Debug.Log("Enemy uses melee attack!");
         animator.SetTrigger("meleeattack");
         GameObject player = GameObject.FindGameObjectWithTag("Player");
-        var health = player.GetComponent<PlayerHealth>();
-        health.TakeDamage(0.1f, 0, transform.position);
+        var health = player.GetComponent<testPlayerHealth>();
+        health.TakeDamage(1);
+
     }
 }
