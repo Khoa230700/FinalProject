@@ -32,4 +32,6 @@ public class GunData : ScriptableObject
     [Header("Scope")]
     public bool hasScope;
     public float scopeZoom;
+    [Header("Crosshair")]
+    public CrosshairData crosshairData;
 }

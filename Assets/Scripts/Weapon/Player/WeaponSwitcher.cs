@@ -6,12 +6,21 @@ using System.Collections;
 public class WeaponSwitcher : MonoBehaviour
 {
     public WeaponUI weaponUI;
+    [SerializeField] private CrosshairManager crosshairManager;
     [SerializeField] private List<GameObject> weaponList = new List<GameObject>();
 
+    private List<PlayerShoot> playerShoots = new List<PlayerShoot>();
     private int currentWeaponIndex = 0;
 
     void Start()
     {
+        foreach (var weapon in weaponList)
+        {
+            playerShoots.Add(weapon.GetComponentInChildren<PlayerShoot>());
+        }
+
+        crosshairManager ??= FindAnyObjectByType<CrosshairManager>();
+
         ActivateWeapon(currentWeaponIndex);
     }
 
@@ -47,22 +56,20 @@ public class WeaponSwitcher : MonoBehaviour
 
     public void UpdateWeaponUI(int index)
     {
-        var activateWeapon = weaponList[index];
-        var playerShoot = activateWeapon.GetComponentInChildren<PlayerShoot>();
+        var playerShoot = playerShoots[index];
 
-        if (playerShoot != null)
-        {
-            playerShoot.weaponUI = weaponUI;
-            weaponUI.gunData = playerShoot.gunData;
+        playerShoot.weaponUI = weaponUI;
 
-            weaponUI.SetFireMode(playerShoot.gunData.fireMode);
-            weaponUI.SetWeaponSprite(playerShoot.gunData.gunSprite);
+        weaponUI.gunData = playerShoot.gunData;
+        weaponUI.SetFireMode(playerShoot.gunData.fireMode);
+        weaponUI.SetWeaponSprite(playerShoot.gunData.gunSprite);
+        weaponUI.CreateBulletUI();
 
-            weaponUI.CreateBulletUI();
-
-            StartCoroutine(DelayUpdateUI(playerShoot));
-        }
+        StartCoroutine(DelayUpdateUI(playerShoot));
+        crosshairManager.SetCrosshairData(playerShoot.gunData.crosshairData);
+        crosshairManager.SetPlayerShoot(playerShoot);
     }
+
 
     private IEnumerator DelayUpdateUI(PlayerShoot playerShoot)
     {
