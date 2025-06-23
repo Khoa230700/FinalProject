@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections.Generic;
 using System;
 using System.Collections;
@@ -34,6 +34,10 @@ public class WeaponSwitcher : MonoBehaviour
     void SwitchWeapon(int index)
     {
         if (index >= weaponList.Count || index == currentWeaponIndex) return;
+
+        // ✅ Hủy reload ở vũ khí cũ
+        var previousPlayerShoot = playerShoots[currentWeaponIndex];
+        previousPlayerShoot.CancelReload();
 
         for (int i = 0; i < weaponList.Count; i++)
         {

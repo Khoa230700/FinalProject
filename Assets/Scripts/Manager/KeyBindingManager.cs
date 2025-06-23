@@ -109,6 +109,8 @@ public class KeyBindingManager : MonoBehaviour
 
     public float GetAxis(string axisName)
     {
+        if (bindings.Count == 0) return 0f;
+
         switch (axisName)
         {
             case "Horizontal":

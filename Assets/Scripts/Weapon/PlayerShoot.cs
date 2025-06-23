@@ -145,4 +145,14 @@ public class PlayerShoot : MonoBehaviour
         currentAmmo = gunData.magazineSize;
         weaponUI.UpdateAmmoUI(currentAmmo, gunData.reserveAmmo);
     }
+
+    public void CancelReload()
+    {
+        if (isRecharge)
+        {
+            isRecharge = false;
+            armsAnimator.ResetTrigger("Recharge");
+            armsAnimator.SetTrigger("Idle");
+        }
+    }
 }

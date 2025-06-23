@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using Unity.AI.Navigation;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.AI;
 
 public class L4DBotController : MonoBehaviour
@@ -13,51 +9,92 @@ public class L4DBotController : MonoBehaviour
     [SerializeField] GameObject bulletPrefab;
     [SerializeField] ParticleSystem bulletParticleSystem;
     [SerializeField] WFX_LightFlicker wFX_LightFlicker;
-    [SerializeField] AudioClip bulletAudioClip;
-    [SerializeField] AudioSource audioSource;
-    public float jumpDuration = 5f;
-    public float jumpHeight = 1.5f;
-    public float jumdectectionRange = 2f; // khoảng cách phát hiện NavMeshLink
+  
 
     [Header("AI Settings")]
     [SerializeField] float followDistance = 8f;
-    [SerializeField] float detectionRange = 15f;
+    [SerializeField] float detectionRange = 25f;
     [SerializeField] float fireRate = 1f;
     [SerializeField] float bulletSpeed = 25f;
-
 
     private NavMeshAgent agent;
     private Animator animator;
     private float fireCooldown = 0f;
     private GameObject currentTarget;
-    private bool isJumping = false;
-    private bool hasJumpedCurrentLink = false;
-    private NavMeshLink currentLink = null;
+
     private void Start()
     {
         agent = GetComponent<NavMeshAgent>();
         animator = GetComponent<Animator>();
-        
+        //agent.updateRotation = false; // Ta tự xử lý quay mặt
     }
 
     private void Update()
     {
-        // 1. Check NavMeshLink và gọi animation jump nếu cần
-        if (!hasJumpedCurrentLink && IsNearNavMeshLink(out currentLink))
+        fireCooldown -= Time.deltaTime;
+
+        float distToPlayer = Vector3.Distance(transform.position, player.position);
+
+        // Nếu player quá xa thì chạy theo player, không bắn
+        if (distToPlayer > agent.stoppingDistance )
         {
-            Debug.Log("GỌI JUMP LINK!!!");
-            animator.SetTrigger("Jump");
-            hasJumpedCurrentLink = true;
+
+            currentTarget = null; // Bỏ target vì phải theo player
+            agent.isStopped = false;
+            agent.SetDestination(player.position);
+            AudioBotManager.Instance.PlayBotSound();
+            Vector3 localVelocity = transform.InverseTransformDirection(agent.velocity);
+            animator.SetFloat("Horizontal", localVelocity.x);
+            animator.SetFloat("Vertical", localVelocity.z);
+            animator.SetBool("isMoving", true);
+
+            return; // ưu tiên theo player nên bỏ qua các bước tiếp theo
         }
 
-        // 2. Reset lại khi rời khỏi link
-        if (hasJumpedCurrentLink && !IsNearNavMeshLink(out _))
-        {
-            hasJumpedCurrentLink = false;
-        }
+        // Player gần thì đứng yên hoặc bắn zombie
+        currentTarget = FindNearestVisibleZombie();
 
-        // 3. Gọi đều BotController mỗi frame
-        BotController();
+        if (currentTarget != null)
+        {
+            float distToTarget = Vector3.Distance(transform.position, currentTarget.transform.position);
+
+            if (distToTarget <= detectionRange)
+            {
+               
+                agent.isStopped = true;
+              
+                agent.SetDestination(transform.position);
+                AudioBotManager.Instance.StopBotSound();
+                
+                Vector3 lookPos = new Vector3(currentTarget.transform.position.x, transform.position.y, currentTarget.transform.position.z);
+                transform.LookAt(lookPos);
+
+                animator.SetFloat("Horizontal", 0f);
+                animator.SetFloat("Vertical", 0f);
+                animator.SetBool("isMoving", false);
+
+                if (fireCooldown <= 0f)
+                {
+                    
+                    animator.SetTrigger("shoot");
+                    Shoot(currentTarget.transform);
+                    fireCooldown = fireRate;
+                }
+
+                return; // ưu tiên bắn zombie
+            }
+            else
+            {
+                // Zombie ra khỏi tầm → bỏ target, đứng yên chờ player (hoặc di chuyển nếu cần)
+                currentTarget = null;
+            }
+        }
+        agent.isStopped = false;
+        animator.SetFloat("Horizontal", 0f);
+        animator.SetFloat("Vertical", 0f);
+        animator.SetBool("isMoving", false);
+
+
 
     }
 
@@ -69,7 +106,7 @@ public class L4DBotController : MonoBehaviour
 
         foreach (GameObject zombie in zombies)
         {
-            if (zombie == null)    continue;
+            if (zombie == null) continue;
 
             float dist = Vector3.Distance(transform.position, zombie.transform.position);
             if (dist < detectionRange && HasLineOfSight(zombie.transform))
@@ -91,7 +128,7 @@ public class L4DBotController : MonoBehaviour
         Vector3 direction = (targetPoint - firePoint.position).normalized;
         float distance = Vector3.Distance(firePoint.position, targetPoint);
 
-        //Debug.DrawRay(firePoint.position, direction * distance, Color.red);
+        Debug.DrawRay(firePoint.position, direction * distance, Color.red);
 
         int layerMask = LayerMask.GetMask("Default"); // Sửa nếu enemy ở layer khác
         if (Physics.Raycast(firePoint.position, direction, out RaycastHit hit, distance, layerMask))
@@ -108,9 +145,9 @@ public class L4DBotController : MonoBehaviour
         {
             Vector3 aimPoint = GetAimPoint(target);
             Vector3 dir = (aimPoint - firePoint.position).normalized;
+            AudioBotManager.Instance.ShootSound();
 
             GameObject bullet = Instantiate(bulletPrefab, firePoint.position, Quaternion.LookRotation(dir));
-
             if (bulletParticleSystem != null)
             {
                 bulletParticleSystem.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
@@ -126,6 +163,46 @@ public class L4DBotController : MonoBehaviour
                 rb.linearVelocity = dir * bulletSpeed;
         }
     }
+    //private void Shoot(Transform target)
+    //{
+    //    if (firePoint)
+    //    {
+    //        Vector3 aimPoint = GetAimPoint(target);
+    //        Vector3 dir = (aimPoint - firePoint.position).normalized;
+
+    //        // Phát âm thanh
+    //        AudioBotManager.Instance.ShootSound();
+
+    //        // Raycast
+    //        if (Physics.Raycast(firePoint.position, dir, out RaycastHit hit, detectionRange))
+    //        {
+    //            if (hit.collider.CompareTag("Enemy"))
+    //            {
+    //                // Gây sát thương nếu có script
+    //                TargetableEnemy enemy = hit.collider.GetComponent<TargetableEnemy>();
+    //                //if (enemy != null)
+    //                //{
+    //                //    enemy.TakeDamage?.Invoke(10); // giả sử có hàm delegate TakeDamage
+    //                //}
+    //            }
+    //        }
+
+    //        // Particle effect
+    //        if (bulletParticleSystem != null)
+    //        {
+    //            bulletParticleSystem.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+    //            bulletParticleSystem.Play();
+    //        }
+
+    //        // Flash
+    //        if (wFX_LightFlicker != null)
+    //        {
+    //            wFX_LightFlicker.FlickerOnce();
+    //        }
+
+    //        // Vẽ tia debug
+    //        Debug.DrawRay(firePoint.position, dir * detectionRange, Color.yellow, 0.2f);
+    //    }
 
     private Vector3 GetAimPoint(Transform target)
     {
@@ -139,119 +216,4 @@ public class L4DBotController : MonoBehaviour
 
         return target.position + Vector3.up * 1.2f;
     }
-    private void BotController()
-    {
-
-        fireCooldown -= Time.deltaTime;
-
-        float distToPlayer = Vector3.Distance(transform.position, player.position);
-
-
-        if (distToPlayer > followDistance)
-        {
-            currentTarget = null;
-            agent.isStopped = false;
-            agent.SetDestination(player.position);
-
-            Vector3 localVelocity = transform.InverseTransformDirection(agent.velocity);
-            animator.SetFloat("Horizontal", localVelocity.x);
-            animator.SetFloat("Vertical", localVelocity.z);
-            animator.SetBool("isMoving", true);
-
-            return; // ưu tiên theo player nên bỏ qua các bước tiếp theo
-        }
-
-        // Player gần thì đứng yên hoặc bắn zombie
-        currentTarget = FindNearestVisibleZombie();
-
-        if (currentTarget != null)
-        {
-            float distToTarget = Vector3.Distance(transform.position, currentTarget.transform.position);
-
-            if (distToTarget <= agent.stoppingDistance)
-            {
-                // Đứng yên khi bắn zombie
-                agent.isStopped = true;
-                agent.SetDestination(transform.position);
-
-                // Quay mặt ngang về phía zombie
-                Vector3 lookPos = new Vector3(currentTarget.transform.position.x, transform.position.y, currentTarget.transform.position.z);
-                transform.LookAt(lookPos);
-
-                animator.SetFloat("Horizontal", 0f);
-                animator.SetFloat("Vertical", 0f);
-                animator.SetBool("isMoving", false);
-
-                if (fireCooldown <= 0f)
-                {
-                    animator.SetTrigger("shoot");
-                    Shoot(currentTarget.transform);
-                    fireCooldown = fireRate;
-                }
-
-                return; // ưu tiên bắn zombie
-            }
-            else
-            {
-                // Zombie ra khỏi tầm → bỏ target, đứng yên chờ player (hoặc di chuyển nếu cần)
-                currentTarget = null;
-            }
-        }
-
-        // Không có target và player gần → đứng yên
-        agent.isStopped = true;
-        agent.SetDestination(transform.position);
-        animator.SetFloat("Horizontal", 0f);
-        animator.SetFloat("Vertical", 0f);
-        animator.SetBool("isMoving", false);
-
-    }
-    bool IsNearNavMeshLink(out NavMeshLink link)
-    {
-        NavMeshLink[] links = FindObjectsOfType<NavMeshLink>();
-        foreach (var l in links)
-        {
-            Vector3 worldStart = l.transform.TransformPoint(l.startPoint);
-            float dist = Vector3.Distance(transform.position, worldStart);
-
-            if (dist < jumdectectionRange)
-            {
-                link = l;
-                return true;
-            }
-        }
-
-        link = null;
-        return false;
-    }
-
-    //IEnumerator JumpNavMeshLink(NavMeshLink link)
-    //{
-    //    isJumping = true;
-    //    agent.isStopped = true;
-
-    //    animator.SetTrigger("Jump");
-
-    //    Vector3 start = transform.position;
-    //    Vector3 end = link.endPoint + link.transform.position;
-
-    //    float elapsed = 0f;
-    //    while (elapsed < jumpDuration)
-    //    {
-    //        float t = elapsed / jumpDuration;
-    //        float height = Mathf.Sin(Mathf.PI * t) * jumpHeight;
-    //        Vector3 newPos = Vector3.Lerp(start, end, t) + Vector3.up * height;
-
-    //        agent.Warp(newPos); // Giữ theo navmesh
-    //        elapsed += Time.deltaTime;
-    //        yield return null;
-    //    }
-
-    //    agent.Warp(end); // Đặt lại chính xác
-    //    agent.isStopped = false;
-    //    isJumping = false;
-
-
-    //}
 }
-
