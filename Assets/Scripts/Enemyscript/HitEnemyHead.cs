@@ -4,7 +4,7 @@ using UnityEngine;
 public class HitEnemyHead : MonoBehaviour
 {
     public EnemyM enemyM;
-    public ParticleSystem particle;
+    //public ParticleSystem particle;
 
 
     void OnTriggerEnter(Collider other)
@@ -12,7 +12,7 @@ public class HitEnemyHead : MonoBehaviour
         if (other.CompareTag("Bullet"))
         {
             enemyM.GetComponent<EnemyM>().TakeDamage(50);
-            particle.Play();
+            
         }
     }
 
@@ -23,8 +23,8 @@ public class HitEnemyHead : MonoBehaviour
         RaycastHit hit;
         if (Physics.Raycast(ray, out hit))
         {
-            enemyM.GetComponent<EnemyM>().TakeDamage(50);
-            particle.Play();
+            enemyM.GetComponent<EnemyM>().TakeDamage(100);
+            
         }
     }
 }
