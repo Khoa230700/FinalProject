@@ -11,7 +11,8 @@ public class RangeEnemy : MonoBehaviour
 
     public GameObject rangedProjectile;
     public Transform firePoint;
-    public float bulletSpeed;
+    public float bulletSpeed = 10f;
+    public float bulletTimelife = 7f;
 
     private float nextFireTime = 0f;
     private NavMeshAgent agent;
@@ -46,7 +47,7 @@ public class RangeEnemy : MonoBehaviour
             agent.SetDestination(player.position);
         }
 
-        // Face the player
+        
         Vector3 direction = (player.position - transform.position).normalized;
         direction.y = 0;
         if (direction != Vector3.zero)
@@ -60,6 +61,7 @@ public class RangeEnemy : MonoBehaviour
             nextFireTime = Time.time + 1f / fireRate;
             var bullet = Instantiate(rangedProjectile, firePoint.position, firePoint.rotation);
             bullet.GetComponent<Rigidbody>().AddForce(firePoint.forward * bulletSpeed);
+            Destroy(bullet, bulletTimelife);
             
         }
         animator.SetTrigger("rangeattack");
