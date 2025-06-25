@@ -23,7 +23,15 @@ public class PanelManager : MonoBehaviour
     string panelOut = "Out";
     string buttonIn = "Normal to Pressed";
     string buttonOut = "Pressed to Dissolve";
-    string buttonNormal = "Pressed to Normal";
+
+    private void Start()
+    {
+        currentButton = panels[currentIndex].button;
+        currentButton.GetComponent<Animator>().Play(buttonIn);
+
+        currentPanel = panels[currentIndex].panel;
+        currentPanel.GetComponent<Animator>().Play(panelIn);
+    }
 
     public void OpenFirstPanel()
     {
@@ -59,6 +67,7 @@ public class PanelManager : MonoBehaviour
             currentButton = panels[currentIndex].button;
             nextPanel = panels[newIndex].panel;
             nextButton = panels[newIndex].button;
+            nextPanel.SetActive(true);
 
             currentIndex = newIndex;
 
