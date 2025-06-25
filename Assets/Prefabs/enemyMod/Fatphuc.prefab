@@ -2502,7 +2502,7 @@ NavMeshAgent:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2428255698981894573}
   m_Enabled: 1
-  m_AgentTypeID: 1479372276
+  m_AgentTypeID: 0
   m_Radius: 0.5
   m_Speed: 3.5
   m_Acceleration: 8
@@ -2673,13 +2673,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 0}
-  particle: {fileID: 5932759154437536613, guid: 46bc0a3270590bb4298982458085919b, type: 3}
   attackDamage: 15
   attackSpeed: 1.5
   attackCooldown: 1.5
   attackRange: 2
   chaseRange: 10
-  explosion: {fileID: 8269600036798690981, guid: 8b2a997bc4a31e14186d37ee03dca1fa, type: 3}
+  explosion: {fileID: 1121192042590650, guid: e1b08032bec16ba4eb1ae23cbd572664, type: 3}
   explosionlifetime: 1
 --- !u!114 &7253536405624064325
 MonoBehaviour:
@@ -3793,7 +3792,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enemyM: {fileID: 7253536405624064325}
-  blood: {fileID: 2360933683143488451, guid: 730678b8a5330c449ada55bde83402ce, type: 3}
+  blood: {fileID: 2629016494315086251, guid: 5776aed3bb070e54cb09a11c8a6a5831, type: 3}
   bloodLifetime: 1
 --- !u!1 &5404579482665404375
 GameObject:
@@ -4421,7 +4420,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enemyM: {fileID: 7253536405624064325}
-  blood: {fileID: 2360933683143488451, guid: 730678b8a5330c449ada55bde83402ce, type: 3}
+  blood: {fileID: 2629016494315086251, guid: 5776aed3bb070e54cb09a11c8a6a5831, type: 3}
   bloodLifetime: 1
 --- !u!1 &6264294629375566313
 GameObject:
