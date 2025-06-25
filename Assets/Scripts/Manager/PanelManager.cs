@@ -3,10 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SettingsUI : MonoBehaviour
+public class PanelManager : MonoBehaviour
 {
     [Header("Panel List")]
-    [SerializeField] private List<PanelOfSettings> panels = new();
+    [SerializeField] private List<PanelList> panels = new();
 
     //* Index
     [SerializeField] private int currentIndex = 0;
@@ -23,6 +23,7 @@ public class SettingsUI : MonoBehaviour
     string panelOut = "Out";
     string buttonIn = "Normal to Pressed";
     string buttonOut = "Pressed to Dissolve";
+    string buttonNormal = "Pressed to Normal";
 
     public void OpenFirstPanel()
     {
@@ -64,6 +65,7 @@ public class SettingsUI : MonoBehaviour
             //* Animator
             currentPanel.GetComponent<Animator>().Play(panelOut);
             currentButton.GetComponent<Animator>().Play(buttonOut);
+
             nextPanel.GetComponent<Animator>().Play(panelIn);
             nextButton.GetComponent<Animator>().Play(buttonIn);
         }
@@ -109,7 +111,7 @@ public class SettingsUI : MonoBehaviour
 }
 
 [Serializable]
-public class PanelOfSettings
+public class PanelList
 {
     public string panelName;
     public GameObject panel;
