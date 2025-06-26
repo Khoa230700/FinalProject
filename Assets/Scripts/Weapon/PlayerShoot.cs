@@ -80,6 +80,8 @@ public class PlayerShoot : MonoBehaviour
 
     void TryShoot()
     {
+        if(PauseGameUI.isPause) return;
+
         if (currentAmmo > 0)
         {
             Shoot();
