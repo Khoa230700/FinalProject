@@ -7,17 +7,14 @@ public class PlayerShoot : MonoBehaviour
     public Animator armsAnimator;
     [HideInInspector] public WeaponUI weaponUI;
 
-    public int currentAmmo; // Chỉnh sửa chỗ 
+    public int currentAmmo;
     private float nextTimeToFire = 0f;
 
-    //private bool isShooting = false;
     private bool isRecharge = false;
-
     private bool isShootingAnimation = false;
     private bool isHoldingFire = false;
 
     public bool IsShooting => isShootingAnimation;
-    // public bool IsShooting => isShootingAnimation || isHoldingFire;
 
     [SerializeField] private ParticleSystem muzzleFlashParticle;
 
@@ -28,13 +25,13 @@ public class PlayerShoot : MonoBehaviour
 
     void Update()
     {
-        // Kiểm tra input
         if (gunData.fireMode == GunFireMode.FullAuto)
         {
-            isHoldingFire = Input.GetButton("Fire1"); // giữ trạng thái nhấn chuột
+            isHoldingFire = Input.GetButton("Fire1");
 
             if (!isRecharge && isHoldingFire && Time.time >= nextTimeToFire)
             {
+                nextTimeToFire = Time.time + 1f / gunData.roundsPerSecond; // ✅ chỉ set ở đây
                 TryShoot();
             }
         }
@@ -44,12 +41,13 @@ public class PlayerShoot : MonoBehaviour
 
             if (!isRecharge && Input.GetButtonDown("Fire1") && Time.time >= nextTimeToFire)
             {
+                nextTimeToFire = Time.time + 1f / gunData.roundsPerSecond;
                 TryShoot();
             }
         }
         else
         {
-            isHoldingFire = false; // không bắn
+            isHoldingFire = false;
         }
 
         if (Input.GetKeyDown(KeyCode.R) && !isRecharge)
@@ -85,7 +83,6 @@ public class PlayerShoot : MonoBehaviour
         if (currentAmmo > 0)
         {
             Shoot();
-            nextTimeToFire = Time.time + 1f / gunData.fireRate;
         }
         else
         {
@@ -116,7 +113,7 @@ public class PlayerShoot : MonoBehaviour
             AudioSource.PlayClipAtPoint(gunData.shootSound, shootPoint.position);
 
         Ray ray = new Ray(shootPoint.position, shootPoint.forward);
-        if (Physics.Raycast(ray, out RaycastHit hit, 100f)) 
+        if (Physics.Raycast(ray, out RaycastHit hit, 100f))
         {
             Hitbox hitbox = hit.collider.GetComponent<Hitbox>();
             if (hitbox != null && hitbox.ownerHealthSystem != null)
@@ -134,7 +131,6 @@ public class PlayerShoot : MonoBehaviour
 
         weaponUI.UpdateAmmoUI(currentAmmo, gunData.reserveAmmo);
     }
-
 
     void Reload()
     {
