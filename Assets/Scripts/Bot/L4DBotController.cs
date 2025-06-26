@@ -214,6 +214,10 @@ public class L4DBotController : MonoBehaviour
         if (col != null)
             return col.bounds.center + Vector3.up * (col.bounds.extents.y * 0.5f);
 
-        return target.position + Vector3.up * 1.2f;
+        EnemiAI ai = target.GetComponent<EnemiAI>();
+        if (ai != null && target.gameObject.CompareTag("Enemy"))
+            return target.position/* + Vector3.up * 1.5f*/;
+
+        return target.position /*+ Vector3.up * 1.2f*/;
     }
 }
