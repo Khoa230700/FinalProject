@@ -73,6 +73,10 @@ crashlytics-build.properties
 .vscode/settings.json
 .vscode/launch.json
 .vscode/extensions.json
-Assets/Plugins
+
+# Thai
 Assets/DemoAssets
 Assets/DemoAssets.meta
+Assets/Plugins
+Assets/Plugins.meta
+Packages/com.singularitygroup.hotreload
