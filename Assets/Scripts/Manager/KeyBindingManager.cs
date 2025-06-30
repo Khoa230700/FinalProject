@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -72,7 +72,7 @@ public class KeyBindingManager : MonoBehaviour
         PlayerPrefs.Save();
     }
 
-    public void LoadKey()
+    void LoadKey()
     {
         bindings.Clear();
 
@@ -86,6 +86,20 @@ public class KeyBindingManager : MonoBehaviour
             KeyCode secondary = (KeyCode)PlayerPrefs.GetInt($"{i}_Secondary" + prefsKey, (int)KeyCode.None);
 
             bindings.Add(new KeyBinding(actionName, primary, secondary));
+        }
+
+        // Nếu chưa có binding nào, tự tạo mặc định
+        if (bindings.Count == 0)
+        {
+            bindings.Add(new KeyBinding("Move Forward", KeyCode.W, KeyCode.UpArrow));
+            bindings.Add(new KeyBinding("Move Backward", KeyCode.S, KeyCode.DownArrow));
+            bindings.Add(new KeyBinding("Move Left", KeyCode.A, KeyCode.LeftArrow));
+            bindings.Add(new KeyBinding("Move Right", KeyCode.D, KeyCode.RightArrow));
+            bindings.Add(new KeyBinding("Run", KeyCode.LeftShift, KeyCode.None));
+            bindings.Add(new KeyBinding("Jump", KeyCode.Space, KeyCode.None));
+            bindings.Add(new KeyBinding("Fire", KeyCode.Mouse0, KeyCode.None));
+            bindings.Add(new KeyBinding("Aim", KeyCode.Mouse1, KeyCode.None));
+            bindings.Add(new KeyBinding("Reload", KeyCode.R, KeyCode.None));
         }
     }
 
