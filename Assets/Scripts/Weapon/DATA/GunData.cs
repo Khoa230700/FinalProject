@@ -12,7 +12,10 @@ public class GunData : ScriptableObject
     [Header("Stats")]
     public int damage;
     public float range;
-    public float fireRate;
+
+    [Tooltip("Số viên/giây. Ví dụ: 5 = bắn 5 viên mỗi giây")]
+    public float roundsPerSecond = 5f;
+
     public float accuracy;
     public int magazineSize;
     public int reserveAmmo;
@@ -27,11 +30,12 @@ public class GunData : ScriptableObject
     public Sprite gunSprite;
     public GameObject bulletPrefab;
     public AudioClip shootSound;
-    public GameObject tracerPrefab; // ✅ thêm dòng này
+    public GameObject tracerPrefab;
 
     [Header("Scope")]
     public bool hasScope;
     public float scopeZoom;
+
     [Header("Crosshair")]
     public CrosshairData crosshairData;
 }
