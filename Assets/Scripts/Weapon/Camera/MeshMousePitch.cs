@@ -35,6 +35,8 @@ public class MeshMouseLook : MonoBehaviour
         Cursor.lockState = CursorLockMode.None; // Hiện và khoá chuột vào giữa màn hình
         Cursor.visible = true;
         isShow = true;
+        Debug.Log("Show");
+
     }
 
     public void Hide()
@@ -42,5 +44,6 @@ public class MeshMouseLook : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked; // Ẩn và khoá chuột vào giữa màn hình
         Cursor.visible = false;
         isShow = false;
+        Debug.Log("Hide");
     }
 }
