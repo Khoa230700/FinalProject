@@ -18,6 +18,7 @@ public class LoadingScreenUI : MonoBehaviour
     public Transform spinnerParent;
     public Image imageObject;
     public Animator animator;
+    public AudioSource audioSource;
 
     [Range(0.25f, 10)] public float fadeSpeed = 4, backgroundFadeSpeed = 2, contentFadeSpeed = 2;
 
@@ -35,29 +36,36 @@ public class LoadingScreenUI : MonoBehaviour
     public List<Sprite> imageList = new();
     private int currentImageIndex;
 
-
     [Header("VIRTUAL SETTINGS")]
     public bool enableVirtualLoading = false;
     public float virtualLoadingTimer = 5;
     private float currentVirtualTime;
 
+    [Header("AUDIO FADE SETTINGS")]
+    [Range(1, 5)] public float audioFadeInDuration = 2f;
+    [Range(1, 5)] public float audioFadeOutDuration = 2f;
+    [Range(0, 1)] public float maxVolume = 1f;
+
     private bool processLoading;
     private AsyncOperation loadingProcess = new();
+    private Coroutine audioFadeCoroutine;
 
     void Start()
     {
         if (enableRandomHints && hintList.Count > 0) StartCoroutine(RandomHint());
         if (enableRandomImages && imageList.Count > 0) StartCoroutine(RandomImage());
+        if (audioSource != null) audioFadeCoroutine = StartCoroutine(FadeAudioVolume(audioSource.volume, maxVolume, audioFadeInDuration));
 
         statusText.text = "0%";
         progressBar.value = 0;
     }
 
-    public static void LoadScene(string targetScene)
+    public static void LoadScene(string targetScene, LoadingScreenUI gameObject)
     {
         try
         {
-            instance = Instantiate(Resources.Load<GameObject>("Standard").GetComponent<LoadingScreenUI>());
+            // instance = Instantiate(Resources.Load<GameObject>("Standard").GetComponent<LoadingScreenUI>());
+            instance = Instantiate(gameObject);
             instance.gameObject.SetActive(true);
             DontDestroyOnLoad(instance.gameObject);
 
@@ -69,26 +77,6 @@ public class LoadingScreenUI : MonoBehaviour
         catch
         {
             Debug.Log("Load");
-            if (instance != null) Destroy(instance.gameObject);
-        }
-    }
-
-    public static void LoadSceneAdditive(string targetScene)
-    {
-        try
-        {
-            instance = Instantiate(Resources.Load<GameObject>("Standard").GetComponent<LoadingScreenUI>());
-            instance.gameObject.SetActive(true);
-            DontDestroyOnLoad(instance.gameObject);
-
-            Time.timeScale = 1;
-            instance.processLoading = true;
-            instance.loadingProcess = SceneManager.LoadSceneAsync(targetScene, LoadSceneMode.Additive);
-            instance.loadingProcess.allowSceneActivation = false;
-        }
-        catch
-        {
-            Debug.Log("Load Additive");
             if (instance != null) Destroy(instance.gameObject);
         }
     }
@@ -110,6 +98,16 @@ public class LoadingScreenUI : MonoBehaviour
 
         if (canvasGroup.alpha == 0) animator.Play("In");
 
+        if (progressBar.value >= 0.8f)
+        {
+            if (audioFadeCoroutine != null)
+            {
+                StopCoroutine(audioFadeCoroutine);
+                audioFadeCoroutine = null;
+                StartCoroutine(FadeAudioVolume(audioSource.volume, 0, audioFadeOutDuration));
+            }
+        }
+
         if (loadingProcess.progress >= 0.9f)
         {
             animator.Play("Out");
@@ -126,6 +124,16 @@ public class LoadingScreenUI : MonoBehaviour
 
         if (canvasGroup.alpha == 0) animator.Play("In");
 
+        if (progressBar.value >= 0.8f)
+        {
+            if (audioFadeCoroutine != null)
+            {
+                StopCoroutine(audioFadeCoroutine);
+                audioFadeCoroutine = null;
+                StartCoroutine(FadeAudioVolume(audioSource.volume, 0, audioFadeOutDuration));
+            }
+        }
+        
         if (currentVirtualTime >= virtualLoadingTimer)
         {
             if (!loadingProcess.allowSceneActivation) loadingProcess.allowSceneActivation = true;
@@ -134,7 +142,6 @@ public class LoadingScreenUI : MonoBehaviour
             {
                 animator.Play("Out");
                 var length = animator.GetCurrentAnimatorStateInfo(0).length;
-
                 Destroy(gameObject, length);
             }
         }
@@ -188,6 +195,18 @@ public class LoadingScreenUI : MonoBehaviour
             imageObject.color = color;
             yield return null;
         }
+    }
+
+    private IEnumerator FadeAudioVolume(float from, float to, float duration)
+    {
+        float t = 0f;
+        while (t < 1f)
+        {
+            t += Time.unscaledDeltaTime / duration;
+            audioSource.volume = Mathf.Lerp(from, to, t);
+            yield return null;
+        }
+        audioSource.volume = to;
     }
 
     private T GetRandomItem<T>(List<T> list, ref int lastIndex)
