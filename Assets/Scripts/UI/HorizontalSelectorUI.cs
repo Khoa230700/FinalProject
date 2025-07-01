@@ -15,7 +15,7 @@ public class HorizontalSelectorUI : MonoBehaviour
     [SerializeField] private Transform indicatorParent;
     [SerializeField] private GameObject indicatorPrefab;
 
-    [Header("Item")]
+    [Header("Items")]
     [SerializeField] private List<ItemSelector> itemSelectors = new();
 
     private int index = 0, previousIndex;
@@ -36,9 +36,12 @@ public class HorizontalSelectorUI : MonoBehaviour
 
         UpdateText();
         CreateIndicatorUI();
-        
-        if (itemSelectors.Count > 0)
+
+        if (itemSelectors.Count > 0 && index < itemSelectors.Count)
+        {
+            UpdateSelection("");
             itemSelectors[index].OnValueChange?.Invoke();
+        }
     }
 
     private void CreateIndicatorUI()
