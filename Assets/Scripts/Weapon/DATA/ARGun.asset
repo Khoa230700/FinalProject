@@ -16,7 +16,7 @@ MonoBehaviour:
   gunType: 1
   damage: 10
   range: 10
-  roundsPerSecond: 2
+  roundsPerSecond: 5
   accuracy: 10
   magazineSize: 30
   reserveAmmo: 150
