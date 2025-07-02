@@ -64,7 +64,7 @@ MonoBehaviour:
   hintFadeDuration: 1.5
   hintList:
   - "Keep your face to the sunshine and you can\u2019t see a <sub>shadow</sub>"
-  - Do not <size=150%>pray</size> for an easy life, pray for the strength to endure
+  - Do not pray for an easy life, pray for the <size=150%>strength</size> to endure
     a difficult one.
   - You should learn from your <color=red>competitor</color> but never copy. Copy
     and you die.
@@ -74,12 +74,13 @@ MonoBehaviour:
   imageList:
   - {fileID: 21300000, guid: eedf83a390c738d4c948c42b4652ed26, type: 3}
   - {fileID: 21300000, guid: 0f3c1ef069e9070479f0a720a9c2998d, type: 3}
-  - {fileID: 21300000, guid: dccf0601820126340ba027bf345ea1e7, type: 3}
+  - {fileID: 21300000, guid: 21ad83572fa160d45b68dacd2dc504fc, type: 3}
   enableVirtualLoading: 1
-  virtualLoadingTimer: 10
-  audioFadeInDuration: 2
-  audioFadeOutDuration: 2
-  maxVolume: 0.8
+  virtualLoadingTimer: 20
+  audioFadeInDuration: 0.05
+  audioFadeOutDuration: 0.5
+  timeFadeOut: 0.9
+  maxVolume: 1
 --- !u!82 &5504540153964398811
 AudioSource:
   m_ObjectHideFlags: 0
@@ -87,13 +88,13 @@ AudioSource:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 948103164451650808}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: 841ce92210f1a3740ae45df234d75234, type: 3}
-  m_Resource: {fileID: 8300000, guid: 841ce92210f1a3740ae45df234d75234, type: 3}
+  m_audioClip: {fileID: 8300000, guid: e7b6535290de1fa4dbc94d6bd1cca600, type: 3}
+  m_Resource: {fileID: 8300000, guid: e7b6535290de1fa4dbc94d6bd1cca600, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 0.506
+  m_Volume: 0
   m_Pitch: 1
   Loop: 1
   Mute: 0
@@ -873,7 +874,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 21ad83572fa160d45b68dacd2dc504fc, type: 3}
+  m_Sprite: {fileID: 0}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1

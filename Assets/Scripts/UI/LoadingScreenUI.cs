@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -41,51 +42,55 @@ public class LoadingScreenUI : MonoBehaviour
     public float virtualLoadingTimer = 5;
     private float currentVirtualTime;
 
-    [Header("AUDIO FADE SETTINGS")]
-    [Range(1, 5)] public float audioFadeInDuration = 2f;
-    [Range(1, 5)] public float audioFadeOutDuration = 2f;
-    [Range(0, 1)] public float maxVolume = 1f;
+    // [Header("AUDIO FADE SETTINGS")]
+    // [Range(0, 3)] public float audioFadeInDuration = 2f;
+    // [Range(0, 3)] public float audioFadeOutDuration = 2f;
+    // [Range(0, 1)] public float timeFadeOut = 0.9f;
+    // [Range(0, 1)] public float maxVolume = 1f;
 
     private bool processLoading;
     private AsyncOperation loadingProcess = new();
-    private Coroutine audioFadeCoroutine;
+    // private Coroutine audioFadeCoroutine;
 
-    void Start()
+    void OnEnable()
     {
+        StopAllCoroutines();
+
         if (enableRandomHints && hintList.Count > 0) StartCoroutine(RandomHint());
         if (enableRandomImages && imageList.Count > 0) StartCoroutine(RandomImage());
-        if (audioSource != null) audioFadeCoroutine = StartCoroutine(FadeAudioVolume(audioSource.volume, maxVolume, audioFadeInDuration));
+        // if (audioSource != null) audioFadeCoroutine = StartCoroutine(FadeAudioVolume(audioSource.volume, maxVolume, audioFadeInDuration));
 
+        imageObject.sprite = GetRandomItem(imageList, ref currentImageIndex);
         statusText.text = "0%";
         progressBar.value = 0;
     }
 
-    public static void LoadScene(string targetScene, LoadingScreenUI gameObject)
+    public static void LoadScene(string targetScene, LoadingScreenUI loadingScreenPrefab)
     {
-        try
-        {
-            // instance = Instantiate(Resources.Load<GameObject>("Standard").GetComponent<LoadingScreenUI>());
-            instance = Instantiate(gameObject);
-            instance.gameObject.SetActive(true);
-            DontDestroyOnLoad(instance.gameObject);
+        instance = Instantiate(loadingScreenPrefab);
+        instance.gameObject.SetActive(true);
+        DontDestroyOnLoad(instance.gameObject);
+        instance.StartCoroutine(instance.LoadSceneRoutine(targetScene));
+    }
 
-            Time.timeScale = 1;
-            instance.processLoading = true;
-            instance.loadingProcess = SceneManager.LoadSceneAsync(targetScene);
-            instance.loadingProcess.allowSceneActivation = false;
-        }
-        catch
-        {
-            Debug.Log("Load");
-            if (instance != null) Destroy(instance.gameObject);
-        }
+    public IEnumerator LoadSceneRoutine(string targetScene)
+    {
+        yield return new WaitForSeconds(0.1f);
+
+        Time.timeScale = 1;
+        processLoading = true;
+        loadingProcess = SceneManager.LoadSceneAsync(targetScene);
+        loadingProcess.allowSceneActivation = false;
     }
 
     void Update()
     {
         if (!processLoading) return;
-        if (enableVirtualLoading) ProcessVirtualLoading();
-        else ProcessLoading();
+
+        if (enableVirtualLoading)
+            ProcessVirtualLoading();
+        else
+            ProcessLoading();
     }
 
     void ProcessLoading()
@@ -98,15 +103,15 @@ public class LoadingScreenUI : MonoBehaviour
 
         if (canvasGroup.alpha == 0) animator.Play("In");
 
-        if (progressBar.value >= 0.8f)
-        {
-            if (audioFadeCoroutine != null)
-            {
-                StopCoroutine(audioFadeCoroutine);
-                audioFadeCoroutine = null;
-                StartCoroutine(FadeAudioVolume(audioSource.volume, 0, audioFadeOutDuration));
-            }
-        }
+        // if (progressBar.value >= timeFadeOut)
+        // {
+        //     if (audioFadeCoroutine != null)
+        //     {
+        //         StopCoroutine(audioFadeCoroutine);
+        //         audioFadeCoroutine = null;
+        //         StartCoroutine(FadeAudioVolume(audioSource.volume, 0, audioFadeOutDuration));
+        //     }
+        // }
 
         if (loadingProcess.progress >= 0.9f)
         {
@@ -124,16 +129,16 @@ public class LoadingScreenUI : MonoBehaviour
 
         if (canvasGroup.alpha == 0) animator.Play("In");
 
-        if (progressBar.value >= 0.8f)
-        {
-            if (audioFadeCoroutine != null)
-            {
-                StopCoroutine(audioFadeCoroutine);
-                audioFadeCoroutine = null;
-                StartCoroutine(FadeAudioVolume(audioSource.volume, 0, audioFadeOutDuration));
-            }
-        }
-        
+        // if (progressBar.value >= timeFadeOut)
+        // {
+        //     if (audioFadeCoroutine != null)
+        //     {
+        //         StopCoroutine(audioFadeCoroutine);
+        //         audioFadeCoroutine = null;
+        //         StartCoroutine(FadeAudioVolume(audioSource.volume, 0, audioFadeOutDuration));
+        //     }
+        // }
+
         if (currentVirtualTime >= virtualLoadingTimer)
         {
             if (!loadingProcess.allowSceneActivation) loadingProcess.allowSceneActivation = true;
@@ -177,7 +182,7 @@ public class LoadingScreenUI : MonoBehaviour
         Color color = hintsText.color;
         while (t < 1f)
         {
-            t += Time.deltaTime / hintFadeDuration;
+            t += Time.unscaledDeltaTime / hintFadeDuration;
             color.a = Mathf.Lerp(from, to, t);
             hintsText.color = color;
             yield return null;
@@ -190,31 +195,36 @@ public class LoadingScreenUI : MonoBehaviour
         Color color = imageObject.color;
         while (t < 1f)
         {
-            t += Time.deltaTime * imageFadingSpeed;
+            t += Time.unscaledDeltaTime * imageFadingSpeed;
             color.a = Mathf.Lerp(from, to, t);
             imageObject.color = color;
             yield return null;
         }
     }
 
-    private IEnumerator FadeAudioVolume(float from, float to, float duration)
-    {
-        float t = 0f;
-        while (t < 1f)
-        {
-            t += Time.unscaledDeltaTime / duration;
-            audioSource.volume = Mathf.Lerp(from, to, t);
-            yield return null;
-        }
-        audioSource.volume = to;
-    }
+    // private IEnumerator FadeAudioVolume(float from, float to, float duration)
+    // {
+    //     float t = 0f;
+    //     while (t < 1f)
+    //     {
+    //         t += Time.unscaledDeltaTime * duration;
+    //         audioSource.volume = Mathf.Lerp(from, to, t);
+    //         yield return null;
+    //     }
+    //     audioSource.volume = to;
+    // }
 
     private T GetRandomItem<T>(List<T> list, ref int lastIndex)
     {
         if (list.Count <= 1) return list[0];
         int newIndex;
-        do { newIndex = Random.Range(0, list.Count); } while (newIndex == lastIndex);
+        do
+        {
+            newIndex = Random.Range(0, list.Count);
+        }
+        while (newIndex == lastIndex);
         lastIndex = newIndex;
+
         return list[newIndex];
     }
 }
