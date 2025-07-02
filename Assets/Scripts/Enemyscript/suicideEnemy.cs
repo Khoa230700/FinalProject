@@ -1,11 +1,12 @@
 using System.Collections;
+using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
 
 public class suicideEnemy : MonoBehaviour
 {
-    public Transform player;
+    //public Transform player;
     NavMeshAgent agent;
     Animator enemyAnimation;
 
@@ -23,6 +24,12 @@ public class suicideEnemy : MonoBehaviour
     public GameObject explosion;
     public float explosionlifetime = 5f;
 
+    //
+    public float detectionRadius = 10f;
+    private Transform currentTarget;
+    public float moveSpeed = 4f;
+    public LayerMask targetLayer;
+
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
@@ -36,18 +43,29 @@ public class suicideEnemy : MonoBehaviour
 
     void Update()
     {
-        agent.destination = player.position;
+        
         enemyAnimation.SetFloat("speed", agent.velocity.magnitude);
 
-        float distance = Vector3.Distance(transform.position, player.position);
+        
 
         //if (distance <= chaseRange)
         //{
         //agent.SetDestination(player.position);
 
-        if (distance <= attackRange)
+        FindClosestTarget();
+
+        if (currentTarget != null)
         {
-            Attack();
+            float distance = Vector3.Distance(transform.position, currentTarget.position);
+
+            if (distance > attackRange)
+            {
+                ChaseTarget();
+            }
+            else
+            {
+                Attack();
+            }
         }
         //}
         //else
@@ -86,5 +104,34 @@ public class suicideEnemy : MonoBehaviour
     {
         yield return new WaitForSeconds(1);
         Destroy(gameObject);
+    }
+
+    //new
+    void FindClosestTarget()
+    {
+        Collider[] hits = Physics.OverlapSphere(transform.position, detectionRadius, targetLayer);
+        if (hits.Length == 0)
+        {
+            currentTarget = null;
+            return;
+        }
+
+        Transform closest = hits
+            .OrderBy(h => Vector3.Distance(transform.position, h.transform.position))
+            .First().transform;
+
+        currentTarget = closest;
+    }
+
+    void ChaseTarget()
+    {
+        Vector3 direction = (currentTarget.position - transform.position).normalized;
+        transform.position += direction * moveSpeed * Time.deltaTime;
+        transform.LookAt(currentTarget); // Optional: face the target
+    }
+    void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, detectionRadius);
     }
 }
