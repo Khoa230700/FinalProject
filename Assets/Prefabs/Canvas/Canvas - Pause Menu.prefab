@@ -2895,10 +2895,10 @@ RectTransform:
   - {fileID: 3450228955845145289}
   m_Father: {fileID: 5328368499062327529}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 100, y: 100}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1001 &2201864347714078992
 PrefabInstance:
@@ -4493,6 +4493,10 @@ PrefabInstance:
       propertyPath: pressEvent.m_PersistentCalls.m_Calls.Array.data[1].m_Target
       value: 
       objectReference: {fileID: 5720223400699409313}
+    - target: {fileID: 1308645228987052344, guid: 44474f72ca2f503408812d3e1927e8db, type: 3}
+      propertyPath: m_Alpha
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1797545047197054023, guid: 44474f72ca2f503408812d3e1927e8db, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -4727,6 +4731,10 @@ PrefabInstance:
     - target: {fileID: 1040088783139482951, guid: 4c50a999ed506084ba382b450e5aeaa1, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1521004599812942638, guid: 4c50a999ed506084ba382b450e5aeaa1, type: 3}
+      propertyPath: m_Alpha
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4733981995305425561, guid: 4c50a999ed506084ba382b450e5aeaa1, type: 3}
       propertyPath: m_AnchorMax.y
