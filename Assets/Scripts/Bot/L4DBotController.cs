@@ -48,10 +48,10 @@ public class L4DBotController : MonoBehaviour
             animator.SetFloat("Vertical", localVelocity.z);
             animator.SetBool("isMoving", true);
 
-            return; // ưu tiên theo player nên bỏ qua các bước tiếp theo
+            return; 
         }
 
-        // Player gần thì đứng yên hoặc bắn zombie
+        
         currentTarget = FindNearestVisibleZombie();
 
         if (currentTarget != null)
@@ -65,7 +65,7 @@ public class L4DBotController : MonoBehaviour
               
                 agent.SetDestination(transform.position);
                 AudioBotManager.Instance.StopBotSound();
-                
+
                 Vector3 lookPos = new Vector3(currentTarget.transform.position.x, transform.position.y, currentTarget.transform.position.z);
                 transform.LookAt(lookPos);
 
@@ -78,6 +78,7 @@ public class L4DBotController : MonoBehaviour
                     
                     animator.SetTrigger("shoot");
                     Shoot(currentTarget.transform);
+                    AudioBotManager.Instance.ShootSound();
                     fireCooldown = fireRate;
                 }
 

@@ -1,15 +1,18 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 using UnityEngine.AI;
 
 public class L4DBotMeleeController : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] Transform player;
-
-
+    private int AttackCombo;
+    private float lastAttackTime;
+    [SerializeField] float attackCooldown = 1.2f;
     [Header("AI Settings")]
-    [SerializeField] float visionRange = 20f;
+    [SerializeField] float visionRange = 10f;
     [SerializeField] float attackRange = 3f;
+    public float detectionRadius = 10f;
 
     private NavMeshAgent agent;
     private Animator animator;
@@ -52,37 +55,32 @@ public class L4DBotMeleeController : MonoBehaviour
             if (distToTarget > attackRange)
             {
                 // CHƯA ĐỦ GẦN → ĐI LẠI
+
                 agent.isStopped = false;
                 agent.SetDestination(currentTarget.transform.position);
-
                 Vector3 localVelocity = transform.InverseTransformDirection(agent.velocity);
                 animator.SetFloat("Horizontal", localVelocity.x);
                 animator.SetFloat("Vertical", localVelocity.z);
                 animator.SetBool("isMoving", true);
+                return;
             }
             else
             {
                 // ĐỦ GẦN → DỪNG LẠI TẤN CÔNG
                 agent.isStopped = true;
-
                 Vector3 lookPos = new Vector3(currentTarget.transform.position.x, transform.position.y, currentTarget.transform.position.z);
                 transform.LookAt(lookPos);
-
                 animator.SetFloat("Horizontal", 0f);
                 animator.SetFloat("Vertical", 0f);
                 animator.SetBool("isMoving", false);
-                animator.SetTrigger("Attack");
+
+                StartCoroutine(TriggerAttack());
+                return;
             }
 
-            return;
+           
+
         }
-
-        // Không thấy zombie → đứng yên
-        agent.isStopped = true;
-        animator.SetFloat("Horizontal", 0f);
-        animator.SetFloat("Vertical", 0f);
-        animator.SetBool("isMoving", false);
-
     }
 
     private GameObject FindNearestVisibleZombie()
@@ -100,6 +98,14 @@ public class L4DBotMeleeController : MonoBehaviour
             {
                 if (dist < minDist)
                 {
+                    if (currentTarget == null)
+                    {
+                        Debug.Log("No target found");
+                    }
+                    else
+                    {
+                        Debug.Log("Target found: " + currentTarget.name);
+                    }
                     minDist = dist;
                     closest = zombie;
                 }
@@ -125,6 +131,19 @@ public class L4DBotMeleeController : MonoBehaviour
 
         return false;
     }
+    IEnumerator TriggerAttack()
+    {
+        if (Time.time - lastAttackTime < attackCooldown)
+            yield break;
+
+        lastAttackTime = Time.time;
+
+        AttackCombo = Random.Range(0, 3);
+        animator.SetInteger("AttackCombo", AttackCombo);
+        yield return null;
+        animator.SetTrigger("Attack");
+        Debug.Log("Attack Triggered with Combo: " + AttackCombo);
+    }
 
     private Vector3 GetAimPoint(Transform target)
     {
@@ -136,6 +155,16 @@ public class L4DBotMeleeController : MonoBehaviour
         if (col != null)
             return col.bounds.center + Vector3.up * (col.bounds.extents.y * 0.5f);
 
-        return target.position + Vector3.up * 1.2f;
+        EnemiAI ai = target.GetComponent<EnemiAI>();
+        if (ai != null && target.gameObject.CompareTag("Enemy"))
+            return target.position/* + Vector3.up * 1.5f*/;
+
+        return target.position /*+ Vector3.up * 1.2f*/;
     }
+    void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, detectionRadius);
+    }
+ 
 }
