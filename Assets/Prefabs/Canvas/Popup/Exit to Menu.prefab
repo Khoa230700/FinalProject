@@ -147,6 +147,7 @@ GameObject:
   - component: {fileID: 8557638463356525325}
   - component: {fileID: 6170642228452838936}
   - component: {fileID: 3377925668365346333}
+  - component: {fileID: 5029870871047934313}
   m_Layer: 5
   m_Name: Yes
   m_TagString: Untagged
@@ -254,6 +255,20 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &5029870871047934313
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 250022138867863514}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 73a8b4b198f015a4eb3c61fe72ae99a9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isSoundOnHover: 1
+  isSoundOnClick: 1
 --- !u!1 &350613341354527484
 GameObject:
   m_ObjectHideFlags: 0
@@ -737,7 +752,7 @@ MonoBehaviour:
         m_CallState: 2
       - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-        m_MethodName: SetActive
+        m_MethodName: 
         m_Mode: 6
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -4600,6 +4615,7 @@ GameObject:
   - component: {fileID: 4733981995305425561}
   - component: {fileID: 7626826299043212554}
   - component: {fileID: 7831662311487879934}
+  - component: {fileID: 8088063508340150284}
   m_Layer: 5
   m_Name: Cancel
   m_TagString: Untagged
@@ -4719,6 +4735,20 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &8088063508340150284
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8971978744918574369}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 73a8b4b198f015a4eb3c61fe72ae99a9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isSoundOnHover: 1
+  isSoundOnClick: 1
 --- !u!1 &8990634358146960662
 GameObject:
   m_ObjectHideFlags: 0

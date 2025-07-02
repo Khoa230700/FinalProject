@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class KeyBindingPopup : MonoBehaviour
 {
@@ -18,21 +19,25 @@ public class KeyBindingPopup : MonoBehaviour
 
     private void Update()
     {
-        if (isListen)
-        {
-            foreach (KeyCode keyCode in Enum.GetValues(typeof(KeyCode)))
-            {
-                if (Input.GetKeyDown(keyCode))
-                {
-                    if (keyCode == KeyCode.Escape)
-                    {
-                        Complete(KeyCode.None);
-                        return;
-                    }
+        if (!isListen) return;
 
-                    Complete(keyCode);
+        if (Input.GetMouseButtonDown(0) && EventSystem.current.IsPointerOverGameObject())
+        {
+            return;
+        }
+
+        foreach (KeyCode keyCode in Enum.GetValues(typeof(KeyCode)))
+        {
+            if (Input.GetKeyDown(keyCode))
+            {
+                if (keyCode == KeyCode.Escape)
+                {
+                    Complete(KeyCode.None);
                     return;
                 }
+
+                Complete(keyCode);
+                return;
             }
         }
     }
