@@ -121,13 +121,14 @@ public class PlayerShoot : MonoBehaviour
             if (hitbox != null && hitbox.ownerHealthSystem != null)
             {
                 bool isHeadshot = hitbox.hitboxType == Hitbox.HitboxType.Head;
-                bool isWeakspot = hitbox.hitboxType == Hitbox.HitboxType.WeakSpot;
+                //bool isWeakspot = hitbox.hitboxType == Hitbox.HitboxType.WeakSpot;
 
                 float finalDamage = gunData.damage;
-                if (isWeakspot) finalDamage = 9999f;
-                else if (isHeadshot) finalDamage *= 2f;
+                //if (isWeakspot) finalDamage = 9999f;
+                if (isHeadshot) finalDamage *= 2f;
 
                 hitbox.ownerHealthSystem.TakeDamage(finalDamage);
+                hitbox.OnHit(finalDamage, hit.point);  // ← thêm dòng này
             }
         }
 
