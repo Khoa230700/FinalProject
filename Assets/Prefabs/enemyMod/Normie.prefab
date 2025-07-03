@@ -2756,7 +2756,7 @@ MonoBehaviour:
   attackSpeed: 1.5
   attackCooldown: 1.5
   attackRange: 2
-  chaseRange: 0
+  chaseRange: 40
   detectionRadius: 10
   moveSpeed: 4
   targetLayer:
