@@ -41,7 +41,7 @@ LineRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6749693277989217856}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -153,3 +153,4 @@ MonoBehaviour:
   tracerColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   tracerDuration: 0.01
   maxDistance: 10
+  shortDistance: 2
