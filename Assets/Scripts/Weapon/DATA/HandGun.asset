@@ -15,13 +15,14 @@ MonoBehaviour:
   gunName: HandGun
   gunType: 0
   damage: 1
-  range: 1
+  range: 10
   roundsPerSecond: 1
   accuracy: 1
   magazineSize: 7
   reserveAmmo: 30
   reloadTime: 1
   fireMode: 0
+  availableFireModes: 00000000
   recoil: 5
   bulletSpeed: 4
   penetrationPower: 4

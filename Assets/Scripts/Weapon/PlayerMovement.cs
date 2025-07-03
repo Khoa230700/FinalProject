@@ -55,14 +55,15 @@ public class PlayerMovement : MonoBehaviour
         // Di chuyển ngang
         controller.Move(move * currentSpeed * Time.deltaTime);
 
-        // Nhảy
+        // Khi nhảy
         if (KeyBindingManager.Instance.GetKeyDown("Jump") && isGrounded)
         {
-            velocity.y = Mathf.Sqrt(playerStats.jumpHeight * -2f * playerStats.gravity);
+            float g = Mathf.Abs(playerStats.gravity);  // Dùng giá trị dương cho công thức
+            velocity.y = Mathf.Sqrt(2f * g * playerStats.jumpHeight);
         }
 
-        // Trọng lực
-        velocity.y += playerStats.gravity * Time.deltaTime;
+        // Gravity
+        velocity.y += playerStats.gravity * Time.deltaTime; // gravity âm để kéo xuống
         controller.Move(velocity * Time.deltaTime);
     }
 

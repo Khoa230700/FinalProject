@@ -3,6 +3,7 @@ using UnityEngine.AI;
 using System.Collections;
 using static NewEnemyAI;
 using System.Linq;
+using NUnit;
 
 public class EnemiAI : MonoBehaviour
 {
@@ -33,6 +34,7 @@ public class EnemiAI : MonoBehaviour
     {
         agent = GetComponent<NavMeshAgent>();
         enemyAnimation = GetComponent<Animator>();
+        player = GameObject.FindWithTag("Player").transform;
     }
 
     void Update()
@@ -67,7 +69,7 @@ public class EnemiAI : MonoBehaviour
         {
             lastAttackTime = Time.time;
             // damage player()
-            //player.GetComponent<HealthBase>().TakeDamage(10);
+            player.GetComponent<PlayerHealth>().TakeDamage(10, 0,this.transform.position);
             Debug.Log("Enemy attacks the player!");
         }
         enemyAnimation.SetTrigger("attack");

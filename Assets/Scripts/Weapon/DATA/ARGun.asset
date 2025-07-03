@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gunName: AK
   gunType: 1
-  damage: 10
+  damage: 50
   range: 10
   roundsPerSecond: 5
   accuracy: 10
@@ -22,6 +22,7 @@ MonoBehaviour:
   reserveAmmo: 150
   reloadTime: 1
   fireMode: 1
+  availableFireModes: 0100000002000000
   recoil: 1
   bulletSpeed: 20
   penetrationPower: 1
