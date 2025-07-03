@@ -14,5 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   walkSpeed: 5
   runSpeed: 8
-  jumpHeight: 2
-  gravity: -9.81
+  jumpHeight: 1.8
+  gravity: -20
+  airControlMultiplier: 0.5

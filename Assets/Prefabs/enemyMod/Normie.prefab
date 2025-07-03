@@ -976,6 +976,7 @@ GameObject:
   - component: {fileID: 218087930694890474}
   - component: {fileID: 1316558654747550126}
   - component: {fileID: 5434881562994337880}
+  - component: {fileID: 3289584220954763909}
   m_Layer: 0
   m_Name: HitEnemy8
   m_TagString: HeadShot
@@ -1047,6 +1048,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enemyM: {fileID: 639718399531827442}
+--- !u!114 &3289584220954763909
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3239438909805355896}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0405504e9ab75343a88002f088d9d05, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ownerHealthSystem: {fileID: 639718399531827442}
+  bloodEffect: {fileID: 8967264388286551387, guid: 75f2e05292738d242a060d01657a4ce5, type: 3}
+  hitboxType: 1
 --- !u!1 &3314240867215492325
 GameObject:
   m_ObjectHideFlags: 0
@@ -1249,7 +1265,7 @@ GameObject:
   - component: {fileID: 639718399531827442}
   m_Layer: 2
   m_Name: Normie
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1262,10 +1278,10 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3738223141133144338}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: 1, z: -0, w: 0}
+  m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
   m_LocalPosition: {x: 4.82076, y: 0.00000047683716, z: -0.24157715}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 4281287692047061046}
   - {fileID: 149598222079393527}
@@ -2699,7 +2715,7 @@ NavMeshAgent:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3738223141133144338}
   m_Enabled: 1
-  m_AgentTypeID: 0
+  m_AgentTypeID: -334000983
   m_Radius: 0.5
   m_Speed: 4
   m_Acceleration: 2
@@ -3933,6 +3949,7 @@ GameObject:
   - component: {fileID: 2770912297625699100}
   - component: {fileID: 4464247418470829019}
   - component: {fileID: 6595765820859634527}
+  - component: {fileID: 1109460859803740406}
   m_Layer: 0
   m_Name: HitEnemy3
   m_TagString: BodyShot
@@ -4006,6 +4023,21 @@ MonoBehaviour:
   enemyM: {fileID: 639718399531827442}
   blood: {fileID: 2629016494315086251, guid: 5776aed3bb070e54cb09a11c8a6a5831, type: 3}
   bloodLifetime: 1
+--- !u!114 &1109460859803740406
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6751500013905844598}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0405504e9ab75343a88002f088d9d05, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ownerHealthSystem: {fileID: 639718399531827442}
+  bloodEffect: {fileID: 1172649150807526450, guid: 696ec32829bb413498cef4215a2a1926, type: 3}
+  hitboxType: 0
 --- !u!1 &6768120555724237328
 GameObject:
   m_ObjectHideFlags: 0
