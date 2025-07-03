@@ -746,6 +746,7 @@ GameObject:
   - component: {fileID: 6047162523273379218}
   - component: {fileID: 1171540291135690815}
   - component: {fileID: 103627199136977146}
+  - component: {fileID: 3312967206366577915}
   m_Layer: 5
   m_Name: Canvas - Pause Menu
   m_TagString: Untagged
@@ -938,6 +939,18 @@ MonoBehaviour:
           m_StringArgument: In
           m_BoolArgument: 1
         m_CallState: 2
+      - m_Target: {fileID: 3312967206366577915}
+        m_TargetAssemblyTypeName: PauseGameUI, Assembly-CSharp
+        m_MethodName: Pause
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: In
+          m_BoolArgument: 1
+        m_CallState: 2
 --- !u!114 &103627199136977146
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -951,6 +964,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   canvasScaler: {fileID: 4635588221915547790}
+--- !u!114 &3312967206366577915
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2505301146601244216}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6de69b0c57ceda3418af2e717c1a0b72, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2815101291789320853
 GameObject:
   m_ObjectHideFlags: 0
@@ -2300,6 +2325,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 3312967206366577915}
+        m_TargetAssemblyTypeName: PauseGameUI, Assembly-CSharp
+        m_MethodName: Resume
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!95 &6719860925955575871
 Animator:
   serializedVersion: 7
@@ -2728,6 +2765,18 @@ MonoBehaviour:
       - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: MeshMouseLook, Assembly-CSharp
         m_MethodName: Hide
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: Out
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 3312967206366577915}
+        m_TargetAssemblyTypeName: PauseGameUI, Assembly-CSharp
+        m_MethodName: Resume
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -3272,7 +3321,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3300445005970564418, guid: a40ddb6321a18444cb35eb34b779547b, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 239
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3315115884708638343, guid: a40ddb6321a18444cb35eb34b779547b, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
@@ -3712,7 +3761,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7718935194733247092, guid: a40ddb6321a18444cb35eb34b779547b, type: 3}
       propertyPath: m_Value
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7782140416304549774, guid: a40ddb6321a18444cb35eb34b779547b, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
