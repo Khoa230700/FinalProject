@@ -976,7 +976,7 @@ GameObject:
   - component: {fileID: 218087930694890474}
   - component: {fileID: 1316558654747550126}
   - component: {fileID: 5434881562994337880}
-  - component: {fileID: 2064364931228868797}
+  - component: {fileID: 3289584220954763909}
   m_Layer: 0
   m_Name: HitEnemy8
   m_TagString: HeadShot
@@ -1048,7 +1048,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enemyM: {fileID: 639718399531827442}
---- !u!114 &2064364931228868797
+--- !u!114 &3289584220954763909
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1265,7 +1265,7 @@ GameObject:
   - component: {fileID: 639718399531827442}
   m_Layer: 2
   m_Name: Normie
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2774,12 +2774,12 @@ MonoBehaviour:
   attackSpeed: 1.5
   attackCooldown: 1.5
   attackRange: 2
-  chaseRange: 0
+  chaseRange: 40
   detectionRadius: 10
   moveSpeed: 4
   targetLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 256
 --- !u!114 &639718399531827442
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3951,7 +3951,7 @@ GameObject:
   - component: {fileID: 2770912297625699100}
   - component: {fileID: 4464247418470829019}
   - component: {fileID: 6595765820859634527}
-  - component: {fileID: 4055517969184889976}
+  - component: {fileID: 1109460859803740406}
   m_Layer: 0
   m_Name: HitEnemy3
   m_TagString: BodyShot
@@ -4025,7 +4025,7 @@ MonoBehaviour:
   enemyM: {fileID: 639718399531827442}
   blood: {fileID: 2629016494315086251, guid: 5776aed3bb070e54cb09a11c8a6a5831, type: 3}
   bloodLifetime: 1
---- !u!114 &4055517969184889976
+--- !u!114 &1109460859803740406
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

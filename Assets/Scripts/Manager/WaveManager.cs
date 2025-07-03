@@ -1,93 +1,136 @@
 ﻿using UnityEngine;
+using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 
-public class WaveManager : MonoBehaviour
+public class EnemySpawnManager : MonoBehaviour
 {
-    [System.Serializable]
-    public class WaveContent
+    public Transform[] spawnPoints;
+
+    private int currentWave = 0;
+    private int activeEnemies = 0;
+    private bool waitingForNextWave = false;
+
+    public float timeBetweenWaves = 60f;
+    private bool isSkipping = false;
+
+    private Dictionary<string, int>[] waveConfigs = new Dictionary<string, int>[]
     {
-        public int normalZombie;
-        public int explodeZombie;
-        public int scorpionZombie;
+        new Dictionary<string, int> { { "normal", 10 } },
+        new Dictionary<string, int> { { "normal", 30 }, { "shot", 5 } },
+        new Dictionary<string, int> { { "normal", 30 }, { "shot", 5 }, { "bomb", 5 } }
+    };
+
+    void Start()
+    {
+        StartCoroutine(GameLoop());
     }
 
-    [Header("Wave Settings")]
-    [SerializeField] private List<Transform> spawnPoints; // Danh sách vị trí spawn zombies
-    [SerializeField] private GameObject normalZombiePrefab;
-    [SerializeField] private GameObject explodeZombiePrefab;
-    [SerializeField] private GameObject scorpionZombiePrefab;
-
-    [SerializeField] private float spawnDelay = 0.5f; // Delay mỗi lần spoawn
-    [Header("Wave For Map 1")]
-    [SerializeField] private List<WaveContent> waves; // Setup từng wave cố định
-
-    private int currentWaveIndex = 0;
-    private int enemiesRemaining;
-    private Queue<GameObject> spawnQueue = new Queue<GameObject>();
-
-    private void Start()
+    void Update()
     {
-        
-    }
-
-    // Bắt đầu wave
-    private void StartWave()
-    {
-        if(currentWaveIndex >= waves.Count)
+        if (waitingForNextWave && Input.GetKeyDown(KeyCode.N))
         {
-            Debug.Log("Hoàn thành map 1!");
-            EvenBus.WaveCompleted();
+            isSkipping = true;
+        }
+    }
+
+    IEnumerator GameLoop()
+    {
+        yield return null; 
+
+        while (currentWave < waveConfigs.Length)
+        {
+            // Đợi đến khi enemy wave trước bị tiêu diệt
+            if (currentWave > 0)
+            {
+                yield return new WaitUntil(() => activeEnemies <= 0);
+                waitingForNextWave = true;
+
+                float timer = 0f;
+                while (timer < timeBetweenWaves && !isSkipping)
+                {
+                    timer += Time.deltaTime;
+                    yield return null;
+                }
+
+                waitingForNextWave = false;
+                isSkipping = false;
+            }
+
+            SpawnWave(currentWave);
+            currentWave++;
+        }
+    }
+
+    void SpawnWave(int waveIndex)
+    {
+        StartCoroutine(SpawnWaveGradually(waveIndex));
+    }
+
+    IEnumerator SpawnWaveGradually(int waveIndex)
+    {
+        var config = waveConfigs[waveIndex];
+        float delayBetweenSpawns = 0.3f;
+
+        foreach (var kvp in config)
+        {
+            string tag = kvp.Key;
+            int count = kvp.Value;
+
+            if (tag == "normal")
+            {
+                
+                int perPoint = count / spawnPoints.Length;
+
+                for (int i = 0; i < spawnPoints.Length; i++)
+                {
+                    for (int j = 0; j < perPoint; j++)
+                    {
+                        Transform spawnPoint = spawnPoints[i];
+                        SpawnEnemyFromPool(tag, spawnPoint);
+                        yield return new WaitForSeconds(delayBetweenSpawns);
+                    }
+                }
+            }
+            else
+            {
+                // Những loại còn lại thì spawn ngẫu nhiên như cũ
+                for (int i = 0; i < count; i++)
+                {
+                    Transform spawnPoint = spawnPoints[Random.Range(0, spawnPoints.Length)];
+                    SpawnEnemyFromPool(tag, spawnPoint);
+                    yield return new WaitForSeconds(delayBetweenSpawns);
+                }
+            }
+        }
+
+        Debug.Log($"Wave {waveIndex + 1} spawn completed. Total active: {activeEnemies}");
+    }
+
+    void SpawnEnemyFromPool(string tag, Transform spawnPoint)
+    {
+        GameObject enemy = ObjectPooler.Instance.SpawnFromPool(tag, spawnPoint.position, Quaternion.identity);
+
+        if (enemy == null)
+        {
+            Debug.LogWarning($"No enemy available in pool with tag: {tag}");
             return;
         }
-        WaveContent wave = waves[currentWaveIndex];
-        spawnQueue.Clear();
 
-        for (int i = 0; i < wave.normalZombie; i++)
-            spawnQueue.Enqueue(normalZombiePrefab);
-        for (int i = 0; i < wave.explodeZombie; i++)
-            spawnQueue.Enqueue(explodeZombiePrefab);
-        for (int i = 0; i < wave.scorpionZombie; i++)
-            spawnQueue.Enqueue(scorpionZombiePrefab);
-
-        enemiesRemaining = spawnQueue.Count;
-
-        EvenBus.WaveStarted(currentWaveIndex + 1);
-        InvokeRepeating(nameof(SpawnEnemy), 0f, spawnDelay);
-    }
-    
-    private void SpawnEnemy()
-    {
-        if( spawnQueue.Count == 0)
+        EnemyTracker tracker = enemy.GetComponent<EnemyTracker>();
+        if (tracker != null)
         {
-            CancelInvoke(nameof(SpawnEnemy));
-            return;
+            tracker.OnDeath = null;
+            tracker.OnDeath = OnEnemyDeath;
         }
 
-        GameObject prefab = spawnQueue.Dequeue();
-        int index = Random.Range(0, spawnPoints.Count);
-        Instantiate(prefab, spawnPoints[index].position, Quaternion.identity);
-        enemiesRemaining--;
-
-        if (enemiesRemaining <= 0)
-        {
-            CancelInvoke(nameof(SpawnEnemy));
-            currentWaveIndex++;
-
-            Debug.Log($"Wave {currentWaveIndex} complete! Spawn shop, hàng chờ 60s");
-
-            // Sau mỗi wave có 60s để tìm Shop 
-            Invoke(nameof(StartWave), 60f);
-        }
-    }
-    private void OnEnemyKilled(int count)
-    {
-        // Hook cộng điểm, cập nhật UI nếu cần.
+        activeEnemies++;
     }
 
-    private void OnDestroy()
+
+
+    void OnEnemyDeath()
     {
-        EvenBus.OnEnemyKilled -= OnEnemyKilled;
+        activeEnemies--;
+        if (activeEnemies < 0) activeEnemies = 0;
     }
 }
-
