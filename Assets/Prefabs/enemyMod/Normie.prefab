@@ -2773,7 +2773,7 @@ MonoBehaviour:
   attackCooldown: 1.5
   attackRange: 2
   chaseRange: 40
-  detectionRadius: 10
+  detectionRadius: 50
   moveSpeed: 4
   targetLayer:
     serializedVersion: 2
