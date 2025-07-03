@@ -2768,8 +2768,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 0}
-  maxHealth: 100
-  currentHealth: 0
   attackDamage: 15
   attackSpeed: 1.5
   attackCooldown: 1.5
