@@ -42,15 +42,8 @@ public class LoadingScreenUI : MonoBehaviour
     public float virtualLoadingTimer = 5;
     private float currentVirtualTime;
 
-    // [Header("AUDIO FADE SETTINGS")]
-    // [Range(0, 3)] public float audioFadeInDuration = 2f;
-    // [Range(0, 3)] public float audioFadeOutDuration = 2f;
-    // [Range(0, 1)] public float timeFadeOut = 0.9f;
-    // [Range(0, 1)] public float maxVolume = 1f;
-
     private bool processLoading;
     private AsyncOperation loadingProcess = new();
-    // private Coroutine audioFadeCoroutine;
 
     void OnEnable()
     {
@@ -58,16 +51,17 @@ public class LoadingScreenUI : MonoBehaviour
 
         if (enableRandomHints && hintList.Count > 0) StartCoroutine(RandomHint());
         if (enableRandomImages && imageList.Count > 0) StartCoroutine(RandomImage());
-        // if (audioSource != null) audioFadeCoroutine = StartCoroutine(FadeAudioVolume(audioSource.volume, maxVolume, audioFadeInDuration));
 
         imageObject.sprite = GetRandomItem(imageList, ref currentImageIndex);
         statusText.text = "0%";
         progressBar.value = 0;
     }
 
-    public static void LoadScene(string targetScene, LoadingScreenUI loadingScreenPrefab)
+    public static void LoadScene(string targetScene)
     {
-        instance = Instantiate(loadingScreenPrefab);
+        if (instance != null) Destroy(instance);
+        instance = Instantiate(Resources.Load<GameObject>("Loading").GetComponent<LoadingScreenUI>());
+        // instance = Instantiate(loadingScreenPrefab);
         instance.gameObject.SetActive(true);
         DontDestroyOnLoad(instance.gameObject);
         instance.StartCoroutine(instance.LoadSceneRoutine(targetScene));
@@ -77,7 +71,6 @@ public class LoadingScreenUI : MonoBehaviour
     {
         yield return new WaitForSeconds(0.1f);
 
-        Time.timeScale = 1;
         processLoading = true;
         loadingProcess = SceneManager.LoadSceneAsync(targetScene);
         loadingProcess.allowSceneActivation = false;
@@ -103,16 +96,6 @@ public class LoadingScreenUI : MonoBehaviour
 
         if (canvasGroup.alpha == 0) animator.Play("In");
 
-        // if (progressBar.value >= timeFadeOut)
-        // {
-        //     if (audioFadeCoroutine != null)
-        //     {
-        //         StopCoroutine(audioFadeCoroutine);
-        //         audioFadeCoroutine = null;
-        //         StartCoroutine(FadeAudioVolume(audioSource.volume, 0, audioFadeOutDuration));
-        //     }
-        // }
-
         if (loadingProcess.progress >= 0.9f)
         {
             animator.Play("Out");
@@ -128,16 +111,6 @@ public class LoadingScreenUI : MonoBehaviour
         currentVirtualTime += Time.unscaledDeltaTime;
 
         if (canvasGroup.alpha == 0) animator.Play("In");
-
-        // if (progressBar.value >= timeFadeOut)
-        // {
-        //     if (audioFadeCoroutine != null)
-        //     {
-        //         StopCoroutine(audioFadeCoroutine);
-        //         audioFadeCoroutine = null;
-        //         StartCoroutine(FadeAudioVolume(audioSource.volume, 0, audioFadeOutDuration));
-        //     }
-        // }
 
         if (currentVirtualTime >= virtualLoadingTimer)
         {
@@ -201,18 +174,6 @@ public class LoadingScreenUI : MonoBehaviour
             yield return null;
         }
     }
-
-    // private IEnumerator FadeAudioVolume(float from, float to, float duration)
-    // {
-    //     float t = 0f;
-    //     while (t < 1f)
-    //     {
-    //         t += Time.unscaledDeltaTime * duration;
-    //         audioSource.volume = Mathf.Lerp(from, to, t);
-    //         yield return null;
-    //     }
-    //     audioSource.volume = to;
-    // }
 
     private T GetRandomItem<T>(List<T> list, ref int lastIndex)
     {
