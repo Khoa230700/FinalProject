@@ -2752,14 +2752,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 0}
-  maxHealth: 100
-  currentHealth: 0
   attackDamage: 15
   attackSpeed: 1.5
   attackCooldown: 1.5
   attackRange: 2
   chaseRange: 0
-  detectionRadius: 50
+  detectionRadius: 10
   moveSpeed: 4
   targetLayer:
     serializedVersion: 2

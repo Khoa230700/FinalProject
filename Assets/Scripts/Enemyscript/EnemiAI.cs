@@ -21,7 +21,7 @@ public class EnemiAI : MonoBehaviour
     public float attackCooldown = 1.5f;
     private float lastAttackTime;
     public float attackRange = 2f;
-    //public float chaseRange = 10f;
+    public float chaseRange = 40f;
 
 
     //new
