@@ -6,13 +6,14 @@ using System.Linq;
 
 public class EnemiAI : MonoBehaviour
 {
-    public Transform player;
+    //public Transform player;
     NavMeshAgent agent;
     Animator enemyAnimation;
 
+    public PlayerHealth player;
 
-    public float maxHealth = 100f;
-    public float currentHealth;
+    //public float maxHealth = 100f;
+    //public float currentHealth;
     public int attackDamage = 15;
     public float attackSpeed = 1.5f;
     private float nextAttackTime = 0f;
@@ -20,7 +21,7 @@ public class EnemiAI : MonoBehaviour
     public float attackCooldown = 1.5f;
     private float lastAttackTime;
     public float attackRange = 2f;
-    public float chaseRange = 10f;
+    //public float chaseRange = 10f;
 
 
     //new
@@ -68,6 +69,8 @@ public class EnemiAI : MonoBehaviour
             lastAttackTime = Time.time;
             // damage player()
             //player.GetComponent<HealthBase>().TakeDamage(10);
+            var health = player.GetComponent<PlayerHealth>();
+            health.TakeDamage(0.1f, 0, transform.position);
             Debug.Log("Enemy attacks the player!");
         }
         enemyAnimation.SetTrigger("attack");
