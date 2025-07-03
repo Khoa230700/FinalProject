@@ -40,8 +40,8 @@ public class PlayerHealth : HealthBase
 
         float finalHealthDamage = leftoverDamage + damageBypassShield; //* Tổng sát thương vào máu
 
-        // OnTakeDamage?.Invoke(-finalHealthDamage, hitPoint); //* Gọi sự kiện khi MÁU nhận sát thương
-        OnTakeDamage?.Invoke(-damage, hitPoint); //* Gọi sự kiện khi nhận sát thương
+        OnTakeDamage?.Invoke(-finalHealthDamage, hitPoint); //* Gọi sự kiện khi MÁU nhận sát thương
+        //OnTakeDamage?.Invoke(-damage, hitPoint); //* Gọi sự kiện khi nhận sát thương
 
         UpdateHealth(-finalHealthDamage);
 

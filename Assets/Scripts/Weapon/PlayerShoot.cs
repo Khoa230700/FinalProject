@@ -56,8 +56,8 @@ public class PlayerShoot : MonoBehaviour
             }
         }
 
-        //weaponUI.UpdateAmmoUI(currentAmmo, reserveAmmo);
-        Debug.Log($"Shot fired! Ammo left: {currentAmmo}");
+        weaponUI.UpdateAmmoUI(currentAmmo, reserveAmmo);
+        //Debug.Log($"Shot fired! Ammo left: {currentAmmo}");
         armsAnimator.SetTrigger("Idle");
     }
 

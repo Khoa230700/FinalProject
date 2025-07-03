@@ -1061,8 +1061,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ownerHealthSystem: {fileID: 639718399531827442}
-  bloodEffect: {fileID: 8967264388286551387, guid: 75f2e05292738d242a060d01657a4ce5, type: 3}
   hitboxType: 1
+  bloodEffect: {fileID: 8967264388286551387, guid: 75f2e05292738d242a060d01657a4ce5, type: 3}
 --- !u!1 &3314240867215492325
 GameObject:
   m_ObjectHideFlags: 0
@@ -2769,6 +2769,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 0}
+  maxHealth: 100
+  currentHealth: 0
   attackDamage: 15
   attackSpeed: 1.5
   attackCooldown: 1.5
@@ -4036,8 +4038,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ownerHealthSystem: {fileID: 639718399531827442}
-  bloodEffect: {fileID: 1172649150807526450, guid: 696ec32829bb413498cef4215a2a1926, type: 3}
   hitboxType: 0
+  bloodEffect: {fileID: 1172649150807526450, guid: 696ec32829bb413498cef4215a2a1926, type: 3}
 --- !u!1 &6768120555724237328
 GameObject:
   m_ObjectHideFlags: 0
