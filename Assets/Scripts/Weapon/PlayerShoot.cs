@@ -5,14 +5,13 @@ public class PlayerShoot : MonoBehaviour
     public GunData gunData;
     public Transform shootPoint;
     public Animator armsAnimator;
-    [HideInInspector] public WeaponUI weaponUI;
+    public WeaponUI weaponUI;
 
     public int currentAmmo;
     private float nextTimeToFire = 0f;
 
     private bool isRecharge = false;
     private bool isShootingAnimation = false;
-    private bool isHoldingFire = false;
 
     public bool IsShooting => isShootingAnimation;
 
@@ -25,62 +24,15 @@ public class PlayerShoot : MonoBehaviour
 
     void Update()
     {
-        if (gunData.fireMode == GunFireMode.FullAuto)
+        if (Input.GetMouseButtonDown(0)) // 0 = chuột trái
         {
-            isHoldingFire = Input.GetButton("Fire1");
-
-            if (!isRecharge && isHoldingFire && Time.time >= nextTimeToFire)
-            {
-                nextTimeToFire = Time.time + 1f / gunData.roundsPerSecond; // ✅ chỉ set ở đây
-                TryShoot();
-            }
-        }
-        else if (gunData.fireMode == GunFireMode.SemiAuto)
-        {
-            isHoldingFire = Input.GetButton("Fire1");
-
-            if (!isRecharge && Input.GetButtonDown("Fire1") && Time.time >= nextTimeToFire)
-            {
-                nextTimeToFire = Time.time + 1f / gunData.roundsPerSecond;
-                TryShoot();
-            }
-        }
-        else
-        {
-            isHoldingFire = false;
-        }
-
-        if (Input.GetKeyDown(KeyCode.R) && !isRecharge)
-        {
-            Reload();
-        }
-
-        if (isShootingAnimation)
-        {
-            AnimatorStateInfo stateInfo = armsAnimator.GetCurrentAnimatorStateInfo(0);
-            if (stateInfo.IsName("Shot") && stateInfo.normalizedTime >= 0.01f)
-            {
-                isShootingAnimation = false;
-                armsAnimator.ResetTrigger("Shot");
-                armsAnimator.SetTrigger("Idle");
-            }
-        }
-
-        if (isRecharge)
-        {
-            AnimatorStateInfo stateInfo = armsAnimator.GetCurrentAnimatorStateInfo(0);
-            if (stateInfo.IsName("Recharge") && stateInfo.normalizedTime >= 0.95f)
-            {
-                isRecharge = false;
-                armsAnimator.ResetTrigger("Recharge");
-                armsAnimator.SetTrigger("Idle");
-            }
+            TryShoot();
         }
     }
 
-    void TryShoot()
+    public void TryShoot()
     {
-        if(PauseGameUI.isPause) return;
+        if (PauseGameUI.isPause) return;
 
         if (currentAmmo > 0)
         {
@@ -120,26 +72,15 @@ public class PlayerShoot : MonoBehaviour
             Hitbox hitbox = hit.collider.GetComponent<Hitbox>();
             if (hitbox != null && hitbox.ownerHealthSystem != null)
             {
-                bool isHeadshot = hitbox.hitboxType == Hitbox.HitboxType.Head;
-                //bool isWeakspot = hitbox.hitboxType == Hitbox.HitboxType.WeakSpot;
-
                 float finalDamage = gunData.damage;
-                //if (isWeakspot) finalDamage = 9999f;
-                if (isHeadshot) finalDamage *= 2f;
+                if (hitbox.hitboxType == Hitbox.HitboxType.Head)
+                    finalDamage *= 2f;
 
                 hitbox.ownerHealthSystem.TakeDamage(finalDamage);
-                hitbox.OnHit(finalDamage, hit.point);  // ← thêm dòng này
+                hitbox.OnHit(finalDamage, hit.point);
             }
         }
 
-        weaponUI.UpdateAmmoUI(currentAmmo, gunData.reserveAmmo);
-    }
-
-    void Reload()
-    {
-        armsAnimator.SetTrigger("Recharge");
-        isRecharge = true;
-        currentAmmo = gunData.magazineSize;
         weaponUI.UpdateAmmoUI(currentAmmo, gunData.reserveAmmo);
     }
 
