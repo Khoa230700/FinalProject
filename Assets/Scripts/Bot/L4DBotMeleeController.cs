@@ -27,16 +27,16 @@ public class L4DBotMeleeController : MonoBehaviour
 
     private void Update()
     {
-
+        
         float distToPlayer = Vector3.Distance(transform.position, player.position);
-
+        Debug.Log("Distance to player: " + distToPlayer);
         // Nếu player quá xa → đi theo player
         if (distToPlayer > agent.stoppingDistance && !animator.GetCurrentAnimatorStateInfo(0).IsName("Attack"))
         {
+            
             currentTarget = null;
             agent.isStopped = false;
             agent.SetDestination(player.position);
-
             Vector3 localVelocity = transform.InverseTransformDirection(agent.velocity);
             animator.SetFloat("Horizontal", localVelocity.x);
             animator.SetFloat("Vertical", localVelocity.z);
@@ -46,7 +46,6 @@ public class L4DBotMeleeController : MonoBehaviour
 
         // Nếu player đủ gần → bắt đầu tìm zombie
         currentTarget = FindNearestVisibleZombie();
-
         if (currentTarget != null)
         {
             float distToTarget = Vector3.Distance(transform.position, currentTarget.transform.position);
@@ -55,7 +54,6 @@ public class L4DBotMeleeController : MonoBehaviour
             if (distToTarget > attackRange)
             {
                 // CHƯA ĐỦ GẦN → ĐI LẠI
-
                 agent.isStopped = false;
                 agent.SetDestination(currentTarget.transform.position);
                 Vector3 localVelocity = transform.InverseTransformDirection(agent.velocity);
@@ -73,12 +71,9 @@ public class L4DBotMeleeController : MonoBehaviour
                 animator.SetFloat("Horizontal", 0f);
                 animator.SetFloat("Vertical", 0f);
                 animator.SetBool("isMoving", false);
-
                 StartCoroutine(TriggerAttack());
                 return;
             }
-
-           
 
         }
     }
@@ -98,14 +93,7 @@ public class L4DBotMeleeController : MonoBehaviour
             {
                 if (dist < minDist)
                 {
-                    if (currentTarget == null)
-                    {
-                        Debug.Log("No target found");
-                    }
-                    else
-                    {
-                        Debug.Log("Target found: " + currentTarget.name);
-                    }
+                    
                     minDist = dist;
                     closest = zombie;
                 }
