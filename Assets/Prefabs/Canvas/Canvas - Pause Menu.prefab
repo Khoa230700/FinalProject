@@ -2912,6 +2912,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: Dropdown Button
       objectReference: {fileID: 0}
+    - target: {fileID: 4304048497854089384, guid: deba918ceed76d04f8cc86a0d2bd3c43, type: 3}
+      propertyPath: selectorTag
+      value: Resolutions
+      objectReference: {fileID: 0}
+    - target: {fileID: 4304048497854089384, guid: deba918ceed76d04f8cc86a0d2bd3c43, type: 3}
+      propertyPath: itemSelectors.Array.size
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7918413900961951966, guid: deba918ceed76d04f8cc86a0d2bd3c43, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -4595,11 +4603,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8390300517581174604, guid: 44474f72ca2f503408812d3e1927e8db, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 1920.0001
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8390300517581174604, guid: 44474f72ca2f503408812d3e1927e8db, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 1080
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8390300517581174604, guid: 44474f72ca2f503408812d3e1927e8db, type: 3}
       propertyPath: m_LocalPosition.x
@@ -4798,11 +4806,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6438289489664540765, guid: 4c50a999ed506084ba382b450e5aeaa1, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 1920.0001
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6438289489664540765, guid: 4c50a999ed506084ba382b450e5aeaa1, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 1080
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6438289489664540765, guid: 4c50a999ed506084ba382b450e5aeaa1, type: 3}
       propertyPath: m_LocalPosition.x
