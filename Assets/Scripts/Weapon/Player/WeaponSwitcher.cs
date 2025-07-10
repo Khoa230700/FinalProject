@@ -12,7 +12,7 @@ public class WeaponSwitcher : MonoBehaviour
     private List<PlayerShoot> playerShoots = new List<PlayerShoot>();
     private int currentWeaponIndex = 0;
 
-    void Start()
+    void Awake()
     {
         foreach (var weapon in weaponList)
         {
@@ -45,7 +45,7 @@ public class WeaponSwitcher : MonoBehaviour
         }
 
         currentWeaponIndex = index;
-        UpdateWeaponUI(index);
+        //UpdateWeaponUI(index);
     }
 
     void ActivateWeapon(int index)
@@ -55,7 +55,7 @@ public class WeaponSwitcher : MonoBehaviour
             weaponList[i].SetActive(i == index);
         }
 
-        UpdateWeaponUI(index);
+        //UpdateWeaponUI(index);
     }
 
     public void UpdateWeaponUI(int index)

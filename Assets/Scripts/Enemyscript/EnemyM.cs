@@ -29,6 +29,7 @@ public class EnemyM : MonoBehaviour
     public void TakeDamage(float amount)
     {
         if (isDead) return;
+        Debug.Log(currentHealth);
 
         currentHealth -= amount;
         currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
