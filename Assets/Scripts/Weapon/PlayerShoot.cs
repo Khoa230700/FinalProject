@@ -19,7 +19,7 @@ public class PlayerShoot : MonoBehaviour
     {
         currentAmmo = gunData.magazineSize;
         reserveAmmo = gunData.reserveAmmo;
-        weaponUI.UpdateAmmoUI(currentAmmo, reserveAmmo);
+        //weaponUI.UpdateAmmoUI(currentAmmo, reserveAmmo);
     }
 
     public void ShootOneBullet()
@@ -56,8 +56,8 @@ public class PlayerShoot : MonoBehaviour
             }
         }
 
-        weaponUI.UpdateAmmoUI(currentAmmo, reserveAmmo);
-        //Debug.Log($"Shot fired! Ammo left: {currentAmmo}");
+        //weaponUI.UpdateAmmoUI(currentAmmo, reserveAmmo);
+        Debug.Log($"Shot fired! Ammo left: {currentAmmo}");
         armsAnimator.SetTrigger("Idle");
     }
 
@@ -87,7 +87,7 @@ public class PlayerShoot : MonoBehaviour
             reserveAmmo = 0;
         }
         isReloading = false;
-        weaponUI.UpdateAmmoUI(currentAmmo, reserveAmmo);
+        //weaponUI.UpdateAmmoUI(currentAmmo, reserveAmmo);
     }
 
     public void CancelReload()
