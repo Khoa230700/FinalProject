@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.AI;
 using System.Collections;
-using static NewEnemyAI;
 using System.Linq;
 using NUnit;
 
