@@ -8,6 +8,7 @@ public class L4DBotMeleeController : MonoBehaviour
     [SerializeField] Transform player;
     private int AttackCombo;
     private float lastAttackTime;
+    
     [SerializeField] float attackCooldown = 1.2f;
     [Header("AI Settings")]
     [SerializeField] float visionRange = 10f;
@@ -27,55 +28,72 @@ public class L4DBotMeleeController : MonoBehaviour
 
     private void Update()
     {
-        
+        EnsureOnNavMesh();
         float distToPlayer = Vector3.Distance(transform.position, player.position);
-        Debug.Log("Distance to player: " + distToPlayer);
-        // Nếu player quá xa → đi theo player
-        if (distToPlayer > agent.stoppingDistance && !animator.GetCurrentAnimatorStateInfo(0).IsName("Attack"))
+        Debug.Log("Distance to Player: " + distToPlayer);
+        // Luôn chạy theo Player nếu quá xa
+        if (distToPlayer >= agent.stoppingDistance)
         {
-            
-            currentTarget = null;
-            agent.isStopped = false;
+            SafeStopAgent(false);
             agent.SetDestination(player.position);
-            Vector3 localVelocity = transform.InverseTransformDirection(agent.velocity);
-            animator.SetFloat("Horizontal", localVelocity.x);
-            animator.SetFloat("Vertical", localVelocity.z);
-            animator.SetBool("isMoving", true);
+            currentTarget = null;
+
+            if (!HasReachedDestination())
+            {
+                Vector3 localVelocity = transform.InverseTransformDirection(agent.velocity);
+                animator.SetBool("isMoving", true);
+                animator.SetFloat("Horizontal", localVelocity.x);
+                animator.SetFloat("Vertical", localVelocity.z);
+                AudioBotManager.Instance.PlayBotSound();
+            }
+            else
+            {
+                animator.SetFloat("Horizontal", 0f);
+                animator.SetFloat("Vertical", 0f);
+                animator.SetBool("isMoving", false);
+                AudioBotManager.Instance.StopBotSound();
+            }
+
             return;
         }
 
-        // Nếu player đủ gần → bắt đầu tìm zombie
+        // Nếu player gần → bắt đầu tìm zombie
         currentTarget = FindNearestVisibleZombie();
+
         if (currentTarget != null)
         {
             float distToTarget = Vector3.Distance(transform.position, currentTarget.transform.position);
 
-            // Nếu zombie trong tầm nhìn nhưng chưa đủ gần để tấn công → đi tới zombie
-            if (distToTarget > attackRange)
+            if (distToTarget >= attackRange)
             {
-                // CHƯA ĐỦ GẦN → ĐI LẠI
-                agent.isStopped = false;
+                // LẠI GẦN ZOMBIE
+                SafeStopAgent(false);
                 agent.SetDestination(currentTarget.transform.position);
                 Vector3 localVelocity = transform.InverseTransformDirection(agent.velocity);
                 animator.SetFloat("Horizontal", localVelocity.x);
                 animator.SetFloat("Vertical", localVelocity.z);
                 animator.SetBool("isMoving", true);
-                return;
+                AudioBotManager.Instance.PlayBotSound();
             }
             else
             {
-                // ĐỦ GẦN → DỪNG LẠI TẤN CÔNG
-                agent.isStopped = true;
-                Vector3 lookPos = new Vector3(currentTarget.transform.position.x, transform.position.y, currentTarget.transform.position.z);
-                transform.LookAt(lookPos);
+                // TẤN CÔNG
+                SafeStopAgent(true);
+                transform.LookAt(new Vector3(currentTarget.transform.position.x, transform.position.y, currentTarget.transform.position.z));
                 animator.SetFloat("Horizontal", 0f);
                 animator.SetFloat("Vertical", 0f);
                 animator.SetBool("isMoving", false);
+               
                 StartCoroutine(TriggerAttack());
-                return;
+                
             }
-
+            return;
         }
+
+        // Nếu không có zombie → đứng yên gần player
+        SafeStopAgent(true);
+        animator.SetBool("isMoving", false);
+     
     }
 
     private GameObject FindNearestVisibleZombie()
@@ -111,12 +129,10 @@ public class L4DBotMeleeController : MonoBehaviour
 
         Debug.DrawRay(transform.position, direction * distance, Color.red);
 
-        int layerMask = LayerMask.GetMask("Default"); 
-        if (Physics.Raycast(transform.position, direction, out RaycastHit hit, distance, layerMask))
+        if (Physics.Raycast(transform.position, direction, out RaycastHit hit, distance))
         {
             return hit.collider.CompareTag("Enemy");
         }
-
         return false;
     }
     IEnumerator TriggerAttack()
@@ -130,6 +146,7 @@ public class L4DBotMeleeController : MonoBehaviour
         animator.SetInteger("AttackCombo", AttackCombo);
         yield return null;
         animator.SetTrigger("Attack");
+        AudioBotManager.Instance.MeleeSound();
         Debug.Log("Attack Triggered with Combo: " + AttackCombo);
     }
 
@@ -149,10 +166,29 @@ public class L4DBotMeleeController : MonoBehaviour
 
         return target.position /*+ Vector3.up * 1.2f*/;
     }
-    void OnDrawGizmosSelected()
+    bool HasReachedDestination()
     {
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, detectionRadius);
+        return !agent.pathPending &&
+               agent.remainingDistance <= agent.stoppingDistance &&
+               (!agent.hasPath || agent.velocity.sqrMagnitude < 0.01f);
     }
- 
+    private void SafeStopAgent(bool stop)
+    {
+        if (agent != null && agent.isOnNavMesh)
+        {
+            agent.isStopped = stop;
+        }
+    }
+    void EnsureOnNavMesh()
+    {
+        if (agent != null && !agent.isOnNavMesh)
+        {
+            NavMeshHit hit;
+            if (NavMesh.SamplePosition(transform.position, out hit, 2f, NavMesh.AllAreas))
+            {
+                transform.position = hit.position;
+                agent.Warp(hit.position); // Teleport về đúng chỗ
+            }
+        }
+    }
 }
