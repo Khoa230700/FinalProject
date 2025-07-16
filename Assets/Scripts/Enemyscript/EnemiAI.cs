@@ -29,7 +29,7 @@ public class EnemiAI : MonoBehaviour
     private Transform currentTarget;
     public float moveSpeed = 4f;
     public LayerMask targetLayer;
-
+    
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
@@ -71,6 +71,8 @@ public class EnemiAI : MonoBehaviour
             // damage player()
             player.GetComponent<PlayerHealth>().TakeDamage(10, 0,this.transform.position);
             Debug.Log("Enemy attacks the player!");
+
+       
         }
         enemyAnimation.SetTrigger("attack");
     }
