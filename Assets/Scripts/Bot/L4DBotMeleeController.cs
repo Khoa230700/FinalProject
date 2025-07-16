@@ -146,7 +146,7 @@ public class L4DBotMeleeController : MonoBehaviour
         animator.SetInteger("AttackCombo", AttackCombo);
         yield return null;
         animator.SetTrigger("Attack");
-        AudioBotManager.Instance.MeleeSound();
+        //AudioBotManager.Instance.MeleeSound();
         Debug.Log("Attack Triggered with Combo: " + AttackCombo);
     }
 
