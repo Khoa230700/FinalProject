@@ -9,7 +9,7 @@ public class L4DBotController : MonoBehaviour
     [SerializeField] GameObject bulletPrefab;
     [SerializeField] ParticleSystem bulletParticleSystem;
     [SerializeField] WFX_LightFlicker wFX_LightFlicker;
-  
+    [SerializeField] private EnemyM enemyM;
 
     [Header("AI Settings")]
     [SerializeField] float detectionRange ;
@@ -29,9 +29,10 @@ public class L4DBotController : MonoBehaviour
 
     private void Update()
     {
+        Debug.Log("mau" + enemyM.currentHealth );
         fireCooldown -= Time.deltaTime;
         float distToPlayer = Vector3.Distance(transform.position, player.position);
-
+        Debug.Log("Distance to Player: " + distToPlayer);
         // Nếu player quá xa thì chạy theo player, không bắn
         if (distToPlayer > agent.stoppingDistance )
         {
@@ -78,7 +79,7 @@ public class L4DBotController : MonoBehaviour
                     AudioBotManager.Instance.ShootSound();
                     fireCooldown = fireRate;
                 }
-
+              
                 return; // ưu tiên bắn zombie
             }
             else
@@ -137,28 +138,35 @@ public class L4DBotController : MonoBehaviour
 
     private void Shoot(Transform target)
     {
-        if (bulletPrefab && firePoint)
-        {
-            Vector3 aimPoint = GetAimPoint(target);
-            Vector3 dir = (aimPoint - firePoint.position).normalized;
-            AudioBotManager.Instance.ShootSound();
-            if (Physics.Raycast(firePoint.position, dir, out RaycastHit hit, detectionRange))
-            {
-                GameObject bullet = Instantiate(bulletPrefab, firePoint.position, Quaternion.LookRotation(dir));
-                if (bulletParticleSystem != null)
-                {
-                    bulletParticleSystem.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
-                    bulletParticleSystem.Play();
-                }
-                if (wFX_LightFlicker != null)
-                {
-                    wFX_LightFlicker.FlickerOnce();
-                }
+        if (firePoint == null || target == null) return;
 
-                Rigidbody rb = bullet.GetComponent<Rigidbody>();
-                if (rb != null)
-                    rb.linearVelocity = dir * bulletSpeed;
+        Vector3 aimPoint = GetAimPoint(target);
+        Vector3 dir = (aimPoint - firePoint.position).normalized;
+
+        AudioBotManager.Instance?.ShootSound();
+
+        if (Physics.Raycast(firePoint.position, dir, out RaycastHit hit, detectionRange))
+        {
+            // Hiệu ứng khi bắn trúng
+            if (bulletParticleSystem != null)
+            {
+                bulletParticleSystem.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+                bulletParticleSystem.Play();
             }
+
+            if (wFX_LightFlicker != null)
+            {
+                wFX_LightFlicker.FlickerOnce();
+            }
+
+          
+            var health = hit.collider.GetComponent<EnemyM>();
+            if (health != null)
+            {
+                health.TakeDamage(20); // tuỳ vào hệ thống bạn dùng
+            }
+
+          
         }
     }
    
