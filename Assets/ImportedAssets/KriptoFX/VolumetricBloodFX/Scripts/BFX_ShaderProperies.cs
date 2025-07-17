@@ -1,9 +1,9 @@
 using UnityEngine;
+using System.Collections;
 using System;
-using UnityEngine.Rendering.Universal;
 
-public class BFX_ShaderProperies : MonoBehaviour
-{
+[ExecuteAlways]
+public class BFX_ShaderProperies : MonoBehaviour {
 
     public BFX_BloodSettings BloodSettings;
 
@@ -20,41 +20,43 @@ public class BFX_ShaderProperies : MonoBehaviour
     float _animationTimeLapsed;
     private float _timeLapsedBeforeFadeout;
 
-    private DecalProjector decal;
-    private Material decalMat;
+    private MaterialPropertyBlock props;
+    private Renderer rend;
 
     public event Action OnAnimationFinished;
 
-    private void Awake()
-    {
-        decal = GetComponent<DecalProjector>();
-        decalMat = new Material(decal.material);
-        decal.material = decalMat;
-        cutoutPropertyID = Shader.PropertyToID("_Cutout");
-        forwardDirPropertyID = Shader.PropertyToID("_DecalForwardDir");
-
-        OnEnable();
-    }
-
     private void OnEnable()
     {
+        if (props == null)
+        {
+            props = new MaterialPropertyBlock();
+            rend = GetComponent<Renderer>();
+
+            cutoutPropertyID = Shader.PropertyToID("_Cutout");
+            forwardDirPropertyID = Shader.PropertyToID("_DecalForwardDir");
+        }
+
         startTime = Time.time + TimeDelay;
         canUpdate = true;
 
-        GetComponent<DecalProjector>().enabled = true;
+        GetComponent<Renderer>().enabled = true;
+
+        rend.GetPropertyBlock(props);
 
         var eval = FloatCurve.Evaluate(0) * GraphIntensityMultiplier;
-        decalMat.SetFloat(cutoutPropertyID, eval);
-        decalMat.SetVector(forwardDirPropertyID, transform.up);
-
+        props.SetFloat(cutoutPropertyID, eval);
+        props.SetVector(forwardDirPropertyID, transform.up);
+        rend.SetPropertyBlock(props);
     }
 
     private void OnDisable()
     {
+        rend.GetPropertyBlock(props);
 
         var eval = FloatCurve.Evaluate(0) * GraphIntensityMultiplier;
-        decalMat.SetFloat(cutoutPropertyID, eval);
+        props.SetFloat(cutoutPropertyID, eval);
 
+        rend.SetPropertyBlock(props);
         _animationTimeLapsed = 0;
         _timeLapsedBeforeFadeout = 0;
     }
@@ -63,19 +65,28 @@ public class BFX_ShaderProperies : MonoBehaviour
 
     private void Update()
     {
-        if (!canUpdate) return;
+        if (!canUpdate && Application.isPlaying) return;
 
-
+        rend.GetPropertyBlock(props);
+        
         var deltaTime = BloodSettings == null ? Time.deltaTime : Time.deltaTime * BloodSettings.AnimationSpeed;
         _timeLapsedBeforeFadeout += deltaTime;
 
         if (BloodSettings == null || _timeLapsedBeforeFadeout > BloodSettings.DecalLifeTimeSeconds - 15f || (_animationTimeLapsed / GraphTimeMultiplier) < 0.3f)
             _animationTimeLapsed += deltaTime;
+       
+
+        if (!Application.isPlaying && BloodSettings != null)
+        {
+            if (BloodSettings.DebugAnimationTime < TimeDelay) _animationTimeLapsed = 0;
+            else _animationTimeLapsed = BloodSettings.DebugAnimationTime;
+        }
 
         var eval = FloatCurve.Evaluate(_animationTimeLapsed / GraphTimeMultiplier) * GraphIntensityMultiplier;
-        decalMat.SetFloat(cutoutPropertyID, eval);
 
-        if (BloodSettings != null) decalMat.SetFloat("_LightIntencity", Mathf.Clamp(BloodSettings.LightIntensityMultiplier, 0.01f, 1f));
+        props.SetFloat(cutoutPropertyID, eval);
+
+        if (BloodSettings != null) props.SetFloat("_LightIntencity", Mathf.Clamp(BloodSettings.LightIntensityMultiplier, 0.01f, 1f));
 
         if (_animationTimeLapsed >= GraphTimeMultiplier)
         {
@@ -83,7 +94,8 @@ public class BFX_ShaderProperies : MonoBehaviour
             OnAnimationFinished?.Invoke();
 
         }
-        decalMat.SetVector(forwardDirPropertyID, transform.up);
+        props.SetVector(forwardDirPropertyID, transform.up);
+        rend.SetPropertyBlock(props);
     }
 
 }
