@@ -12,7 +12,7 @@ public class WeaponSwitcher : MonoBehaviour
     private List<PlayerShoot> playerShoots = new List<PlayerShoot>();
     private int currentWeaponIndex = 0;
 
-    void Start()
+    void Awake()
     {
         foreach (var weapon in weaponList)
         {

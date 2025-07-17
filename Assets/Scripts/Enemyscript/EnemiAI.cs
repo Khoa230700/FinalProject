@@ -1,19 +1,18 @@
 ﻿using UnityEngine;
 using UnityEngine.AI;
 using System.Collections;
-using static NewEnemyAI;
 using System.Linq;
+using NUnit;
 
 public class EnemiAI : MonoBehaviour
 {
-    //public Transform player;
+    public Transform player;
     NavMeshAgent agent;
     Animator enemyAnimation;
 
-    public PlayerHealth player;
 
-    //public float maxHealth = 100f;
-    //public float currentHealth;
+    public float maxHealth = 100f;
+    public float currentHealth;
     public int attackDamage = 15;
     public float attackSpeed = 1.5f;
     private float nextAttackTime = 0f;
@@ -29,11 +28,12 @@ public class EnemiAI : MonoBehaviour
     private Transform currentTarget;
     public float moveSpeed = 4f;
     public LayerMask targetLayer;
-
+    
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
         enemyAnimation = GetComponent<Animator>();
+        player = GameObject.FindWithTag("Player").transform;
     }
 
     void Update()
@@ -68,10 +68,10 @@ public class EnemiAI : MonoBehaviour
         {
             lastAttackTime = Time.time;
             // damage player()
-            //player.GetComponent<HealthBase>().TakeDamage(10);
-            var health = player.GetComponent<PlayerHealth>();
-            health.TakeDamage(0.1f, 0, transform.position);
+            player.GetComponent<PlayerHealth>().TakeDamage(10, 0,this.transform.position);
             Debug.Log("Enemy attacks the player!");
+
+       
         }
         enemyAnimation.SetTrigger("attack");
     }
