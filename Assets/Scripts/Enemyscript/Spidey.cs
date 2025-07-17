@@ -16,6 +16,7 @@ public class Spidey : MonoBehaviour
 
     public float meleeDistance = 2f;
     public float stopDistance = 20f;
+    public Animator animator;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -62,7 +63,7 @@ public class Spidey : MonoBehaviour
             // damage player()
             Debug.Log("Enemy attacks the player!");
         }
-        //enemyAnimation.SetTrigger("attack");
+        animator.SetTrigger("MeleeAttack");
     }
 
     void HookAttack()
@@ -72,5 +73,6 @@ public class Spidey : MonoBehaviour
             lastAttackTime1 = Time.time;
             enemy.ThrowHook(player);
         }
+        animator.SetTrigger("Hook");
     }
 }
