@@ -3,12 +3,9 @@ using UnityEngine;
 
 public class DamegeMelee : MonoBehaviour
 {
-    public EnemyM enemyM;
+  
 
-    public void Update()
-    {
-        Debug.Log("mau" + enemyM.currentHealth);
-    }
+   
 
     private void OnTriggerEnter(Collider other)
     {

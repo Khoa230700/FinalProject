@@ -9,7 +9,7 @@ public class L4DBotController : MonoBehaviour
     [SerializeField] GameObject bulletPrefab;
     [SerializeField] ParticleSystem bulletParticleSystem;
     [SerializeField] WFX_LightFlicker wFX_LightFlicker;
-    [SerializeField] private EnemyM enemyM;
+    [SerializeField] TargetableEnemy hitdame;
 
     [Header("AI Settings")]
     [SerializeField] float detectionRange ;
@@ -29,7 +29,7 @@ public class L4DBotController : MonoBehaviour
 
     private void Update()
     {
-        Debug.Log("mau" + enemyM.currentHealth );
+       
         fireCooldown -= Time.deltaTime;
         float distToPlayer = Vector3.Distance(transform.position, player.position);
         Debug.Log("Distance to Player: " + distToPlayer);
@@ -158,8 +158,14 @@ public class L4DBotController : MonoBehaviour
             {
                 wFX_LightFlicker.FlickerOnce();
             }
+            var hb = hit.collider.GetComponent<Hitbox>();
+            if (hb != null )
+            {
+               
+                hb.ownerHealthSystem.TakeDamage(20);
+                hb.OnHit(20, hit.point);
+            }
 
-          
             var health = hit.collider.GetComponent<EnemyM>();
             if (health != null)
             {
@@ -172,18 +178,20 @@ public class L4DBotController : MonoBehaviour
    
     private Vector3 GetAimPoint(Transform target)
     {
-        TargetableEnemy et = target.GetComponent<TargetableEnemy>();
-        if (et != null && et.aimTarget != null)
-            return et.aimTarget.position;
+        hitdame = target.gameObject.GetComponentInChildren<TargetableEnemy>();
+        if (hitdame != null && hitdame.aimTarget != null)
+            return hitdame.aimTarget.position;
 
         Collider col = target.GetComponent<Collider>();
         if (col != null)
-            return col.bounds.center;/*+ Vector3.up * (col.bounds.extents.y * 0.5f);*/
+            return col.transform.position;
 
         EnemiAI ai = target.GetComponent<EnemiAI>();
         if (ai != null && target.gameObject.CompareTag("Enemy"))
-            return target.position/* + Vector3.up * 1.5f*/;
+            return target.position + Vector3.up * 1.5f;
 
-        return target.position /*+ Vector3.up * 1.2f*/;
+        return target.position + Vector3.up * 1.2f;
+
+      
     }
 }

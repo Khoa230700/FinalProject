@@ -17,10 +17,7 @@ public class AudioBotManager : MonoBehaviour
         {
             Instance = this;
         }
-        else
-        {
-            Destroy(gameObject);
-        }
+        
     }
 
         public void PlayBotSound()

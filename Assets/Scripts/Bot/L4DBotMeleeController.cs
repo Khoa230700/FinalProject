@@ -83,7 +83,6 @@ public class L4DBotMeleeController : MonoBehaviour
                 animator.SetFloat("Horizontal", 0f);
                 animator.SetFloat("Vertical", 0f);
                 animator.SetBool("isMoving", false);
-               
                 StartCoroutine(TriggerAttack());
                 
             }

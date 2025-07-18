@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 8079558651761959656}
   - component: {fileID: 3586379497261931724}
   - component: {fileID: 5658322781626220109}
-  m_Layer: 2
+  m_Layer: 0
   m_Name: AttackDetect
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -787,7 +787,7 @@ GameObject:
   - component: {fileID: 3515417579159368491}
   - component: {fileID: 2190198581176926509}
   - component: {fileID: 1730337569766138010}
-  m_Layer: 2
+  m_Layer: 0
   m_Name: AI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -977,6 +977,7 @@ GameObject:
   - component: {fileID: 1316558654747550126}
   - component: {fileID: 5434881562994337880}
   - component: {fileID: 3289584220954763909}
+  - component: {fileID: 7775071814243305905}
   m_Layer: 0
   m_Name: HitEnemy8
   m_TagString: HeadShot
@@ -1063,6 +1064,19 @@ MonoBehaviour:
   ownerHealthSystem: {fileID: 639718399531827442}
   hitboxType: 1
   bloodEffect: {fileID: 8967264388286551387, guid: 75f2e05292738d242a060d01657a4ce5, type: 3}
+--- !u!114 &7775071814243305905
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3239438909805355896}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4c71a6787ee5539468cd533cc0144806, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  aimTarget: {fileID: 1219334098712275762}
 --- !u!1 &3314240867215492325
 GameObject:
   m_ObjectHideFlags: 0
@@ -1263,7 +1277,8 @@ GameObject:
   - component: {fileID: 2243277575312782797}
   - component: {fileID: 7891509131991545629}
   - component: {fileID: 639718399531827442}
-  m_Layer: 2
+  - component: {fileID: 1442766571847242536}
+  m_Layer: 0
   m_Name: Normie
   m_TagString: Enemy
   m_Icon: {fileID: 0}
@@ -2769,6 +2784,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 0}
+  maxHealth: 100
+  currentHealth: 0
   attackDamage: 15
   attackSpeed: 1.5
   attackCooldown: 1.5
@@ -2794,6 +2811,29 @@ MonoBehaviour:
   maxHealth: 100
   currentHealth: 100
   animator: {fileID: 4440705263268147471}
+--- !u!136 &1442766571847242536
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3738223141133144338}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.5
+  m_Height: 1
+  m_Direction: 1
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &3777046724730365686
 GameObject:
   m_ObjectHideFlags: 0
