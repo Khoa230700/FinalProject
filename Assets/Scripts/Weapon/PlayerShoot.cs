@@ -3,17 +3,25 @@ using System.Collections;
 
 public class PlayerShoot : MonoBehaviour
 {
+    [Header("Data & References")]
     public GunData gunData;
     public Transform shootPoint;
     public Animator armsAnimator;
     public WeaponUI weaponUI;
+    [SerializeField] private ParticleSystem muzzleFlashParticle;
 
     [HideInInspector] public int currentAmmo;
     [HideInInspector] public int reserveAmmo;
-    public bool isReloading = false;
-    public bool IsShooting;
+    public bool isReloading { get; private set; }
 
-    [SerializeField] private ParticleSystem muzzleFlashParticle;
+    // Cờ báo đang trong chuỗi bắn
+    public bool IsShooting { get; private set; }
+
+    // Thời gian cho các animation switch (nếu bạn có)
+    [Header("Switch Animations")]
+    [SerializeField] private float hideDuration = 0.5f;
+    [SerializeField] private float getDuration = 0.5f;
+    public bool IsSwitchingWeapon { get; private set; }
 
     void Start()
     {
@@ -22,27 +30,41 @@ public class PlayerShoot : MonoBehaviour
         weaponUI.UpdateAmmoUI(currentAmmo, reserveAmmo);
     }
 
+    #region SWITCH WEAPON (nếu dùng)
+    public IEnumerator SwitchOut()
+    {
+        IsSwitchingWeapon = true;
+        armsAnimator.SetTrigger("Hide");
+        yield return new WaitForSeconds(hideDuration);
+    }
+
+    public IEnumerator SwitchIn()
+    {
+        armsAnimator.SetTrigger("Get");
+        yield return new WaitForSeconds(getDuration);
+        IsSwitchingWeapon = false;
+    }
+    #endregion
+
     public void ShootOneBullet()
     {
         if (PauseGameUI.isPause || isReloading || currentAmmo <= 0)
-        {
-            Debug.Log($"Cannot shoot: Paused: {PauseGameUI.isPause}, Reloading: {isReloading}, CurrentAmmo: {currentAmmo}");
             return;
-        }
 
+        // → Bắt đầu bắn
+        IsShooting = true;
+
+        // Giảm đạn, trigger Shot
         currentAmmo--;
-        armsAnimator.ResetTrigger("Shot"); // Reset trước
+        armsAnimator.ResetTrigger("Shot");
         armsAnimator.SetTrigger("Shot");
 
-        if (muzzleFlashParticle != null)
-        {
-            muzzleFlashParticle.Play();
-            Debug.Log("muzzle play");
-        }
-
+        // Muzzle + âm thanh
+        if (muzzleFlashParticle != null) muzzleFlashParticle.Play();
         if (gunData.shootSound != null)
             AudioSource.PlayClipAtPoint(gunData.shootSound, shootPoint.position);
 
+        // Raycast gây damage…
         Ray ray = new Ray(shootPoint.position, shootPoint.forward);
         if (Physics.Raycast(ray, out RaycastHit hit, gunData.range))
         {
@@ -57,24 +79,46 @@ public class PlayerShoot : MonoBehaviour
         }
 
         weaponUI.UpdateAmmoUI(currentAmmo, reserveAmmo);
-        //Debug.Log($"Shot fired! Ammo left: {currentAmmo}");
-        armsAnimator.SetTrigger("Idle");
+
+        // Chờ xong clip “Shot” rồi mới xét có reset về Idle hay không
+        StartCoroutine(ResetShootingAfterAnimation());
+    }
+
+    /// <summary>
+    /// Sau khi clip “Shot” kết thúc:
+    /// - Nếu là Semi-Auto → luôn về Idle, IsShooting=false  
+    /// - Nếu là Full-Auto và bạn vẫn giữ chuột → giữ IsShooting=true, không về Idle  
+    /// - Nếu là Full-Auto và bạn đã buông chuột → về Idle, IsShooting=false
+    /// </summary>
+    private IEnumerator ResetShootingAfterAnimation()
+    {
+        AnimatorStateInfo info = armsAnimator.GetCurrentAnimatorStateInfo(0);
+        yield return new WaitForSeconds(info.length);
+
+        bool stillHolding = Input.GetMouseButton(0);
+        bool isFullAuto = gunData.fireMode == GunFireMode.FullAuto;
+
+        if (!isFullAuto || !stillHolding)
+        {
+            armsAnimator.SetTrigger("Idle");
+            IsShooting = false;
+        }
     }
 
     public void Reload()
     {
-        if (isReloading) return;
-        if (currentAmmo >= gunData.magazineSize) return;
-        if (reserveAmmo <= 0) return;
+        if (isReloading || currentAmmo >= gunData.magazineSize || reserveAmmo <= 0)
+            return;
 
         isReloading = true;
         armsAnimator.SetTrigger("Recharge");
         StartCoroutine(ReloadRoutine());
     }
 
-    IEnumerator ReloadRoutine()
+    private IEnumerator ReloadRoutine()
     {
         yield return new WaitForSeconds(gunData.reloadTime);
+
         int need = gunData.magazineSize - currentAmmo;
         if (reserveAmmo >= need)
         {
@@ -86,6 +130,7 @@ public class PlayerShoot : MonoBehaviour
             currentAmmo += reserveAmmo;
             reserveAmmo = 0;
         }
+
         isReloading = false;
         weaponUI.UpdateAmmoUI(currentAmmo, reserveAmmo);
     }
