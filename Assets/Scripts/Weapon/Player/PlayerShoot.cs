@@ -13,58 +13,58 @@ public class PlayerShoot : MonoBehaviour
     [HideInInspector] public int currentAmmo;
     [HideInInspector] public int reserveAmmo;
     public bool isReloading { get; private set; }
-
-    // Cờ báo đang trong chuỗi bắn
     public bool IsShooting { get; private set; }
-
-    // Thời gian cho các animation switch (nếu bạn có)
-    [Header("Switch Animations")]
-    [SerializeField] private float hideDuration = 0.5f;
-    [SerializeField] private float getDuration = 0.5f;
     public bool IsSwitchingWeapon { get; private set; }
+
+    private Coroutine shotResetCoroutine;
 
     void Start()
     {
         currentAmmo = gunData.magazineSize;
         reserveAmmo = gunData.reserveAmmo;
-        weaponUI.UpdateAmmoUI(currentAmmo, reserveAmmo);
+        weaponUI?.UpdateAmmoUI(currentAmmo, reserveAmmo);
     }
 
-    #region SWITCH WEAPON (nếu dùng)
-    public IEnumerator SwitchOut()
+    public bool IsReadyToShoot { get; private set; } = true; // Chặn spam bắn
+
+    public void StartShooting()
     {
-        IsSwitchingWeapon = true;
-        armsAnimator.SetTrigger("Hide");
-        yield return new WaitForSeconds(hideDuration);
+        if (!IsShooting)
+        {
+            IsShooting = true;
+        }
     }
 
-    public IEnumerator SwitchIn()
+    public void StopShooting()
     {
-        armsAnimator.SetTrigger("Get");
-        yield return new WaitForSeconds(getDuration);
-        IsSwitchingWeapon = false;
+        if (IsShooting)
+        {
+            IsShooting = false;
+            armsAnimator.CrossFade("Idle", 0.08f);
+        }
     }
-    #endregion
 
     public void ShootOneBullet()
     {
         if (PauseGameUI.isPause || isReloading || currentAmmo <= 0)
             return;
 
-        // → Bắt đầu bắn
-        IsShooting = true;
-
-        // Giảm đạn, trigger Shot
         currentAmmo--;
-        armsAnimator.ResetTrigger("Shot");
-        armsAnimator.SetTrigger("Shot");
 
-        // Muzzle + âm thanh
+        // Tắt anim run, ép chạy shot
+        armsAnimator.SetBool("Walk", false);
+        armsAnimator.SetBool("Run", false);
+        armsAnimator.Play("Shot", 0, 0f);
+
         if (muzzleFlashParticle != null) muzzleFlashParticle.Play();
         if (gunData.shootSound != null)
             AudioSource.PlayClipAtPoint(gunData.shootSound, shootPoint.position);
 
-        // Raycast gây damage…
+        if (muzzleFlashParticle != null) muzzleFlashParticle.Play();
+        if (gunData.shootSound != null)
+            AudioSource.PlayClipAtPoint(gunData.shootSound, shootPoint.position);
+
+        // Raycast...
         Ray ray = new Ray(shootPoint.position, shootPoint.forward);
         if (Physics.Raycast(ray, out RaycastHit hit, gunData.range))
         {
@@ -78,32 +78,30 @@ public class PlayerShoot : MonoBehaviour
             }
         }
 
-        weaponUI.UpdateAmmoUI(currentAmmo, reserveAmmo);
+        weaponUI?.UpdateAmmoUI(currentAmmo, reserveAmmo);
 
-        // Chờ xong clip “Shot” rồi mới xét có reset về Idle hay không
-        StartCoroutine(ResetShootingAfterAnimation());
+        // Luôn chờ đúng thời lượng anim, rồi unlock (bắn viên tiếp theo)
+        if (shotResetCoroutine != null) StopCoroutine(shotResetCoroutine);
+        shotResetCoroutine = StartCoroutine(ResetShotAnimation());
     }
 
-    /// <summary>
-    /// Sau khi clip “Shot” kết thúc:
-    /// - Nếu là Semi-Auto → luôn về Idle, IsShooting=false  
-    /// - Nếu là Full-Auto và bạn vẫn giữ chuột → giữ IsShooting=true, không về Idle  
-    /// - Nếu là Full-Auto và bạn đã buông chuột → về Idle, IsShooting=false
-    /// </summary>
-    private IEnumerator ResetShootingAfterAnimation()
+    private IEnumerator ResetShotAnimation()
     {
-        AnimatorStateInfo info = armsAnimator.GetCurrentAnimatorStateInfo(0);
-        yield return new WaitForSeconds(info.length);
+        // Đợi hết clip shot
+        while (!armsAnimator.GetCurrentAnimatorStateInfo(0).IsName("Shot"))
+            yield return null;
+        float wait = armsAnimator.GetCurrentAnimatorStateInfo(0).length / armsAnimator.GetCurrentAnimatorStateInfo(0).speed;
+        yield return new WaitForSeconds(wait);
 
-        bool stillHolding = Input.GetMouseButton(0);
-        bool isFullAuto = gunData.fireMode == GunFireMode.FullAuto;
-
-        if (!isFullAuto || !stillHolding)
+        // KHÔNG được về Idle nếu còn giữ chuột và ở chế độ auto!
+        if (!Input.GetMouseButton(0) || gunData.fireMode != GunFireMode.FullAuto)
         {
-            armsAnimator.SetTrigger("Idle");
-            IsShooting = false;
+            StopShooting();
         }
+        // Nếu vẫn giữ chuột (auto), thì IsShooting vẫn true, không reset Idle.
     }
+
+    // --- Reload và Switch giữ nguyên, không cho bắn khi isReloading/IsSwitchingWeapon ---
 
     public void Reload()
     {
@@ -118,7 +116,6 @@ public class PlayerShoot : MonoBehaviour
     private IEnumerator ReloadRoutine()
     {
         yield return new WaitForSeconds(gunData.reloadTime);
-
         int need = gunData.magazineSize - currentAmmo;
         if (reserveAmmo >= need)
         {
@@ -130,9 +127,8 @@ public class PlayerShoot : MonoBehaviour
             currentAmmo += reserveAmmo;
             reserveAmmo = 0;
         }
-
         isReloading = false;
-        weaponUI.UpdateAmmoUI(currentAmmo, reserveAmmo);
+        weaponUI?.UpdateAmmoUI(currentAmmo, reserveAmmo);
     }
 
     public void CancelReload()
@@ -141,5 +137,19 @@ public class PlayerShoot : MonoBehaviour
         isReloading = false;
         armsAnimator.ResetTrigger("Recharge");
         armsAnimator.SetTrigger("Idle");
+    }
+
+    public IEnumerator SwitchOut()
+    {
+        IsSwitchingWeapon = true;
+        armsAnimator.SetTrigger("Hide");
+        yield return new WaitForSeconds(0.3f);
+    }
+
+    public IEnumerator SwitchIn()
+    {
+        armsAnimator.SetTrigger("Get");
+        yield return new WaitForSeconds(0.3f);
+        IsSwitchingWeapon = false;
     }
 }
