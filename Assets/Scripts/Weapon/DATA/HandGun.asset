@@ -20,7 +20,7 @@ MonoBehaviour:
   accuracy: 1
   magazineSize: 7
   reserveAmmo: 30
-  reloadTime: 1
+  reloadTime: 1.5
   fireMode: 0
   availableFireModes: 00000000
   recoil: 5
