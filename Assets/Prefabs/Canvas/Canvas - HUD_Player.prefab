@@ -3363,7 +3363,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ee222cc0a383db6408c7905e97cb6582, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dynamicScale: 10
+  dynamicScale: 128
   playerMovement: {fileID: 0}
   playerCamera: {fileID: 0}
   canvasGroup: {fileID: 1214612907037308686}
