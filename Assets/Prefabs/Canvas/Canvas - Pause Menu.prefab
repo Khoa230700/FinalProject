@@ -3388,7 +3388,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3300445005970564418, guid: a40ddb6321a18444cb35eb34b779547b, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: 239
       objectReference: {fileID: 0}
     - target: {fileID: 3315115884708638343, guid: a40ddb6321a18444cb35eb34b779547b, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
@@ -4136,7 +4136,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7718935194733247092, guid: a40ddb6321a18444cb35eb34b779547b, type: 3}
       propertyPath: m_Value
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7782140416304549774, guid: a40ddb6321a18444cb35eb34b779547b, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
