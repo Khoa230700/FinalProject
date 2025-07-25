@@ -6,7 +6,8 @@ public class LookAtCameraUI : MonoBehaviour
 
     void Start()
     {
-        cam ??= Camera.main.transform;
+        if (cam == null)
+            cam = FindAnyObjectByType<Camera>().transform;
     }
 
     void LateUpdate()
