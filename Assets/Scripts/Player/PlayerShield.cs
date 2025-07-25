@@ -25,13 +25,6 @@ public class PlayerShield : MonoBehaviour
         UpdateShield(maxShield);
     }
 
-    //* Test
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.S))
-            UpdateShield(Random.Range(10f, 30f));
-    }
-
     //* Nhận sát thương và trả về lượng sát thương dư thừa
     public float TakeDamage(float damage)
     {

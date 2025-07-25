@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class CrosshairManager : MonoBehaviour
+public class CrosshairUI : MonoBehaviour
 {
     [Header("Settings")]
     [SerializeField] private float dynamicScale = 10f;

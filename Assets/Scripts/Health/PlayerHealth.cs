@@ -3,8 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-public class PlayerHealth : HealthBase
+public class PlayerHealth : MonoBehaviour
 {
+    [Header("Health Settings")]
+    public float maxHealth = 100;
+    private float currentHealth;
+
     [Header("Regeneration")]
     public bool useRegen;
     public float regenRate;
@@ -13,18 +17,21 @@ public class PlayerHealth : HealthBase
 
     [Header("References")]
     [SerializeField] private BarUI barUI;
-    [SerializeField] private PlayerShield shield;
+
+    [Header("Events")]
+    public UnityEvent<float, Vector3> OnTakeDamage;
 
     private Coroutine regenRoutine;
+    private PlayerShield shield;
 
-    protected override void Start()
+    void Start()
     {
-        base.Start();
+        UpdateHealth(maxHealth);
         shield ??= GetComponent<PlayerShield>();
     }
 
     //* Nhận sát thương qua lá chắn và tính toán sát thương còn lại, thêm khả năng xuyên lá chắn , thêm vào điểm va chạm
-    public override void TakeDamage(float damage, float penetrationPercent = 0f, Vector3 hitPoint = default)
+    public void TakeDamage(float damage, float penetrationPercent = 0f, Vector3 hitPoint = default)
     {
         //* Khởi động tái tạo khi nhận sát thương
         if (regenRoutine != null) StopCoroutine(regenRoutine);
@@ -64,7 +71,7 @@ public class PlayerHealth : HealthBase
     }
 
     //* Hồi máu (+ hồi, - trừ)
-    protected override void UpdateHealth(float amount)
+    public void UpdateHealth(float amount)
     {
         currentHealth = Mathf.Clamp(currentHealth + amount, 0, maxHealth);
         UpdateUI();
@@ -73,7 +80,7 @@ public class PlayerHealth : HealthBase
             Die();
     }
 
-    protected override void Die()
+    public void Die()
     {
         Debug.Log("Die!");
     }

@@ -6,7 +6,7 @@ using System.Collections;
 public class WeaponSwitcher : MonoBehaviour
 {
     public WeaponUI weaponUI;
-    [SerializeField] private CrosshairManager crosshairManager;
+    [SerializeField] private CrosshairUI crosshairManager;
     [SerializeField] private List<GameObject> weaponList = new List<GameObject>();
 
     private List<PlayerShoot> playerShoots = new List<PlayerShoot>();
@@ -19,7 +19,7 @@ public class WeaponSwitcher : MonoBehaviour
             playerShoots.Add(weapon.GetComponentInChildren<PlayerShoot>());
         }
 
-        crosshairManager ??= FindAnyObjectByType<CrosshairManager>();
+        crosshairManager ??= FindAnyObjectByType<CrosshairUI>();
 
         ActivateWeapon(currentWeaponIndex);
     }
