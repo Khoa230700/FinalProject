@@ -1,89 +1,103 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 using UnityEngine.AI;
 
 public class L4DBotMeleeController : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] Transform player;
-
-
+    private int AttackCombo;
+    private float lastAttackTime;
+    [SerializeField] float stopdistang;
+    [SerializeField] float attackCooldown = 1.2f;
     [Header("AI Settings")]
-    [SerializeField] float visionRange = 20f;
+    [SerializeField] float visionRange = 10f;
     [SerializeField] float attackRange = 3f;
+    public float detectionRadius = 10f;
 
-    private NavMeshAgent agent;
+    public NavMeshAgent agent;
     private Animator animator;
     private GameObject currentTarget;
 
     private void Start()
     {
-        agent = GetComponent<NavMeshAgent>();
         animator = GetComponent<Animator>();
         //agent.updateRotation = false; // Ta tự xử lý quay mặt
     }
 
     private void Update()
     {
-
-        float distToPlayer = Vector3.Distance(transform.position, player.position);
-
-        // Nếu player quá xa → đi theo player
-        if (distToPlayer > agent.stoppingDistance && !animator.GetCurrentAnimatorStateInfo(0).IsName("Attack"))
+        NavMeshHit hit;
+        if (NavMesh.SamplePosition(transform.position, out hit, 5f, NavMesh.AllAreas))
         {
-            currentTarget = null;
-            agent.isStopped = false;
-            agent.SetDestination(player.position);
-
-            Vector3 localVelocity = transform.InverseTransformDirection(agent.velocity);
-            animator.SetFloat("Horizontal", localVelocity.x);
-            animator.SetFloat("Vertical", localVelocity.z);
-            animator.SetBool("isMoving", true);
-            return;
+            transform.position = hit.position; // Đặt lại vị trí sát NavMesh gần nhất
         }
+        EnsureOnNavMesh();
+        agent.SetDestination(player.position);
+    //    float distToPlayer = Vector3.Distance(transform.position, player.position);
+    //    Debug.Log("Distance to Player: " + distToPlayer);
+    //    Luôn chạy theo Player nếu quá xa
+    //    if (distToPlayer >= agent.stoppingDistance)
+    //    {
+    //        SafeStopAgent(false);
+    //        agent.SetDestination(player.position);
+    //        currentTarget = null;
 
-        // Nếu player đủ gần → bắt đầu tìm zombie
-        currentTarget = FindNearestVisibleZombie();
+    //        if (!HasReachedDestination())
+    //        {
+    //            Vector3 localVelocity = transform.InverseTransformDirection(agent.velocity);
+    //            animator.SetBool("isMoving", true);
+    //            animator.SetFloat("Horizontal", localVelocity.x);
+    //            animator.SetFloat("Vertical", localVelocity.z);
+    //            AudioBotManager.Instance.PlayBotSound();
+    //        }
+    //        else
+    //        {
+    //            animator.SetFloat("Horizontal", 0f);
+    //            animator.SetFloat("Vertical", 0f);
+    //            animator.SetBool("isMoving", false);
+    //            AudioBotManager.Instance.StopBotSound();
+    //        }
 
-        if (currentTarget != null)
-        {
-            float distToTarget = Vector3.Distance(transform.position, currentTarget.transform.position);
+    //        return;
+    //    }
 
-            // Nếu zombie trong tầm nhìn nhưng chưa đủ gần để tấn công → đi tới zombie
-            if (distToTarget > attackRange)
-            {
-                // CHƯA ĐỦ GẦN → ĐI LẠI
-                agent.isStopped = false;
-                agent.SetDestination(currentTarget.transform.position);
+    //    Nếu player gần → bắt đầu tìm zombie
+    //   currentTarget = FindNearestVisibleZombie();
+    //    if (currentTarget != null)
+    //    {
+    //        float distToTarget = Vector3.Distance(transform.position, currentTarget.transform.position);
+    //        if (distToTarget >= attackRange)
+    //        {
+    //            LẠI GẦN ZOMBIE
+    //                SafeStopAgent(false);
+    //            agent.SetDestination(currentTarget.transform.position);
+    //            Vector3 localVelocity = transform.InverseTransformDirection(agent.velocity);
+    //            animator.SetFloat("Horizontal", localVelocity.x);
+    //            animator.SetFloat("Vertical", localVelocity.z);
+    //            animator.SetBool("isMoving", true);
+    //            AudioBotManager.Instance.PlayBotSound();
+    //        }
+    //        else
+    //        {
+    //            TẤN CÔNG
+    //                SafeStopAgent(true);
+    //            transform.LookAt(new Vector3(currentTarget.transform.position.x, transform.position.y, currentTarget.transform.position.z));
+    //            animator.SetFloat("Horizontal", 0f);
+    //            animator.SetFloat("Vertical", 0f);
+    //            animator.SetBool("isMoving", false);
+    //            StartCoroutine(TriggerAttack());
 
-                Vector3 localVelocity = transform.InverseTransformDirection(agent.velocity);
-                animator.SetFloat("Horizontal", localVelocity.x);
-                animator.SetFloat("Vertical", localVelocity.z);
-                animator.SetBool("isMoving", true);
-            }
-            else
-            {
-                // ĐỦ GẦN → DỪNG LẠI TẤN CÔNG
-                agent.isStopped = true;
+    //        }
+    //        return;
+    //    }
 
-                Vector3 lookPos = new Vector3(currentTarget.transform.position.x, transform.position.y, currentTarget.transform.position.z);
-                transform.LookAt(lookPos);
+    //    // Nếu không có zombie → đứng yên gần player
+    //    SafeStopAgent(true);
+    //    animator.SetBool("isMoving", false);
 
-                animator.SetFloat("Horizontal", 0f);
-                animator.SetFloat("Vertical", 0f);
-                animator.SetBool("isMoving", false);
-                animator.SetTrigger("Attack");
-            }
-
-            return;
-        }
-
-        // Không thấy zombie → đứng yên
-        agent.isStopped = true;
-        animator.SetFloat("Horizontal", 0f);
-        animator.SetFloat("Vertical", 0f);
-        animator.SetBool("isMoving", false);
-
-    }
+    //}
+}
 
     private GameObject FindNearestVisibleZombie()
     {
@@ -100,6 +114,7 @@ public class L4DBotMeleeController : MonoBehaviour
             {
                 if (dist < minDist)
                 {
+                    
                     minDist = dist;
                     closest = zombie;
                 }
@@ -117,13 +132,25 @@ public class L4DBotMeleeController : MonoBehaviour
 
         Debug.DrawRay(transform.position, direction * distance, Color.red);
 
-        int layerMask = LayerMask.GetMask("Default"); 
-        if (Physics.Raycast(transform.position, direction, out RaycastHit hit, distance, layerMask))
+        if (Physics.Raycast(transform.position, direction, out RaycastHit hit, distance))
         {
             return hit.collider.CompareTag("Enemy");
         }
-
         return false;
+    }
+    IEnumerator TriggerAttack()
+    {
+        if (Time.time - lastAttackTime < attackCooldown)
+            yield break;
+
+        lastAttackTime = Time.time;
+
+        AttackCombo = Random.Range(0, 3);
+        animator.SetInteger("AttackCombo", AttackCombo);
+        yield return null;
+        animator.SetTrigger("Attack");
+        //AudioBotManager.Instance.MeleeSound();
+        Debug.Log("Attack Triggered with Combo: " + AttackCombo);
     }
 
     private Vector3 GetAimPoint(Transform target)
@@ -136,6 +163,35 @@ public class L4DBotMeleeController : MonoBehaviour
         if (col != null)
             return col.bounds.center + Vector3.up * (col.bounds.extents.y * 0.5f);
 
-        return target.position + Vector3.up * 1.2f;
+        EnemiAI ai = target.GetComponent<EnemiAI>();
+        if (ai != null && target.gameObject.CompareTag("Enemy"))
+            return target.position/* + Vector3.up * 1.5f*/;
+
+        return target.position /*+ Vector3.up * 1.2f*/;
+    }
+    bool HasReachedDestination()
+    {
+        return !agent.pathPending &&
+               agent.remainingDistance <= agent.stoppingDistance &&
+               (!agent.hasPath || agent.velocity.sqrMagnitude < 0.01f);
+    }
+    private void SafeStopAgent(bool stop)
+    {
+        if (agent != null && agent.isOnNavMesh)
+        {
+            agent.isStopped = stop;
+        }
+    }
+    void EnsureOnNavMesh()
+    {
+        if (agent != null && !agent.isOnNavMesh)
+        {
+            NavMeshHit hit;
+            if (NavMesh.SamplePosition(transform.position, out hit, 2f, NavMesh.AllAreas))
+            {
+                transform.position = hit.position;
+                agent.Warp(hit.position); // Teleport về đúng chỗ
+            }
+        }
     }
 }

@@ -1,8 +1,8 @@
 ﻿using UnityEngine;
 using UnityEngine.AI;
 using System.Collections;
-using static NewEnemyAI;
 using System.Linq;
+using NUnit;
 
 public class EnemiAI : MonoBehaviour
 {
@@ -20,7 +20,7 @@ public class EnemiAI : MonoBehaviour
     public float attackCooldown = 1.5f;
     private float lastAttackTime;
     public float attackRange = 2f;
-    public float chaseRange = 10f;
+    public float chaseRange = 40f;
 
 
     //new
@@ -28,11 +28,12 @@ public class EnemiAI : MonoBehaviour
     private Transform currentTarget;
     public float moveSpeed = 4f;
     public LayerMask targetLayer;
-
+    
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
         enemyAnimation = GetComponent<Animator>();
+        player = GameObject.FindWithTag("Player").transform;
     }
 
     void Update()
@@ -67,8 +68,10 @@ public class EnemiAI : MonoBehaviour
         {
             lastAttackTime = Time.time;
             // damage player()
-            //player.GetComponent<HealthBase>().TakeDamage(10);
+            player.GetComponent<PlayerHealth>().TakeDamage(10, 0,this.transform.position);
             Debug.Log("Enemy attacks the player!");
+
+       
         }
         enemyAnimation.SetTrigger("attack");
     }

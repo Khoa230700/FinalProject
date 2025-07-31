@@ -8968,6 +8968,7 @@ GameObject:
   - component: {fileID: 3044735178645879458}
   - component: {fileID: 1214612907037308686}
   - component: {fileID: 5890734741497890596}
+  - component: {fileID: 1061006660542179740}
   m_Layer: 5
   m_Name: CROSSHAIR
   m_TagString: Untagged
@@ -9030,6 +9031,25 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dynamicScale: 128
+  playerMovement: {fileID: 0}
+  playerCamera: {fileID: 0}
+  canvasGroup: {fileID: 1214612907037308686}
+  runCrosshair: {fileID: 2424873434169650135}
+  staticCrosshair: {fileID: 8638274891728498826}
+  dynamicCrosshair: {fileID: 8204647806904703443}
+--- !u!114 &1061006660542179740
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8581933922979097243}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee222cc0a383db6408c7905e97cb6582, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  dynamicScale: 42
   playerMovement: {fileID: 0}
   playerCamera: {fileID: 0}
   canvasGroup: {fileID: 1214612907037308686}

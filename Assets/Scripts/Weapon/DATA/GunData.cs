@@ -21,6 +21,7 @@ public class GunData : ScriptableObject
     public int reserveAmmo;
     public float reloadTime;
     public GunFireMode fireMode;
+    public GunFireMode[] availableFireModes;  // Các mode được phép
     public float recoil;
     public float bulletSpeed;
     public float penetrationPower;

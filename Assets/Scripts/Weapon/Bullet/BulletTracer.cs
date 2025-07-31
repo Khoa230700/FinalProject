@@ -8,10 +8,10 @@ public class BulletTracer : MonoBehaviour
     public Color tracerColor = Color.yellow;
     public float tracerDuration = 0.2f;
     public float maxDistance = 100f;
+    public float shortDistance = 2f;
 
     public void Init(Vector3 start, Vector3 direction)
     {
-        // Khởi tạo hoặc lấy LineRenderer
         lineRenderer = GetComponent<LineRenderer>();
         if (lineRenderer == null)
         {
@@ -20,10 +20,16 @@ public class BulletTracer : MonoBehaviour
 
         SetupLineRenderer();
 
-        Vector3 end = start + direction * maxDistance;
+        float tracerLength = 2.5f; // 🎯 Độ dài vệt đạn mong muốn
+        Vector3 end = start + direction * tracerLength;
+
         if (Physics.Raycast(start, direction, out RaycastHit hit, maxDistance))
         {
-            end = hit.point;
+            float hitDistance = Vector3.Distance(start, hit.point);
+            if (hitDistance < tracerLength)
+            {
+                end = hit.point; // Nếu trúng gần hơn độ dài vệt đạn
+            }
         }
 
         lineRenderer.SetPosition(0, start);

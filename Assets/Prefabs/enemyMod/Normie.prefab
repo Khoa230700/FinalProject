@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 8079558651761959656}
   - component: {fileID: 3586379497261931724}
   - component: {fileID: 5658322781626220109}
-  m_Layer: 2
+  m_Layer: 0
   m_Name: AttackDetect
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -736,7 +736,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2568088395683991286}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3657ca4cfbb38284c8391949a59cad72, type: 3}
   m_Name: 
@@ -787,7 +787,7 @@ GameObject:
   - component: {fileID: 3515417579159368491}
   - component: {fileID: 2190198581176926509}
   - component: {fileID: 1730337569766138010}
-  m_Layer: 2
+  m_Layer: 0
   m_Name: AI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -976,6 +976,8 @@ GameObject:
   - component: {fileID: 218087930694890474}
   - component: {fileID: 1316558654747550126}
   - component: {fileID: 5434881562994337880}
+  - component: {fileID: 3289584220954763909}
+  - component: {fileID: 7775071814243305905}
   m_Layer: 0
   m_Name: HitEnemy8
   m_TagString: HeadShot
@@ -991,12 +993,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3239438909805355896}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.043773513, y: -0.38708046, z: -0.11950828, w: 0.9132198}
-  m_LocalPosition: {x: -0.143, y: 0.047, z: 0.075}
+  m_LocalRotation: {x: 0.5, y: -0.5, z: -0.50000006, w: 0.50000006}
+  m_LocalPosition: {x: -0.25526428, y: 1.6716417, z: -0.09568998}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 3497891642073242694}
+  m_Father: {fileID: 1219334098712275762}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!135 &218087930694890474
 SphereCollider:
@@ -1047,6 +1049,34 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enemyM: {fileID: 639718399531827442}
+--- !u!114 &3289584220954763909
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3239438909805355896}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0405504e9ab75343a88002f088d9d05, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ownerHealthSystem: {fileID: 639718399531827442}
+  hitboxType: 1
+  bloodEffect: {fileID: 8967264388286551387, guid: 75f2e05292738d242a060d01657a4ce5, type: 3}
+--- !u!114 &7775071814243305905
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3239438909805355896}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4c71a6787ee5539468cd533cc0144806, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  aimTarget: {fileID: 1219334098712275762}
 --- !u!1 &3314240867215492325
 GameObject:
   m_ObjectHideFlags: 0
@@ -1247,9 +1277,10 @@ GameObject:
   - component: {fileID: 2243277575312782797}
   - component: {fileID: 7891509131991545629}
   - component: {fileID: 639718399531827442}
-  m_Layer: 2
+  - component: {fileID: 1442766571847242536}
+  m_Layer: 0
   m_Name: Normie
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1262,11 +1293,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3738223141133144338}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: 1, z: -0, w: 0}
+  m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
   m_LocalPosition: {x: 4.82076, y: 0.00000047683716, z: -0.24157715}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_ConstrainProportionsScale: 1
   m_Children:
+  - {fileID: 6607325736403247256}
   - {fileID: 4281287692047061046}
   - {fileID: 149598222079393527}
   - {fileID: 5338100827514246168}
@@ -2699,7 +2731,7 @@ NavMeshAgent:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3738223141133144338}
   m_Enabled: 1
-  m_AgentTypeID: 0
+  m_AgentTypeID: -334000983
   m_Radius: 0.5
   m_Speed: 4
   m_Acceleration: 2
@@ -2758,7 +2790,12 @@ MonoBehaviour:
   attackSpeed: 1.5
   attackCooldown: 1.5
   attackRange: 2
-  chaseRange: 0
+  chaseRange: 40
+  detectionRadius: 50
+  moveSpeed: 4
+  targetLayer:
+    serializedVersion: 2
+    m_Bits: 256
 --- !u!114 &639718399531827442
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2774,6 +2811,29 @@ MonoBehaviour:
   maxHealth: 100
   currentHealth: 100
   animator: {fileID: 4440705263268147471}
+--- !u!136 &1442766571847242536
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3738223141133144338}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.5
+  m_Height: 1
+  m_Direction: 1
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &3777046724730365686
 GameObject:
   m_ObjectHideFlags: 0
@@ -3426,7 +3486,6 @@ Transform:
   - {fileID: 4865603613578173423}
   - {fileID: 4107260641715842905}
   - {fileID: 4646936862901109637}
-  - {fileID: 6607325736403247256}
   m_Father: {fileID: 2752363721983486891}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &5427173145910012010
@@ -3930,6 +3989,7 @@ GameObject:
   - component: {fileID: 2770912297625699100}
   - component: {fileID: 4464247418470829019}
   - component: {fileID: 6595765820859634527}
+  - component: {fileID: 1109460859803740406}
   m_Layer: 0
   m_Name: HitEnemy3
   m_TagString: BodyShot
@@ -4003,6 +4063,21 @@ MonoBehaviour:
   enemyM: {fileID: 639718399531827442}
   blood: {fileID: 2629016494315086251, guid: 5776aed3bb070e54cb09a11c8a6a5831, type: 3}
   bloodLifetime: 1
+--- !u!114 &1109460859803740406
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6751500013905844598}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0405504e9ab75343a88002f088d9d05, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ownerHealthSystem: {fileID: 639718399531827442}
+  hitboxType: 0
+  bloodEffect: {fileID: 1172649150807526450, guid: 696ec32829bb413498cef4215a2a1926, type: 3}
 --- !u!1 &6768120555724237328
 GameObject:
   m_ObjectHideFlags: 0
@@ -4492,6 +4567,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4281287692047061046}
+  - component: {fileID: 7129226719308162337}
   m_Layer: 0
   m_Name: CATRigHub001
   m_TagString: Untagged
@@ -4517,6 +4593,21 @@ Transform:
   - {fileID: 8865994683633568128}
   m_Father: {fileID: 1219334098712275762}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7129226719308162337
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8576626056933702039}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9875ca482c081364c934c1012ae0c17b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enemyM: {fileID: 639718399531827442}
+  blood: {fileID: 2629016494315086251, guid: 5776aed3bb070e54cb09a11c8a6a5831, type: 3}
+  bloodLifetime: 1
 --- !u!1 &8721930535725868945
 GameObject:
   m_ObjectHideFlags: 0

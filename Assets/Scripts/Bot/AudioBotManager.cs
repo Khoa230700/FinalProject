@@ -7,6 +7,7 @@ public class AudioBotManager : MonoBehaviour
     [SerializeField] private AudioSource botAudioSource;
     [SerializeField] private AudioClip[] botSounds;
     [SerializeField] private AudioClip shoot;
+    [SerializeField] private AudioClip[] melee;
     private int currentClipIndex = 0;
     private float shootSoundCooldown = 0f;
     private float soundCooldownTime = 0; // delay 0.5s giữa các lần phát
@@ -16,10 +17,7 @@ public class AudioBotManager : MonoBehaviour
         {
             Instance = this;
         }
-        else
-        {
-            Destroy(gameObject);
-        }
+        
     }
 
         public void PlayBotSound()
@@ -44,9 +42,23 @@ public class AudioBotManager : MonoBehaviour
         if (shoot != null && shootSoundCooldown <= 0f)
         {
             botAudioSource.volume = 0.3f;
-            botAudioSource.PlayOneShot(shoot);
+            //botAudioSource.play
+            AudioSource.PlayClipAtPoint(shoot, transform.position);
             shootSoundCooldown = soundCooldownTime;
         }
+    }
+    public void MeleeSound()
+    {
+        if (melee == null || melee.Length == 0 || botAudioSource == null)
+            return;
+
+        if (!botAudioSource.isPlaying)
+        {
+            int randomIndex = Random.Range(0, melee.Length); // Chọn ngẫu nhiên từ 0 đến melee.Length - 1
+            botAudioSource.clip = melee[randomIndex];
+            botAudioSource.Play();
+        }
+
     }
 
 }
