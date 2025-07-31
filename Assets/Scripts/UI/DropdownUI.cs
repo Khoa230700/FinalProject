@@ -39,8 +39,7 @@ public class DropdownUI : MonoBehaviour
                 };
                 selector.OnValueChange.AddListener(() =>
                 {
-                    // Screen.SetResolution(currentRes.width, currentRes.height, Screen.fullScreen);
-                    Debug.Log("Set resolution: " + resolutionTitle);
+                    Screen.SetResolution(currentRes.width, currentRes.height, Screen.fullScreen);
                 });
 
                 itemSelectors.Add(selector);

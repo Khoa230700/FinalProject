@@ -53,6 +53,10 @@ public class AudioManager : MonoBehaviour
         ApplyVolumes();
     }
 
+    public float GetMasterVolume() => masterVolume;
+    public float GetMusicVolume() => musicVolume;
+    public float GetSFXVolume() => sfxVolume;
+
     private void ApplyVolumes()
     {
         musicSource.volume = musicVolume * masterVolume;

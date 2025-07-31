@@ -93,7 +93,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &7745500849964817018
 RectTransform:
   m_ObjectHideFlags: 0
@@ -304,7 +304,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bloodScreenFader:
     image: {fileID: 8916557124795647916}
-    minAlpha: 0.4
+    minAlpha: 0.1
     fadeInSpeed: 25
     fadeOutSpeed: 0.3
     fadeOutPause: 0.5
