@@ -3,11 +3,15 @@ using UnityEngine;
 
 public class QuestManager : MonoBehaviour
 {
+    [Header("List of quests for every scene")]
+    [SerializeField] private QuestInfoSO[] questList;
+
     private Dictionary<string, Quest> questMap;
 
     private void Awake()
     {
-        questMap = CreateQuestMap();
+        questMap = CreateQuestMap(questList);
+        Debug.Log("Quest Map Created with " + questMap.Count + " quests.");
     }
 
     private void OnEnable()
@@ -47,9 +51,12 @@ public class QuestManager : MonoBehaviour
         Debug.Log("Completing quest: " + id);
     }
 
-    private Dictionary<string, Quest> CreateQuestMap()
+    public Dictionary<string, Quest> CreateQuestMap(QuestInfoSO[] allQuests = null)
     {
-        QuestInfoSO[] allQuests = Resources.LoadAll<QuestInfoSO>("Quests");
+        if (allQuests == null || allQuests.Length == 0)
+        {
+            allQuests = Resources.LoadAll<QuestInfoSO>("Quests");
+        }
 
         Dictionary<string, Quest> idToQuestMap = new Dictionary<string, Quest>();
         foreach (QuestInfoSO questInfo in allQuests)

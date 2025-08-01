@@ -19,7 +19,6 @@ public class QuestPoint : MonoBehaviour
 
     private void OnEnable()
     {
-        Debug.Log(GameEventsManager.Instance);
         GameEventsManager.Instance.questEvents.OnQuestStateChanged += QuestStateChanged;
     }
 
@@ -58,7 +57,9 @@ public class QuestPoint : MonoBehaviour
     {
         if (isPlayerInRange && KeyBindingManager.Instance.GetKeyDown("Interact"))
         {
-            
+            GameEventsManager.Instance.questEvents.StartQuest(questId);
+            GameEventsManager.Instance.questEvents.AdvanceQuest(questId);
+            GameEventsManager.Instance.questEvents.CompleteQuest(questId);
         }
     }
 }
