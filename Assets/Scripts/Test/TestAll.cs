@@ -12,8 +12,8 @@ public class TestAll : MonoBehaviour
         }
 
         // Movement controls
-        float moveHorizontal = Input.GetAxis("Horizontal");
-        float moveVertical = Input.GetAxis("Vertical");
+        float moveHorizontal = KeyBindingManager.Instance.GetAxis("Horizontal");
+        float moveVertical = KeyBindingManager.Instance.GetAxis("Vertical");
 
         Vector3 movement = new Vector3(moveHorizontal, 0, moveVertical);
         transform.Translate(movement * 5f * Time.deltaTime);

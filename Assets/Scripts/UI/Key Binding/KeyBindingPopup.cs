@@ -8,6 +8,8 @@ using UnityEngine.EventSystems;
 public class KeyBindingPopup : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI descriptionText;
+    [SerializeField] private GameObject hotkeysSettingPanel;
+    [SerializeField] private GameObject closeButtonKeyBinding;
     private Animator animator;
     private bool isListen;
     private Action<KeyCode> OnComplete;
@@ -21,8 +23,9 @@ public class KeyBindingPopup : MonoBehaviour
     {
         if (!isListen) return;
 
-        if (Input.GetMouseButtonDown(0) && EventSystem.current.IsPointerOverGameObject())
+        if (Input.GetMouseButtonDown(0) && IsPointerOver(closeButtonKeyBinding.transform))
         {
+            Hide();
             return;
         }
 
@@ -46,12 +49,15 @@ public class KeyBindingPopup : MonoBehaviour
     {
         OnComplete = callback;
         descriptionText.text = "Press a key for " + keyName.ToUpper();
+        hotkeysSettingPanel.SetActive(false);
         animator.Play("In");
+
         isListen = true;
     }
 
     public void Hide()
     {
+        hotkeysSettingPanel.SetActive(true);
         isListen = false;
         animator.Play("Out");
     }
@@ -60,5 +66,13 @@ public class KeyBindingPopup : MonoBehaviour
     {
         Hide();
         OnComplete?.Invoke(keyCode);
+    }
+
+    bool IsPointerOver(Transform target)
+    {
+        var data = new PointerEventData(EventSystem.current) { position = Input.mousePosition };
+        var results = new List<RaycastResult>();
+        EventSystem.current.RaycastAll(data, results);
+        return results.Exists(r => r.gameObject.transform.IsChildOf(target));
     }
 }
