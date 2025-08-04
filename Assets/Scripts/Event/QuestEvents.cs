@@ -20,9 +20,15 @@ public class QuestEvents
         OnCompleteQuest?.Invoke(questId);
     }
 
-    public event Action<Quest> OnQuestStateChanged;
-    public void QuestStateChanged(Quest quest)
+    public event Action<Quest> OnQuestStateChange;
+    public void QuestStateChange(Quest quest)
     {
-        OnQuestStateChanged?.Invoke(quest);
+        OnQuestStateChange?.Invoke(quest);
+    }
+
+    public event Action<string, int, QuestStepState> OnQuestStepStateChange;
+    public void QuestStepStateChanged(string questId, int stepIndex, QuestStepState questStepState)
+    {
+        OnQuestStepStateChange?.Invoke(questId, stepIndex, questStepState);
     }
 }
