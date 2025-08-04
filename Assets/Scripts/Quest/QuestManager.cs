@@ -28,7 +28,6 @@ public class QuestManager : MonoBehaviour
         GameEventsManager.Instance.questEvents.OnAdvanceQuest += AdvanceQuest;
         GameEventsManager.Instance.questEvents.OnCompleteQuest += CompleteQuest;
 
-        GameEventsManager.Instance.questEvents.OnQuestStateChange += QuestStateChange;
         GameEventsManager.Instance.questEvents.OnQuestStepStateChange += QuestStepStateChange;
 
         GameEventsManager.Instance.playerEvents.OnPlayerLevelChange += PlayerLevelChange;
@@ -40,16 +39,10 @@ public class QuestManager : MonoBehaviour
         GameEventsManager.Instance.questEvents.OnAdvanceQuest -= AdvanceQuest;
         GameEventsManager.Instance.questEvents.OnCompleteQuest -= CompleteQuest;
 
-        GameEventsManager.Instance.questEvents.OnQuestStateChange -= QuestStateChange;
         GameEventsManager.Instance.questEvents.OnQuestStepStateChange -= QuestStepStateChange;
 
         GameEventsManager.Instance.playerEvents.OnPlayerLevelChange -= PlayerLevelChange;
 
-    }
-
-    private void QuestStateChange(Quest quest)
-    {
-        
     }
 
     private void Start()

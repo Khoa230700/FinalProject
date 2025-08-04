@@ -8,20 +8,31 @@ public class QuestsUI : MonoBehaviour
 
     private Dictionary<string, QuestItemUI> questItemsMap = new();
 
-    public void UpdateUI(string questId, string questTitle, List<string> questSteps)
+    private void OnEnable()
     {
-        if (!questItemsMap.TryGetValue(questId, out QuestItemUI questItemUI))
+        GameEventsManager.Instance.questEvents.OnQuestStateChange += UpdateUI;
+    }
+
+    private void OnDisable()
+    {
+        GameEventsManager.Instance.questEvents.OnQuestStateChange -= UpdateUI;
+    }
+
+    public void UpdateUI(Quest quest)
+    {
+        string questId = quest.questInfo.questId;
+        string questTitle = quest.questInfo.questName;
+        string questStatus = quest.GetStatus();
+
+        if (!questItemsMap.ContainsKey(questId))
         {
             GameObject questItemGO = Instantiate(questItemPrefab, this.transform);
             questItemGO.name = questTitle;
-
-            questItemUI = questItemGO.GetComponent<QuestItemUI>();
-            questItemUI.Setup(questTitle);
-
+            QuestItemUI questItemUI = questItemGO.GetComponent<QuestItemUI>();
             questItemsMap.Add(questId, questItemUI);
         }
 
-        questItemUI.UpdateUI(questSteps);
+        questItemsMap[questId].UpdateUI(questId, questTitle, questStatus);
     }
 
     public void ClearAllQuest()

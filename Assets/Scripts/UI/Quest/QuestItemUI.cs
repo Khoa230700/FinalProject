@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 public class QuestItemUI : MonoBehaviour
 {
@@ -12,7 +13,7 @@ public class QuestItemUI : MonoBehaviour
     [SerializeField] private GameObject questStepPrefab;
 
     private bool isOpen = false;
-    private List<GameObject> stepGOs = new();
+    private Dictionary<string, TextMeshProUGUI> questStepsMap = new();
 
     void Start()
     {
@@ -27,34 +28,19 @@ public class QuestItemUI : MonoBehaviour
         }
     }
 
-    public void Setup(string title)
+    public void UpdateUI(string id, string title, string status)
     {
         titleText.text = title;
-    }
 
-    public void UpdateUI(List<string> steps)
-    {
-        // Đảm bảo số lượng stepGO phù hợp
-        for (int i = 0; i < steps.Count; i++)
+        if(!questStepsMap.ContainsKey(id))
         {
-            if (i < stepGOs.Count)
-            {
-                stepGOs[i].SetActive(true);
-                stepGOs[i].transform.Find("Text").GetComponent<TextMeshProUGUI>().text = steps[i];
-            }
-            else
-            {
-                GameObject stepGO = Instantiate(questStepPrefab, listRoot);
-                stepGO.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = steps[i];
-                stepGOs.Add(stepGO);
-            }
+            GameObject questStepGO = Instantiate(questStepPrefab, listRoot);
+            questStepGO.name = status;
+            TextMeshProUGUI questStepText = questStepGO.GetComponentInChildren<TextMeshProUGUI>();
+            questStepsMap.Add(id, questStepText);
         }
 
-        // Ẩn các step cũ không còn dùng nữa
-        for (int i = steps.Count; i < stepGOs.Count; i++)
-        {
-            stepGOs[i].SetActive(false);
-        }
+        questStepsMap[id].text = status;
     }
 
     private void ToggleUI()

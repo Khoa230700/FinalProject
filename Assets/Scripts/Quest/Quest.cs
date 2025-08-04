@@ -58,11 +58,24 @@ public class Quest
         if (stepIndex < questStepStates.Length)
         {
             questStepStates[stepIndex].state = questStepState.state;
+            questStepStates[stepIndex].status = questStepState.status;
         }
     }
 
     public QuestData GetQuestData()
     {
         return new QuestData(questState, currentQuestStepIndex, questStepStates);
+    }
+
+    public string GetStatus()
+    {
+        string status = "";
+
+        for (int i = 0; i < currentQuestStepIndex; i++)
+        {
+            status += $"Step {i + 1}: {questStepStates[i].status}\n";
+        }
+
+        return status;
     }
 }

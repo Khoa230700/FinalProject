@@ -5,6 +5,11 @@ public class CollectCoinsQuestStep : QuestStep
     [SerializeField] private int coinsToComplete = 5;
     private int coinsCollected = 0;
 
+    private void Start()
+    {
+        UpdateState();
+    }
+
     //Test
     private void Update()
     {
@@ -32,17 +37,13 @@ public class CollectCoinsQuestStep : QuestStep
     private void UpdateState()
     {
         string state = coinsCollected.ToString();
-        ChangeState(state);
+        string status = $"Collected {coinsCollected}/{coinsToComplete} coins";
+        ChangeState(state, status);
     }
 
     protected override void SetQuestStepState(string questStepState)
     {
         this.coinsCollected = int.Parse(questStepState);
         UpdateState();
-    }
-
-    public override string GetStepStateDescription()
-    {
-        return $"{coinsCollected} / {coinsToComplete} Coins";
     }
 }
