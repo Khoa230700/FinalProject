@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 1844587978789850820}
   - component: {fileID: 3399032803370227046}
   m_Layer: 0
-  m_Name: CollectCoinsQuestStep
+  m_Name: CollectCoinsQuestStep 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -44,3 +44,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3e05fd35932291b4ea5bc90dd96318fd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  questStepDescription: 333
+  coinsToComplete: 100

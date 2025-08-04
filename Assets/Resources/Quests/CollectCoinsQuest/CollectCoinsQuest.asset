@@ -13,10 +13,13 @@ MonoBehaviour:
   m_Name: CollectCoinsQuest
   m_EditorClassIdentifier: 
   <questId>k__BackingField: CollectCoinsQuest
-  displayName: Collect 2 coin!
-  requiredLevel: 1
+  questName: muoi lam
+  autoStart: 1
+  requiredPlayerLevel: 1
   questPrerequisites: []
   questStepsPrefabs:
   - {fileID: 8955380540285265465, guid: 25f31abe2772d4542a382d0fa5a5b937, type: 3}
+  - {fileID: 8955380540285265465, guid: 0f579a396bf167046987a1dde0e537de, type: 3}
+  - {fileID: 8955380540285265465, guid: 61fb457f9bec0104aa09ff4f9bdb8700, type: 3}
   pointReward: 50
   experienceReward: 250
