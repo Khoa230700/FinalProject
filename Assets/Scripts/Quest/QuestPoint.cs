@@ -8,6 +8,10 @@ public class QuestPoint : MonoBehaviour
     [Header("Quests")]
     [SerializeField] private QuestInfoSO questInfoForPoint;
 
+    [Header("Settings")]
+    [SerializeField] private bool startPoint = true;
+    [SerializeField] private bool completePoint = true;
+
     private bool isPlayerInRange = false;
     private string questId;
     private QuestState currentQuestState;
@@ -19,19 +23,19 @@ public class QuestPoint : MonoBehaviour
 
     private void OnEnable()
     {
-        GameEventsManager.Instance.questEvents.OnQuestStateChanged += QuestStateChanged;
+        GameEventsManager.Instance.questEvents.OnQuestStateChange += QuestStateChanged;
     }
 
     private void OnDisable()
     {
-        GameEventsManager.Instance.questEvents.OnQuestStateChanged -= QuestStateChanged;
+        GameEventsManager.Instance.questEvents.OnQuestStateChange -= QuestStateChanged;
     }
 
     private void QuestStateChanged(Quest quest)
     {
-        if (quest.info.questId.Equals(questId))
+        if (quest.questInfo.questId.Equals(questId))
         {
-            currentQuestState = quest.state;
+            currentQuestState = quest.questState;
         }
     }
 
@@ -49,7 +53,6 @@ public class QuestPoint : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             isPlayerInRange = false;
-            Debug.Log("Player exited quest point range: " + gameObject.name);
         }
     }
 
@@ -57,9 +60,18 @@ public class QuestPoint : MonoBehaviour
     {
         if (isPlayerInRange && KeyBindingManager.Instance.GetKeyDown("Interact"))
         {
-            GameEventsManager.Instance.questEvents.StartQuest(questId);
-            GameEventsManager.Instance.questEvents.AdvanceQuest(questId);
-            GameEventsManager.Instance.questEvents.CompleteQuest(questId);
+            if (currentQuestState == QuestState.CanStart && startPoint)
+            {
+                GameEventsManager.Instance.questEvents.StartQuest(questId);
+            }
+            else if (currentQuestState == QuestState.CanComplete && completePoint)
+            {
+                GameEventsManager.Instance.questEvents.CompleteQuest(questId);
+            }
+            else
+            {
+                Debug.Log("Cannot interact with quest point: " + gameObject.name + ". Current state: " + currentQuestState);
+            }
         }
     }
 }

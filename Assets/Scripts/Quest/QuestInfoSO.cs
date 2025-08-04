@@ -6,12 +6,11 @@ using UnityEngine;
 public class QuestInfoSO : ScriptableObject
 {
     [field: SerializeField] public string questId { get; private set; }
-    
-    [Header("General")]
-    public string displayName;
+    public string questName;
+    public bool autoStart = false;
 
     [Header("Requirements")]
-    public int requiredLevel;
+    public int requiredPlayerLevel;
     public QuestInfoSO[] questPrerequisites;
 
     [Header("Steps")]

@@ -4,15 +4,30 @@ using UnityEngine;
 
 public class Quest
 {
-    public QuestInfoSO info;
-    public QuestState state;
-    private int currentQuestStepIndex = 0;
+    public QuestInfoSO questInfo;
+    public QuestState questState;
+    public int currentQuestStepIndex = 0;
+
+    private QuestStepState[] questStepStates;
 
     public Quest(QuestInfoSO questInfo)
     {
-        this.info = questInfo;
-        this.state = QuestState.NotStarted;
+        this.questInfo = questInfo;
+        this.questState = QuestState.RequirementsNotMet;
         this.currentQuestStepIndex = 0;
+        this.questStepStates = new QuestStepState[questInfo.questStepsPrefabs.Length];
+        for (int i = 0; i < questStepStates.Length; i++)
+        {
+            questStepStates[i] = new QuestStepState();
+        }
+    }
+
+    public Quest(QuestInfoSO questInfo, QuestState questState, int currentQuestStepIndex, QuestStepState[] questStepStates)
+    {
+        this.questInfo = questInfo;
+        this.questState = questState;
+        this.currentQuestStepIndex = currentQuestStepIndex;
+        this.questStepStates = questStepStates;
     }
 
     public void MoveToNextStep()
@@ -22,16 +37,32 @@ public class Quest
 
     public bool IsCurrentStepExists()
     {
-        return currentQuestStepIndex < info.questStepsPrefabs.Length;
+        return currentQuestStepIndex < questInfo.questStepsPrefabs.Length;
     }
 
-    public void InstantiateCurrentStep(Transform parent)
+    public void InstantiateCurrentQuestStep(Transform parent)
     {
         if (IsCurrentStepExists())
         {
-            GameObject stepPrefab = info.questStepsPrefabs[currentQuestStepIndex];
+            GameObject stepPrefab = questInfo.questStepsPrefabs[currentQuestStepIndex];
             GameObject stepInstance = Object.Instantiate(stepPrefab, parent);
-            stepInstance.name = $"{info.questId}_Step_{currentQuestStepIndex}";
+
+            stepInstance.GetComponent<QuestStep>()
+                .InitializeQuestStep(questInfo.questId, currentQuestStepIndex, questStepStates[currentQuestStepIndex].state);
+            stepInstance.name = $"{questInfo.questId}_Step_{currentQuestStepIndex}";
         }
+    }
+
+    public void StoreQuestStepState(int stepIndex, QuestStepState questStepState)
+    {
+        if (stepIndex < questStepStates.Length)
+        {
+            questStepStates[stepIndex].state = questStepState.state;
+        }
+    }
+
+    public QuestData GetQuestData()
+    {
+        return new QuestData(questState, currentQuestStepIndex, questStepStates);
     }
 }

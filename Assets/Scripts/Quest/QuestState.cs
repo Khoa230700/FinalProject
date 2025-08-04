@@ -4,7 +4,9 @@ using UnityEngine;
 
 public enum QuestState
 {
-    NotStarted,
+    RequirementsNotMet,
+    CanStart,
     InProgress,
+    CanComplete,
     Completed
 }
