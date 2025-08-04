@@ -97,9 +97,11 @@ public class KeyBindingManager : MonoBehaviour
             bindings.Add(new KeyBinding("Move Right", KeyCode.D, KeyCode.RightArrow));
             bindings.Add(new KeyBinding("Run", KeyCode.LeftShift, KeyCode.None));
             bindings.Add(new KeyBinding("Jump", KeyCode.Space, KeyCode.None));
-            bindings.Add(new KeyBinding("Fire", KeyCode.Mouse0, KeyCode.None));
-            bindings.Add(new KeyBinding("Aim", KeyCode.Mouse1, KeyCode.None));
+            bindings.Add(new KeyBinding("Crouch", KeyCode.LeftControl, KeyCode.C));
             bindings.Add(new KeyBinding("Reload", KeyCode.R, KeyCode.None));
+            bindings.Add(new KeyBinding("Interact", KeyCode.E, KeyCode.None));
+            bindings.Add(new KeyBinding("Use", KeyCode.F, KeyCode.None));
+            bindings.Add(new KeyBinding("Open Quests", KeyCode.Tab, KeyCode.None));
         }
     }
 
