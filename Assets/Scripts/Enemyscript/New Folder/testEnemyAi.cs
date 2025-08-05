@@ -1,33 +1,31 @@
-﻿using UnityEngine;
-using UnityEngine.AI;
-using System.Collections;
+using NUnit.Framework;
 using System.Linq;
-using NUnit;
+using UnityEngine;
+using UnityEngine.AI;
+using static testPlayerHealth;
 
-public class EnemiAI : MonoBehaviour
+using System.Collections.Generic;
+
+public class testEnemyAi : MonoBehaviour
 {
-    public Transform player;
-    NavMeshAgent agent;
-    Animator enemyAnimation;
-
-
-    public float maxHealth = 100f;
-    public float currentHealth;
-    public int attackDamage = 15;
-    public float attackSpeed = 1.5f;
-    private float nextAttackTime = 0f;
-
-    public float attackCooldown = 1.5f;
-    private float lastAttackTime;
-    public float attackRange = 2f;
-    public float chaseRange = 40f;
-
-
     //new
     public float detectionRadius = 10f;
     private Transform currentTarget;
     public float moveSpeed = 4f;
     public LayerMask targetLayer;
+
+
+    NavMeshAgent agent;
+    Animator enemyAnimation;
+    public Transform player;
+
+    public float attackCooldown = 1.5f;
+    private float lastAttackTime;
+    public float attackRange = 2f;
+
+
+
+    public List<testPlayerHealth> healthScript = new List<testPlayerHealth>();
     
     void Start()
     {
@@ -41,7 +39,7 @@ public class EnemiAI : MonoBehaviour
         //agent.destination = player.position;
         enemyAnimation.SetFloat("speed", agent.velocity.magnitude);
 
-        
+
 
         FindClosestTarget();
 
@@ -59,20 +57,22 @@ public class EnemiAI : MonoBehaviour
             }
         }
     }
-    
 
-    
+
+
     void Attack()
     {
         if (Time.time - lastAttackTime >= attackCooldown)
         {
             lastAttackTime = Time.time;
             // damage player()
-            player.GetComponent<PlayerHealth>().TakeDamage(10, 0,this.transform.position);
-            
+            //player.GetComponent<PlayerHealth>().TakeDamage(10, 0, this.transform.position);
             Debug.Log("Enemy attacks the player!");
 
-       
+            
+            
+            
+
         }
         enemyAnimation.SetTrigger("attack");
     }
@@ -107,4 +107,8 @@ public class EnemiAI : MonoBehaviour
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, detectionRadius);
     }
+
+
+
+    
 }
