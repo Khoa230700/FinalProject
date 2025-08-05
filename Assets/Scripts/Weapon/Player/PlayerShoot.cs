@@ -8,6 +8,10 @@ public class PlayerShoot : MonoBehaviour
     public Transform shootPoint;
     public Animator armsAnimator;
     public WeaponUI weaponUI;
+
+    [Header("Aiming")]
+    public CSGOScope csgoScope;               // Kéo thả trong Inspector nếu có scope
+
     [SerializeField] private ParticleSystem muzzleFlashParticle;
 
     [HideInInspector] public int currentAmmo;
@@ -25,14 +29,12 @@ public class PlayerShoot : MonoBehaviour
         weaponUI?.UpdateAmmoUI(currentAmmo, reserveAmmo);
     }
 
-    public bool IsReadyToShoot { get; private set; } = true; // Chặn spam bắn
+    public bool IsReadyToShoot { get; private set; } = true;
 
     public void StartShooting()
     {
         if (!IsShooting)
-        {
             IsShooting = true;
-        }
     }
 
     public void StopShooting()
@@ -40,7 +42,11 @@ public class PlayerShoot : MonoBehaviour
         if (IsShooting)
         {
             IsShooting = false;
-            armsAnimator.CrossFade("Idle", 0.08f);
+            // Nếu đang scoped thì về AimingIdle, còn lại về Idle
+            if (csgoScope != null && csgoScope.IsScoped)
+                armsAnimator.CrossFade("AimingIdle", 0.08f);
+            else
+                armsAnimator.CrossFade("Idle", 0.08f);
         }
     }
 
@@ -51,57 +57,75 @@ public class PlayerShoot : MonoBehaviour
 
         currentAmmo--;
 
-        // Tắt anim run, ép chạy shot
+        // Chọn animation tùy scoped hay không
+        bool scoped = (csgoScope != null && csgoScope.IsScoped);
+        string anim = scoped ? "AimingShot" : "Shot";
         armsAnimator.SetBool("Walk", false);
         armsAnimator.SetBool("Run", false);
-        armsAnimator.Play("Shot", 0, 0f);
+        armsAnimator.Play(anim, 0, 0f);
 
-        if (muzzleFlashParticle != null) muzzleFlashParticle.Play();
+        muzzleFlashParticle?.Play();
         if (gunData.shootSound != null)
             AudioSource.PlayClipAtPoint(gunData.shootSound, shootPoint.position);
 
-        if (muzzleFlashParticle != null) muzzleFlashParticle.Play();
-        if (gunData.shootSound != null)
-            AudioSource.PlayClipAtPoint(gunData.shootSound, shootPoint.position);
+        int count = (gunData.gunType == GunType.Shotgun)
+                    ? gunData.pelletCount
+                    : 1;
 
-        // Raycast...
-        Ray ray = new Ray(shootPoint.position, shootPoint.forward);
-        if (Physics.Raycast(ray, out RaycastHit hit, gunData.range))
+        for (int i = 0; i < count; i++)
         {
-            var hb = hit.collider.GetComponent<Hitbox>();
-            if (hb != null && hb.ownerHealthSystem != null)
+            Vector3 dir = (count == 1)
+                          ? shootPoint.forward
+                          : GetSpreadDirection(shootPoint.forward, gunData.spreadAngle);
+
+            Ray ray = new Ray(shootPoint.position, dir);
+            if (Physics.Raycast(ray, out RaycastHit hit, gunData.range))
             {
-                float dmg = gunData.damage;
-                if (hb.hitboxType == Hitbox.HitboxType.Head) dmg *= 2f;
-                hb.ownerHealthSystem.TakeDamage(dmg);
-                hb.OnHit(dmg, hit.point);
+                var hb = hit.collider.GetComponent<Hitbox>();
+                if (hb != null && hb.ownerHealthSystem != null)
+                {
+                    float dmg = gunData.damage;
+                    if (hb.hitboxType == Hitbox.HitboxType.Head) dmg *= 2f;
+                    hb.ownerHealthSystem.TakeDamage(dmg);
+                    hb.OnHit(dmg, hit.point);
+                }
             }
         }
 
         weaponUI?.UpdateAmmoUI(currentAmmo, reserveAmmo);
 
-        // Luôn chờ đúng thời lượng anim, rồi unlock (bắn viên tiếp theo)
         if (shotResetCoroutine != null) StopCoroutine(shotResetCoroutine);
         shotResetCoroutine = StartCoroutine(ResetShotAnimation());
     }
 
+    private Vector3 GetSpreadDirection(Vector3 forward, float angle)
+    {
+        float x = Random.Range(-angle, angle);
+        float y = Random.Range(-angle, angle);
+        return Quaternion.Euler(x, y, 0) * forward;
+    }
+
     private IEnumerator ResetShotAnimation()
     {
-        // Đợi hết clip shot
-        while (!armsAnimator.GetCurrentAnimatorStateInfo(0).IsName("Shot"))
+        // Đợi clip "Shot" hoặc "AimingShot" kết thúc
+        while (!armsAnimator.GetCurrentAnimatorStateInfo(0).IsName("Shot")
+               && !armsAnimator.GetCurrentAnimatorStateInfo(0).IsName("AimingShot"))
             yield return null;
-        float wait = armsAnimator.GetCurrentAnimatorStateInfo(0).length / armsAnimator.GetCurrentAnimatorStateInfo(0).speed;
+
+        float wait = armsAnimator.GetCurrentAnimatorStateInfo(0).length
+                   / armsAnimator.GetCurrentAnimatorStateInfo(0).speed;
         yield return new WaitForSeconds(wait);
 
-        // KHÔNG được về Idle nếu còn giữ chuột và ở chế độ auto!
-        if (!Input.GetMouseButton(0) || gunData.fireMode != GunFireMode.FullAuto)
+        if (csgoScope != null && csgoScope.IsScoped)
+        {
+            // Giữ AimingIdle giữa các shot khi scoped
+            armsAnimator.CrossFade("AimingIdle", 0.08f);
+        }
+        else if (!Input.GetMouseButton(0) || gunData.fireMode != GunFireMode.FullAuto)
         {
             StopShooting();
         }
-        // Nếu vẫn giữ chuột (auto), thì IsShooting vẫn true, không reset Idle.
     }
-
-    // --- Reload và Switch giữ nguyên, không cho bắn khi isReloading/IsSwitchingWeapon ---
 
     public void Reload()
     {
@@ -117,16 +141,9 @@ public class PlayerShoot : MonoBehaviour
     {
         yield return new WaitForSeconds(gunData.reloadTime);
         int need = gunData.magazineSize - currentAmmo;
-        if (reserveAmmo >= need)
-        {
-            currentAmmo += need;
-            reserveAmmo -= need;
-        }
-        else
-        {
-            currentAmmo += reserveAmmo;
-            reserveAmmo = 0;
-        }
+        int used = Mathf.Min(need, reserveAmmo);
+        currentAmmo += used;
+        reserveAmmo -= used;
         isReloading = false;
         weaponUI?.UpdateAmmoUI(currentAmmo, reserveAmmo);
     }

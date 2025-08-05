@@ -1,42 +1,50 @@
-﻿using UnityEngine;
+﻿// GunData.cs
+using UnityEngine;
 
-public enum GunType { Pistol, Rifle, Shotgun, Sniper, SMG, LMG }
+public enum GunType { Handgun, AssaultRifle, SniperRifle, Shotgun }
 public enum GunFireMode { SemiAuto, FullAuto, Burst, Safety }
 
 [CreateAssetMenu(fileName = "NewGunData", menuName = "Gun/Gun Data")]
 public class GunData : ScriptableObject
 {
+    [Header("Identity")]
     public string gunName;
     public GunType gunType;
+    public Sprite gunSprite;           // Hình ảnh cho UI
 
-    [Header("Stats")]
+    [Header("Ballistics")]
     public int damage;
     public float range;
+    [Tooltip("Pellet count per shot (only for Shotgun)")]
+    public int pelletCount = 1;
+    [Tooltip("Spread angle in degrees (only for Shotgun)")]
+    public float spreadAngle = 0f;
 
-    [Tooltip("Số viên/giây. Ví dụ: 5 = bắn 5 viên mỗi giây")]
+    [Header("Fire Mode Settings")]
+    [Tooltip("FullAuto: rounds per second")]
     public float roundsPerSecond = 5f;
+    [Tooltip("Burst: number of shots per burst")]
+    public int burstCount = 3;
+    [Tooltip("Burst: time between shots in a burst")]
+    public float burstFireRate = 0.1f;
+    [Tooltip("Burst: cooldown after completing a burst")]
+    public float burstCooldown = 0.3f;
 
-    public float accuracy;
+    public GunFireMode fireMode;
+    public GunFireMode[] availableFireModes;
+
+    [Header("Magazine")]
     public int magazineSize;
     public int reserveAmmo;
     public float reloadTime;
-    public GunFireMode fireMode;
-    public GunFireMode[] availableFireModes;  // Các mode được phép
-    public float recoil;
-    public float bulletSpeed;
-    public float penetrationPower;
-    public float weight;
-
-    [Header("Visuals & Audio")]
-    public Sprite gunSprite;
-    public GameObject bulletPrefab;
-    public AudioClip shootSound;
-    public GameObject tracerPrefab;
 
     [Header("Scope")]
     public bool hasScope;
-    public float scopeZoom;
+    [Tooltip("Field of view when scoped")]
+    public float scopeZoom = 10f;
 
-    [Header("Crosshair")]
-    public CrosshairData crosshairData;
+    [Header("UI & Effects")]
+    public CrosshairData crosshairData;      // Data cho crosshair UI
+    public GameObject tracerPrefab;
+    public AudioClip shootSound;
 }

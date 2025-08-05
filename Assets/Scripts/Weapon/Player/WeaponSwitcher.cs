@@ -86,8 +86,8 @@ public class WeaponSwitcher : MonoBehaviour
         weaponUI.CreateBulletUI();
 
         StartCoroutine(DelayUpdateUI(playerShoot));
-        crosshairManager.SetCrosshairData(playerShoot.gunData.crosshairData);
-        crosshairManager.SetPlayerShoot(playerShoot);
+        //crosshairManager.SetCrosshairData(playerShoot.gunData.crosshairData);
+        //crosshairManager.SetPlayerShoot(playerShoot);
     }
 
 
