@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿// PlayerMovementAnim.cs
+using UnityEngine;
 
 public class PlayerMovementAnim : MonoBehaviour
 {
@@ -8,17 +9,25 @@ public class PlayerMovementAnim : MonoBehaviour
 
     void Update()
     {
-        bool isMoving = playerMovement.IsMoving();
-        bool isRunning = playerMovement.IsRunning();
+        // Nếu đang scoped (sniper) thì bỏ qua chạy/chạy nhanh
+        bool isAiming = playerShoot != null &&
+                        playerShoot.csgoScope != null &&
+                        playerShoot.csgoScope.IsScoped;
+        if (isAiming)
+            return;
+
+        // Nếu đang bắn hoặc đang chuyển súng cũng bỏ qua
         bool isShooting = playerShoot != null && playerShoot.IsShooting;
         bool isSwitching = playerShoot != null && playerShoot.IsSwitchingWeapon;
-
-        if (isSwitching || isShooting)
+        if (isShooting || isSwitching)
         {
             armsAnimator.SetBool("Walk", false);
             armsAnimator.SetBool("Run", false);
             return;
         }
+
+        bool isMoving = playerMovement.IsMoving();
+        bool isRunning = playerMovement.IsRunning();
 
         if (isMoving && isRunning)
         {
@@ -36,4 +45,5 @@ public class PlayerMovementAnim : MonoBehaviour
             armsAnimator.SetBool("Run", false);
         }
     }
+    // :contentReference[oaicite:3]{index=3}
 }

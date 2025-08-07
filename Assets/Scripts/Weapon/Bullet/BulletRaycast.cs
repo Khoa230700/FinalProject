@@ -1,58 +1,42 @@
-﻿using UnityEngine;
+﻿// BulletRaycast.cs
+using UnityEngine;
 
 [RequireComponent(typeof(LineRenderer))]
 public class BulletRaycast : MonoBehaviour
 {
     private int damage;
     private float range;
-    private float penetrationPower;
-
-    [Header("Tracer Settings")]
-    public float tracerDuration = 0.05f;      // Bao lâu thì ray biến mất
-    public Color tracerColor = Color.yellow;  // Màu vệt đạn
-
+    private float tracerDuration;
+    private Color tracerColor;
     private LineRenderer lineRenderer;
 
-    public void InitFromGunData(GunData gunData, Transform shootPoint)
+    public void Init(GunData gunData, Vector3 origin, Vector3 direction)
     {
         damage = gunData.damage;
         range = gunData.range;
-        penetrationPower = gunData.penetrationPower;
+        tracerDuration = gunData.reloadTime * 0 + 0.05f; // hoặc expose trong GunData nếu cần
+        tracerColor = Color.yellow;
 
         lineRenderer = GetComponent<LineRenderer>();
         SetupLineRenderer();
 
         RaycastHit hit;
-        Vector3 endPoint;
-
-        if (Physics.Raycast(shootPoint.position, shootPoint.forward, out hit, range))
+        Vector3 end = origin + direction * range;
+        if (Physics.Raycast(origin, direction, out hit, range))
         {
-            endPoint = hit.point;
-
-            // Gây sát thương nếu có
-            IDamageable target = hit.collider.GetComponent<IDamageable>();
-            if (target != null)
-            {
-                target.TakeDamage(damage);
-            }
-        }
-        else
-        {
-            endPoint = shootPoint.position + shootPoint.forward * range;
+            end = hit.point;
+            var target = hit.collider.GetComponent<IDamageable>();
+            if (target != null) target.TakeDamage(damage);
         }
 
-        // Vẽ vệt đạn
-        lineRenderer.SetPosition(0, shootPoint.position);
-        lineRenderer.SetPosition(1, endPoint);
+        lineRenderer.SetPosition(0, origin);
+        lineRenderer.SetPosition(1, end);
 
-        // Hủy sau thời gian ngắn
         Destroy(gameObject, tracerDuration);
     }
 
     private void SetupLineRenderer()
     {
-        if (lineRenderer == null) return;
-
         lineRenderer.positionCount = 2;
         lineRenderer.material = new Material(Shader.Find("Legacy Shaders/Particles/Alpha Blended"));
         lineRenderer.startColor = tracerColor;

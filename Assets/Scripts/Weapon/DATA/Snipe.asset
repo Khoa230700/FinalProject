@@ -13,23 +13,21 @@ MonoBehaviour:
   m_Name: Snipe
   m_EditorClassIdentifier: 
   gunName: Sniper
-  gunType: 3
+  gunType: 2
+  gunSprite: {fileID: 21300000, guid: e61d050005d5660459236f04d5072e30, type: 3}
   damage: 80
   range: 100
+  pelletCount: 1
+  spreadAngle: 0
   roundsPerSecond: 1
-  accuracy: 1
+  burstCount: 3
+  burstFireRate: 0.1
+  burstCooldown: 0.3
+  fireMode: 0
+  availableFireModes: 00000000
   magazineSize: 5
   reserveAmmo: 25
   reloadTime: 1
-  fireMode: 0
-  recoil: 1
-  bulletSpeed: 1
-  penetrationPower: 1
-  weight: 1
-  gunSprite: {fileID: 0}
-  bulletPrefab: {fileID: 7814520410349339580, guid: 89f39d5a062f87a4da3d0695d4453cb0, type: 3}
-  shootSound: {fileID: 0}
-  tracerPrefab: {fileID: 6749693277989217856, guid: dfcafcdd61ac0e447b7e869afc9b8d0c, type: 3}
   hasScope: 1
   scopeZoom: 2
   crosshairData:
@@ -45,3 +43,5 @@ MonoBehaviour:
       jumpScale: 1.8
       bounceSize: 2
       moveSpeed: 3
+  tracerPrefab: {fileID: 6749693277989217856, guid: dfcafcdd61ac0e447b7e869afc9b8d0c, type: 3}
+  shootSound: {fileID: 0}
