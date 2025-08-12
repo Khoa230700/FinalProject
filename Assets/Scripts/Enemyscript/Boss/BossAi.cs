@@ -41,6 +41,8 @@ public class BossAi : MonoBehaviour
     public string playerTag = "Player";
     public float rotationSpeed = 5f;
 
+    public Animator enemyAnimation;
+
     private void Start()
     {
         agent = GetComponent<NavMeshAgent>();
@@ -124,6 +126,7 @@ public class BossAi : MonoBehaviour
             if (col.GetComponent<PlayerHealth>())
                 col.GetComponent<PlayerHealth>().TakeDamage(20);
         }
+        enemyAnimation.SetTrigger("Slam");
     }
 
     // --- Fire Breath ---
@@ -137,6 +140,7 @@ public class BossAi : MonoBehaviour
         fireDamageArea.enabled = true;
 
         Invoke(nameof(StopFireBreath), channelTime);
+        enemyAnimation.SetBool("FireBreath",true);
     }
 
     void StopFireBreath()
@@ -151,6 +155,7 @@ public class BossAi : MonoBehaviour
 
         // Debug
         Debug.Log("Stopped fire breath, resuming movement.");
+        enemyAnimation.SetBool("FireBreath", false);
     }
 
     // --- Utility Methods ---
