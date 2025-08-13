@@ -43,9 +43,14 @@ public class BossAi : MonoBehaviour
 
     public Animator enemyAnimation;
 
+    //fix
+    private float destinationUpdateRate = 0.5f;
+    private float nextDestinationUpdateTime = 0f;
+
     private void Start()
     {
         agent = GetComponent<NavMeshAgent>();
+        //enemyAnimation = GetComponent<Animator>();
         fireFX.Stop();
         fireDamageArea.enabled = false;
     }
@@ -91,9 +96,14 @@ public class BossAi : MonoBehaviour
         {
             // Default: Chase
             agent.isStopped = false;
-            if (!agent.hasPath || agent.remainingDistance < 0.5f)
+            //if (!agent.hasPath || agent.remainingDistance < 0.5f)
+            //{
+            //    agent.SetDestination(player.position);
+            //}
+            if (Time.time >= nextDestinationUpdateTime)
             {
                 agent.SetDestination(player.position);
+                nextDestinationUpdateTime = Time.time + destinationUpdateRate;
             }
         }
     }
@@ -102,15 +112,15 @@ public class BossAi : MonoBehaviour
 
     void MeleeAttack()
     {
-        agent.isStopped = true;
+        //agent.isStopped = true;
         Debug.Log("Boss performs melee attack!");
         player.GetComponent<testPlayerHealth>()?.TakeDamage(10);
     }
 
     void RangeAttack()
     {
-        agent.isStopped = true;
-        Debug.Log("Boss performs range attack!");
+        //agent.isStopped = true;
+        //Debug.Log("Boss performs range attack!");
         GameObject bullet = Instantiate(rangedProjectile, firePoint.position, firePoint.rotation);
         bullet.GetComponent<Rigidbody>().AddForce(firePoint.forward * bulletSpeed);
         Destroy(bullet, bulletTimelife);
@@ -118,14 +128,14 @@ public class BossAi : MonoBehaviour
 
     void SlamAttack()
     {
-        agent.isStopped = true;
-        Debug.Log("Boss performs slam attack!");
-        Collider[] colliders = Physics.OverlapSphere(transform.position, 4f);
-        foreach (Collider col in colliders)
-        {
-            if (col.GetComponent<PlayerHealth>())
-                col.GetComponent<PlayerHealth>().TakeDamage(20);
-        }
+        //agent.isStopped = true;
+        //Debug.Log("Boss performs slam attack!");
+        //Collider[] colliders = Physics.OverlapSphere(transform.position, 4f);
+        //foreach (Collider col in colliders)
+        //{
+        //    if (col.GetComponent<PlayerHealth>())
+        //        col.GetComponent<PlayerHealth>().TakeDamage(20);
+        //}
         enemyAnimation.SetTrigger("Slam");
     }
 
@@ -150,15 +160,15 @@ public class BossAi : MonoBehaviour
         isChanneling = false;
 
         // Resume movement
-        agent.isStopped = false;
-        agent.SetDestination(player.position);
+        //agent.isStopped = false;
+        //agent.SetDestination(player.position);
 
         // Debug
-        Debug.Log("Stopped fire breath, resuming movement.");
+        //Debug.Log("Stopped fire breath, resuming movement.");
         enemyAnimation.SetBool("FireBreath", false);
     }
 
-    // --- Utility Methods ---
+    
 
     bool HasLineOfSight()
     {

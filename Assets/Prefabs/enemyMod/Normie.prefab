@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 8079558651761959656}
   - component: {fileID: 3586379497261931724}
   - component: {fileID: 5658322781626220109}
-  m_Layer: 2
+  m_Layer: 0
   m_Name: AttackDetect
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -787,7 +787,7 @@ GameObject:
   - component: {fileID: 3515417579159368491}
   - component: {fileID: 2190198581176926509}
   - component: {fileID: 1730337569766138010}
-  m_Layer: 2
+  m_Layer: 0
   m_Name: AI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1264,7 +1264,7 @@ GameObject:
   - component: {fileID: 7891509131991545629}
   - component: {fileID: 639718399531827442}
   - component: {fileID: -4696093054594487209}
-  m_Layer: 2
+  m_Layer: 0
   m_Name: Normie
   m_TagString: Enemy
   m_Icon: {fileID: 0}
