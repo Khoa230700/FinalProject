@@ -988,13 +988,14 @@ GameObject:
   - component: {fileID: 7288246387717682266}
   - component: {fileID: 2627525649373999735}
   - component: {fileID: 7253536405624064325}
+  - component: {fileID: -6986480240095431204}
   m_Layer: 2
   m_Name: Fatphuc
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &375666397023812266
 Transform:
   m_ObjectHideFlags: 0
@@ -2699,6 +2700,18 @@ MonoBehaviour:
   maxHealth: 100
   currentHealth: 100
   animator: {fileID: 3642929288294522959}
+--- !u!114 &-6986480240095431204
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2428255698981894573}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bfb390852452ce84f8cf4791c7405347, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2514346375837288734
 GameObject:
   m_ObjectHideFlags: 0

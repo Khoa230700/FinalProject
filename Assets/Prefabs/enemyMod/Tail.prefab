@@ -942,6 +942,7 @@ GameObject:
   - component: {fileID: 5283704895021203843}
   - component: {fileID: 4978095246227783246}
   - component: {fileID: 800144705376637159}
+  - component: {fileID: 9221063056691571086}
   m_Layer: 2
   m_Name: Tail
   m_TagString: Enemy
@@ -2259,6 +2260,18 @@ MonoBehaviour:
   maxHealth: 100
   currentHealth: 100
   animator: {fileID: 5462182493676516279}
+--- !u!114 &9221063056691571086
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2340879936498945498}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bfb390852452ce84f8cf4791c7405347, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2344813332677895130
 GameObject:
   m_ObjectHideFlags: 0
