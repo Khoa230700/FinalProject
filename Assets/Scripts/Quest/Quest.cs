@@ -34,23 +34,23 @@ public class Quest
                 targetID = obj.targetID,
                 currentAmount = 0,
                 requiredAmount = obj.requiredAmount,
-                // isCompleted = false
+                isCompleted = false
             });
         }
     }
 
     public bool IsCompleted() => objectives.TrueForAll(o => o.isCompleted);
-    // public void UpdateObjective(string objectiveID, int amount = 1)
-    // {
-    //     var objective = objectives.Find(obj => obj.objectiveID == objectiveID);
-    //     if (objective != null && !objective.isCompleted)
-    //     {
-    //         objective.currentAmount += amount;
-    //         if (objective.currentAmount >= objective.requiredAmount)
-    //         {
-    //             objective.isCompleted = true;
-    //             objective.currentAmount = objective.requiredAmount;
-    //         }
-    //     }
-    // }
+    public void UpdateObjective(string objectiveID, int amount = 1)
+    {
+        var objective = objectives.Find(obj => obj.objectiveID == objectiveID);
+        if (objective != null && !objective.isCompleted)
+        {
+            objective.currentAmount += amount;
+            if (objective.currentAmount >= objective.requiredAmount)
+            {
+                objective.isCompleted = true;
+                objective.currentAmount = objective.requiredAmount;
+            }
+        }
+    }
 }

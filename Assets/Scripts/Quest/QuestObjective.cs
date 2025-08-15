@@ -16,5 +16,5 @@ public class QuestObjective
     public string targetID; //ID của target (Enemy, Item,...)
     public int currentAmount;
     public int requiredAmount;
-    public bool isCompleted => currentAmount >= requiredAmount;
+    public bool isCompleted;
 }

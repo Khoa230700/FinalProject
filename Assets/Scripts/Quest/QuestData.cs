@@ -7,19 +7,19 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "New Quest", menuName = "Quest")]
 public class QuestData : ScriptableObject
 {
-    [Header("Thông tin Quest")]
+    [Header("Infomations")]
     public string questID;
     public string questName;
     [TextArea(3, 5)] public string description;
 
-    [Header("Yêu cầu")]
+    [Header("Required")]
     public List<QuestObjective> objectives = new List<QuestObjective>();
 
-    [Header("Phần thưởng")]
+    [Header("Reward")]
     public int expReward;
     public int goldReward;
 
-    [Header("Điều kiện")]
+    [Header("Condition")]
     public List<string> prerequisiteQuests = new List<string>();
     public int requiredLevel = 1;
 
