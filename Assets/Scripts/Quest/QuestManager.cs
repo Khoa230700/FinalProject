@@ -28,6 +28,7 @@ public class QuestManager : MonoBehaviour
     private void Start()
     {
         StartQuest("Test"); //Test
+        StartQuest("Test1"); //Test
     }
 
     //BẮT ĐẦU QUEST
@@ -61,7 +62,7 @@ public class QuestManager : MonoBehaviour
         activeQuests.Add(newQuest);
 
         OnQuestStarted?.Invoke(newQuest);
-        Debug.Log($"Đã bắt đầu quest: {questData.questName}");
+        Debug.Log($"Bắt đầu quest: {questData.questName}");
 
         return true;
     }
@@ -97,6 +98,8 @@ public class QuestManager : MonoBehaviour
     public void CompleteQuest(Quest quest)
     {
         quest.status = QuestStatus.Completed;
+        GiveRewards(quest.questData);
+
         OnQuestCompleted?.Invoke(quest);
         Debug.Log($"Quest hoàn thành: {quest.questData.questName}");
     }
@@ -118,7 +121,7 @@ public class QuestManager : MonoBehaviour
         activeQuests.Remove(quest);
         completedQuestIDs.Add(quest.questData.questID);
 
-        Debug.Log($"Đã nộp quest: {quest.questData.questName}");
+        Debug.Log($"Nộp quest: {quest.questData.questName}");
         return true;
     }
 
