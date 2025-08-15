@@ -25,6 +25,11 @@ public class QuestManager : MonoBehaviour
         Instance = this;
     }
 
+    private void Start()
+    {
+        StartQuest("Test"); //Test
+    }
+
     //BẮT ĐẦU QUEST
     public bool StartQuest(string questID)
     {

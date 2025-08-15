@@ -3,8 +3,7 @@ public enum QuestObjectiveType
     Kill,        //Giết quái vật
     Collect,     //Thu thập vật phẩm
     Interact,    //Tương tác với NPC/Object
-    Reach,       //Đến một vị trí
-    Deliver      //Giao đồ
+    Reach        //Đến một vị trí
 }
 
 [System.Serializable]
