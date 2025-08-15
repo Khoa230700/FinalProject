@@ -223,7 +223,6 @@ GameObject:
   - component: {fileID: 8238868048323404710}
   - component: {fileID: 4191974618325084082}
   - component: {fileID: 5807518807383611123}
-  - component: {fileID: 2982635939071919356}
   m_Layer: 5
   m_Name: Quest item
   m_TagString: Untagged
@@ -317,22 +316,6 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &2982635939071919356
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3144404629413162415}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a776a3cd6aeb3ec4a8f47bb0fe3c4834, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  animator: {fileID: 5807518807383611123}
-  titleText: {fileID: 428565739119961065}
-  listRoot: {fileID: 7671231902408638142}
-  questStepPrefab: {fileID: 7471398747587934787, guid: 472ac52165d173845a7ad5752d29852e, type: 3}
 --- !u!1 &7334312179313962870
 GameObject:
   m_ObjectHideFlags: 0
