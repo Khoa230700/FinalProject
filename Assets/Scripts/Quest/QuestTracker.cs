@@ -10,10 +10,9 @@ public class QuestTracker : MonoBehaviour
 
     private void Start()
     {
-        // Auto-assign targetID if empty
         if (string.IsNullOrEmpty(targetID))
         {
-            targetID = gameObject.name;
+            Debug.LogError("targetID không thể null hoặc empty");
         }
     }
 
@@ -48,6 +47,8 @@ public class QuestTracker : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         OnCollected(); //Test
+        OnKilled();
+        OnInteracted();
 
         if (trackingType == QuestObjectiveType.Reach && other.CompareTag("Player"))
         {

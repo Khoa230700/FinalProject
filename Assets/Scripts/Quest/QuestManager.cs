@@ -12,18 +12,15 @@ public class QuestManager : MonoBehaviour
 {
     public static QuestManager Instance { get; private set; }
 
-    [Header("Quest DataBase")]
-    public List<QuestData> allQuests = new();
-
-    [Header("Current Quests")]
+    [Header("Quests")]
     public List<Quest> activeQuests = new();
-    private List<string> completedQuestIDs = new();
+    public List<QuestSO> allQuests = new();
+    public List<string> completedQuestIDs = new();
 
 
     [Header("Settings")]
     [SerializeField] private bool autoStart = true;
     [SerializeField] private bool autoSave = true;
-    [SerializeField] private float autoSaveInterval = 60f; // 60 giây
 
     //Events
     public Action<Quest> OnQuestStarted;
@@ -32,24 +29,18 @@ public class QuestManager : MonoBehaviour
     public Action OnQuestDataLoaded;
 
     private Coroutine autoSaveCoroutine;
-    private string savePath;
 
     private void Awake()
     {
         Instance = this;
         SceneManager.sceneLoaded += OnSceneLoaded;
-        if (allQuests == null || allQuests.Count <= 0)        
-        {
-            allQuests = Resources.LoadAll("Quests", typeof(QuestData)).OfType<QuestData>().ToList();
-        }
+        allQuests = Resources.LoadAll("Quests", typeof(QuestSO)).OfType<QuestSO>().ToList();
     }
 
     private void Start()
     {
-        savePath = Application.persistentDataPath + "/QuestSave.json";
         LoadQuestData();
 
-        if (autoSave) autoSaveCoroutine = StartCoroutine(AutoSaveCoroutine());
         if (autoStart) StartCoroutine(CheckAutoStartQuests());
     }
 
@@ -86,7 +77,7 @@ public class QuestManager : MonoBehaviour
         {
             //Kiểm tra quest chưa được start và thỏa mãn điều kiện
             if (!completedQuestIDs.Contains(questData.questID) &&
-                !activeQuests.Any(q => q.questData.questID == questData.questID))
+                !activeQuests.Any(q => q.questSO.questID == questData.questID))
             {
                 if (questData.autoStartDelay > 0)
                 {
@@ -105,35 +96,35 @@ public class QuestManager : MonoBehaviour
     //BẮT ĐẦU QUEST
     public bool StartQuest(string questID)
     {
-        QuestData questData = allQuests.Find(q => q.questID == questID);
+        QuestSO questSO = allQuests.Find(q => q.questID == questID);
 
-        //Tìm quest data
-        if (!questData)
+        //Tìm quest progress
+        if (!questSO)
         {
             Debug.Log($"Không tìm thấy quest với ID: {questID}");
             return false;
         }
 
         //Kiểm tra quest đã hoàn thành hoặc đang active
-        if (completedQuestIDs.Contains(questID) || activeQuests.Any(q => q.questData.questID == questID))
+        if (completedQuestIDs.Contains(questID) || activeQuests.Any(q => q.questSO.questID == questID))
         {
             Debug.Log($"QuestID: {questID} đã hoàn thành hoặc đang active");
             return false;
         }
 
         //Kiểm tra điều kiện
-        if (!CheckQuestRequirements(questData))
+        if (!CheckQuestRequirements(questSO))
         {
             return false;
         }
 
         //Tạo quest mới và thêm vào danh sách active
-        Quest newQuest = new Quest(questData);
+        Quest newQuest = new Quest(questSO);
         newQuest.status = QuestStatus.Active;
         activeQuests.Add(newQuest);
 
         OnQuestStarted?.Invoke(newQuest);
-        Debug.Log($"Bắt đầu quest: {questData.questName}");
+        Debug.Log($"Bắt đầu quest: {questSO.questName}");
 
         if (autoSave) SaveQuestData();
 
@@ -144,6 +135,7 @@ public class QuestManager : MonoBehaviour
     public void UpdateQuestProgress(QuestObjectiveType type, string targetID, int amount = 1)
     {
         bool hasUpdated = false;
+        List<Quest> questsToComplete = new();
 
         foreach (var quest in activeQuests)
         {
@@ -161,12 +153,17 @@ public class QuestManager : MonoBehaviour
                     //Kiểm tra quest hoàn thành
                     if (quest.IsCompleted())
                     {
-                        CompleteQuest(quest);
+                        questsToComplete.Add(quest);
                     }
 
                     break;
                 }
             }
+        }
+
+        foreach (var quest in questsToComplete)
+        {
+            CompleteQuest(quest);
         }
 
         if (hasUpdated && autoSave) SaveQuestData();
@@ -175,66 +172,45 @@ public class QuestManager : MonoBehaviour
     //HOÀN THÀNH QUEST
     public void CompleteQuest(Quest quest)
     {
-        quest.status = QuestStatus.Completed;
-        GiveRewards(quest.questData);
-
         OnQuestCompleted?.Invoke(quest);
-        Debug.Log($"Quest hoàn thành: {quest.questData.questName}");
-    }
-
-    //NỘP QUEST VÀ NHẬN THƯỞNG
-    public bool TurnInQuest(string questID)
-    {
-        Quest quest = activeQuests.Find(q => q.questData.questID == questID);
-        if (quest == null || quest.status != QuestStatus.Completed)
-        {
-            return false;
-        }
-
-        //Trao thưởng
-        GiveRewards(quest.questData);
-
-        //Chuyển quest sang trại thái đã nộp
-        quest.status = QuestStatus.TurnedIn;
-        activeQuests.Remove(quest);
-        completedQuestIDs.Add(quest.questData.questID);
-
-        Debug.Log($"Nộp quest: {quest.questData.questName}");
-
-        if (autoSave) SaveQuestData();
-
-        return true;
+        GiveRewards(quest);
+        Debug.Log($"Quest hoàn thành: {quest.questSO.questName}");
     }
 
     //TRAO THƯỞNG
-    private void GiveRewards(QuestData questData)
+    private void GiveRewards(Quest quest)
     {
+        //Chuyển quest sang trại thái đã nộp
+        quest.status = QuestStatus.Completed;
+        activeQuests.Remove(quest);
+        completedQuestIDs.Add(quest.questSO.questID);
+
         // Thêm EXP
-        if (questData.expReward > 0)
+        if (quest.questSO.expReward > 0)
         {
             // PlayerManager.Instance.AddExperience(questData.expReward);
-            Debug.Log($"Nhận được {questData.expReward} EXP");
+            Debug.Log($"Nhận được {quest.questSO.expReward} EXP");
         }
 
         // Thêm Gold
-        if (questData.goldReward > 0)
+        if (quest.questSO.goldReward > 0)
         {
             // PlayerManager.Instance.AddGold(questData.goldReward);
-            Debug.Log($"Nhận được {questData.goldReward} Gold");
+            Debug.Log($"Nhận được {quest.questSO.goldReward} Gold");
         }
     }
 
     //KIỂM TRA ĐIỀU KIỆN QUEST
-    private bool CheckQuestRequirements(QuestData questData)
+    private bool CheckQuestRequirements(QuestSO questSO)
     {
         // Kiểm tra level yêu cầu
         // if (PlayerManager.Instance.GetLevel() < questData.requiredLevel)
         //     return false;
 
         // Kiểm tra prerequisite quests
-        foreach (string prereqID in questData.prerequisiteQuests)
+        foreach (QuestSO prereq in questSO.prerequisiteQuests)
         {
-            if (!completedQuestIDs.Contains(prereqID))
+            if (!completedQuestIDs.Contains(prereq.questID))
                 return false;
         }
 
@@ -244,126 +220,95 @@ public class QuestManager : MonoBehaviour
     //SAVE
     public void SaveQuestData()
     {
-        try
+        QuestData questData = new();
+
+        //Lưu các quest đang active
+        foreach (var quest in activeQuests)
         {
-            QuestSaveData saveData = new QuestSaveData();
-
-            //Lưu các quest đang active
-            foreach (var quest in activeQuests)
+            QuestDataSO questSave = new QuestDataSO
             {
-                QuestSave questSave = new QuestSave
-                {
-                    questID = quest.questData.questID,
-                    status = quest.status
-                };
+                questID = quest.questSO.questID,
+                status = quest.status
+            };
 
-                foreach (var objective in quest.objectives)
+            foreach (var objective in quest.objectives)
+            {
+                questSave.objectives.Add(new ObjectiveData
                 {
-                    questSave.objectives.Add(new ObjectiveSave
-                    {
-                        objectiveID = objective.objectiveID,
-                        currentAmount = objective.currentAmount,
-                        isCompleted = objective.isCompleted
-                    });
-                }
-
-                saveData.activeQuests.Add(questSave);
+                    objectiveID = objective.objectiveID,
+                    currentAmount = objective.currentAmount,
+                    isCompleted = objective.isCompleted
+                });
             }
 
-            //Lưu id quest đã hoàn thành
-            saveData.completedQuestIDs = new List<string>(completedQuestIDs);
-            saveData.currentScene = SceneManager.GetActiveScene().name;
-            saveData.saveTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-
-
-            //Convert to JSON and save
-            string json = JsonUtility.ToJson(saveData, true);
-            File.WriteAllText(savePath, json);
-
-            Debug.Log($"Quest data đã được lưu: {savePath}");
+            questData.activeQuests.Add(questSave);
         }
-        catch (Exception e)
-        {
-            Debug.LogError($"Lỗi khi lưu quest data: {e.Message}");
-        }
+
+        //Lưu id quest đã hoàn thành
+        questData.completedQuestIDs = new List<string>(completedQuestIDs);
+        questData.saveTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+
+
+        //Convert to JSON and save
+        SaveLoadUtils.Save("QuestData", questData, EncryptionType.AES);
+        // string json = JsonUtility.ToJson(saveData, true);
+        // File.WriteAllText(savePath, json);
     }
 
     //LOAD
     public void LoadQuestData()
     {
-        try
+        QuestData questData = SaveLoadUtils.Load<QuestData>("QuestData", EncryptionType.AES);
+        // string json = File.ReadAllText(savePath);
+
+        if (questData == null)
         {
-            if (!File.Exists(savePath))
+            Debug.Log("Không thể load quest save data");
+            return;
+        }
+
+        //Clear current data
+        activeQuests.Clear();
+        completedQuestIDs.Clear();
+
+        //Load completed quest IDs
+        completedQuestIDs.AddRange(questData.completedQuestIDs);
+
+        //Load active quests
+        foreach (var questSave in questData.activeQuests)
+        {
+            QuestSO questSO = allQuests.Find(q => q.questID == questSave.questID);
+            if (questSO != null)
             {
-                Debug.Log("Không tìm thấy file save quest data");
-                return;
-            }
+                Quest quest = new Quest(questSO);
+                quest.status = questSave.status;
 
-            string json = File.ReadAllText(savePath);
-            QuestSaveData saveData = JsonUtility.FromJson<QuestSaveData>(json);
-
-            if (saveData == null)
-            {
-                Debug.LogError("Không thể load quest save data");
-                return;
-            }
-
-            //Clear current data
-            activeQuests.Clear();
-            completedQuestIDs.Clear();
-
-            //Load completed quest IDs
-            completedQuestIDs.AddRange(saveData.completedQuestIDs);
-
-            //Load active quests
-            foreach (var questSave in saveData.activeQuests)
-            {
-                QuestData questData = allQuests.Find(q => q.questID == questSave.questID);
-                if (questData != null)
+                // Load objective progress
+                for (int i = 0; i < quest.objectives.Count && i < questSave.objectives.Count; i++)
                 {
-                    Quest quest = new Quest(questData);
-                    quest.status = questSave.status;
-
-                    // Load objective progress
-                    for (int i = 0; i < quest.objectives.Count && i < questSave.objectives.Count; i++)
+                    var objSave = questSave.objectives.Find(o => o.objectiveID == quest.objectives[i].objectiveID);
+                    if (objSave != null)
                     {
-                        var objSave = questSave.objectives.Find(o => o.objectiveID == quest.objectives[i].objectiveID);
-                        if (objSave != null)
-                        {
-                            quest.objectives[i].currentAmount = objSave.currentAmount;
-                            quest.objectives[i].isCompleted = objSave.isCompleted;
-                        }
+                        quest.objectives[i].currentAmount = objSave.currentAmount;
+                        quest.objectives[i].isCompleted = objSave.isCompleted;
                     }
+                }
 
-                    activeQuests.Add(quest);
-                }
-                else
-                {
-                    Debug.LogWarning($"Không tìm thấy quest data cho ID: {questSave.questID}");
-                }
+                activeQuests.Add(quest);
             }
+            else
+            {
+                Debug.LogWarning($"Không tìm thấy quest data cho ID: {questSave.questID}");
+            }
+        }
 
-            OnQuestDataLoaded?.Invoke();
-            Debug.Log($"Đã load quest data: {saveData.activeQuests.Count} active quests, {saveData.completedQuestIDs.Count} completed quests");
-        }
-        catch (Exception e)
-        {
-            Debug.LogError($"Lỗi khi load quest data: {e.Message}");
-        }
-    }
-
-    private IEnumerator AutoSaveCoroutine()
-    {
-        while (true)
-        {
-            yield return new WaitForSeconds(autoSaveInterval);
-            SaveQuestData();
-        }
+        OnQuestDataLoaded?.Invoke();
+        Debug.Log($"Đã load quest data: {questData.activeQuests.Count} active quests, {questData.completedQuestIDs.Count} completed quests");
     }
 
     // Debug methods
     [ContextMenu("Save Quest Data")]
-    public void SaveQuestDataDebug()
+    public void SaveQuestDataDebugXOR()
     {
         SaveQuestData();
     }
@@ -374,37 +319,27 @@ public class QuestManager : MonoBehaviour
         LoadQuestData();
     }
 
-    [ContextMenu("Load Quest")]
+    [ContextMenu("Load Quest Resource")]
     public void LoadQuestResourceDebug()
     {
-        allQuests = Resources.LoadAll("Quests", typeof(QuestData)).OfType<QuestData>().ToList();
-        savePath = Application.persistentDataPath + "/QuestSave.json";
-        Debug.Log(savePath);
+        allQuests = Resources.LoadAll("Quests", typeof(QuestSO)).OfType<QuestSO>().ToList();
+        foreach (var quest in allQuests)
+        {
+            StartQuest(quest.questID);
+        }
     }
 
     [ContextMenu("Clear Save Data")]
     public void ClearSaveData()
     {
+        string savePath = Application.persistentDataPath + "/QuestData.json";
+        allQuests.Clear();
+        activeQuests.Clear();
+        completedQuestIDs.Clear();
+
         if (File.Exists(savePath))
         {
             File.Delete(savePath);
-            Debug.Log("Quest save data đã được xóa");
         }
     }
-
-    // // Lấy quest đang active
-    // public Quest GetActiveQuest(string questID)
-    // {
-    //     return activeQuests.Find(q => q.questData.questID == questID);
-    // }
-
-    // // Lấy tất cả quest có thể bắt đầu
-    // public List<QuestData> GetAvailableQuests()
-    // {
-    //     return allQuests.Where(q => 
-    //         !completedQuestIDs.Contains(q.questID) && 
-    //         !activeQuests.Any(aq => aq.questData.questID == q.questID) &&
-    //         CheckQuestRequirements(q)
-    //     ).ToList();
-    // }
 }

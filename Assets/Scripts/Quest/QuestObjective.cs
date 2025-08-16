@@ -1,3 +1,5 @@
+using UnityEngine;
+
 public enum QuestObjectiveType
 {
     Kill,        //Giết quái vật
@@ -9,7 +11,7 @@ public enum QuestObjectiveType
 [System.Serializable]
 public class QuestObjective
 {
-    public string objectiveID;
+    [HideInInspector] public string objectiveID;
     public string description;
     public QuestObjectiveType type;
     public string targetID; //ID của target (Enemy, Item,...)

@@ -6,29 +6,30 @@ public enum QuestStatus
 {
     NotStarted,
     Active,
-    Completed,
-    TurnedIn
+    Completed
 }
 
 [System.Serializable]
 public class Quest
 {
-    public QuestData questData;
+    public QuestSO questSO;
     public QuestStatus status;
     public List<QuestObjective> objectives;
 
-    public Quest(QuestData data)
+    public Quest(QuestSO questSO)
     {
-        questData = data;
+        this.questSO = questSO;
         status = QuestStatus.NotStarted;
 
         //Copy objectives từ ScriptableObject
         objectives = new();
-        foreach (var obj in data.objectives)
+        for (int i = 0; i < questSO.objectives.Count; i++)
         {
+            var obj = questSO.objectives[i];
             objectives.Add(new QuestObjective
             {
-                objectiveID = obj.objectiveID,
+                // objectiveID = questData.objectives[i].objectiveID,
+                objectiveID = questSO.questID + "_" + i,
                 description = obj.description,
                 type = obj.type,
                 targetID = obj.targetID,

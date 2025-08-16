@@ -1,38 +1,25 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
-using UnityEditor;
-using UnityEngine;
 
-[CreateAssetMenu(fileName = "New Quest", menuName = "Quest")]
-public class QuestData : ScriptableObject
+[System.Serializable]
+public class QuestData
 {
-    [Header("Infomations")]
+    public List<QuestDataSO> activeQuests = new();
+    public List<string> completedQuestIDs = new();
+    public string saveTime;
+}
+
+[System.Serializable]
+public class QuestDataSO
+{
     public string questID;
-    public string questName;
-    [TextArea(3, 5)] public string description;
+    public QuestStatus status;
+    public List<ObjectiveData> objectives = new();
+}
 
-    [Header("Required")]
-    public List<QuestObjective> objectives = new List<QuestObjective>();
-
-    [Header("Rewards")]
-    public int expReward;
-    public int goldReward;
-
-    [Header("Conditions")]
-    public List<string> prerequisiteQuests = new List<string>();
-    public int requiredLevel = 1;
-
-    [Header("Settings")]
-    public bool autoStart = false;
-    public string autoStartScene = "";
-    public float autoStartDelay = 0f;
-
-    void OnValidate()
-    {
-        if (string.IsNullOrEmpty(questID))
-        {
-            questID = questName + Guid.NewGuid().ToString();
-        }
-    }
+[System.Serializable]
+public class ObjectiveData
+{
+    public string objectiveID;
+    public int currentAmount;
+    public bool isCompleted;
 }

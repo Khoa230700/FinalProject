@@ -1,0 +1,40 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEditor;
+using UnityEngine;
+
+[CreateAssetMenu(fileName = "New Quest", menuName = "Quest")]
+public class QuestSO : ScriptableObject
+{
+    [Header("Infomations")]
+    public string questID;
+    public string questName;
+    [TextArea(3, 5)] public string description;
+
+    [Header("Required")]
+    public List<QuestObjective> objectives = new();
+
+    [Header("Rewards")]
+    public int expReward;
+    public int goldReward;
+
+    [Header("Conditions")]
+    public List<QuestSO> prerequisiteQuests = new();
+    public int requiredLevel = 1;
+
+    [Header("Settings")]
+    public bool autoStart = false;
+    public string autoStartScene = "";
+    public float autoStartDelay = 0f;
+
+#if UNITY_EDITOR
+    void OnValidate()
+    {
+        if (string.IsNullOrEmpty(questID))
+        {
+            questID = questName + Guid.NewGuid().ToString();
+        }
+    }
+#endif
+}

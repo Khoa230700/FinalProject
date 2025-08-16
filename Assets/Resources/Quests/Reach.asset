@@ -10,23 +10,23 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 19c1a55a65e88f44280c5bd48b9fe731, type: 3}
-  m_Name: Test 1
+  m_Name: Reach
   m_EditorClassIdentifier: 
-  questID: Test1
-  questName: Test
-  description: TestTestTestTestTestTestTestTestTestTestTestTestTest
+  questID: Reach
+  questName: Reach
+  description: Reach
   objectives:
-  - objectiveID: Test3
-    description: Tessssttt
-    type: 1
-    targetID: TestCube
+  - objectiveID: 
+    description: Reach
+    type: 2
+    targetID: Reach
     currentAmount: 0
     requiredAmount: 5
     isCompleted: 0
-  expReward: 5
-  goldReward: 10
+  expReward: 0
+  goldReward: 0
   prerequisiteQuests: []
   requiredLevel: 1
   autoStart: 1
-  autoStartScene: 
+  autoStartScene: Test
   autoStartDelay: 0

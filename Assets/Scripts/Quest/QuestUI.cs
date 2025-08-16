@@ -84,7 +84,7 @@ public class QuestUI : MonoBehaviour
         Transform objectiveListParent = questItem.transform.Find("List Quest");
         Animator animator = questItem.GetComponent<Animator>();
 
-        questTitle.text = quest.questData.questName;
+        questTitle.text = quest.questSO.questName;
 
         questToUI[quest] = questItem;
 
