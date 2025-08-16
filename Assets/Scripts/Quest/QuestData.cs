@@ -15,13 +15,18 @@ public class QuestData : ScriptableObject
     [Header("Required")]
     public List<QuestObjective> objectives = new List<QuestObjective>();
 
-    [Header("Reward")]
+    [Header("Rewards")]
     public int expReward;
     public int goldReward;
 
-    [Header("Condition")]
+    [Header("Conditions")]
     public List<string> prerequisiteQuests = new List<string>();
     public int requiredLevel = 1;
+
+    [Header("Settings")]
+    public bool autoStart = false;
+    public string autoStartScene = "";
+    public float autoStartDelay = 0f;
 
     void OnValidate()
     {
