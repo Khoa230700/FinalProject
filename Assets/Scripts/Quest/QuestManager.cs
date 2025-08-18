@@ -26,15 +26,12 @@ public class QuestManager : MonoBehaviour
     public Action<Quest> OnQuestStarted;
     public Action<Quest> OnQuestCompleted;
     public Action<Quest, QuestObjective> OnObjectiveUpdated;
-    public Action OnQuestDataLoaded;
-
-    private Coroutine autoSaveCoroutine;
 
     private void Awake()
     {
         Instance = this;
         SceneManager.sceneLoaded += OnSceneLoaded;
-        allQuests = Resources.LoadAll("Quests", typeof(QuestSO)).OfType<QuestSO>().ToList();
+        allQuests ??= Resources.LoadAll("Quests", typeof(QuestSO)).OfType<QuestSO>().ToList();
     }
 
     private void Start()
@@ -49,8 +46,6 @@ public class QuestManager : MonoBehaviour
         SceneManager.sceneLoaded -= OnSceneLoaded;
 
         if (autoSave) SaveQuestData();
-
-        if (autoSaveCoroutine != null) StopCoroutine(autoSaveCoroutine);
     }
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
@@ -87,36 +82,19 @@ public class QuestManager : MonoBehaviour
                 if (CheckQuestRequirements(questData))
                 {
                     StartQuest(questData.questID);
-                    Debug.Log($"[Auto Start] Quest đã tự động bắt đầu: {questData.questName}");
                 }
             }
         }
     }
 
     //BẮT ĐẦU QUEST
-    public bool StartQuest(string questID)
+    public void StartQuest(string questID)
     {
         QuestSO questSO = allQuests.Find(q => q.questID == questID);
 
-        //Tìm quest progress
-        if (!questSO)
-        {
-            Debug.Log($"Không tìm thấy quest với ID: {questID}");
-            return false;
-        }
-
-        //Kiểm tra quest đã hoàn thành hoặc đang active
-        if (completedQuestIDs.Contains(questID) || activeQuests.Any(q => q.questSO.questID == questID))
-        {
-            Debug.Log($"QuestID: {questID} đã hoàn thành hoặc đang active");
-            return false;
-        }
-
-        //Kiểm tra điều kiện
-        if (!CheckQuestRequirements(questSO))
-        {
-            return false;
-        }
+        if (!questSO) return;
+        if (!CheckQuestRequirements(questSO)) return;
+        if (completedQuestIDs.Contains(questID) || activeQuests.Any(q => q.questSO.questID == questID)) return;
 
         //Tạo quest mới và thêm vào danh sách active
         Quest newQuest = new Quest(questSO);
@@ -124,11 +102,9 @@ public class QuestManager : MonoBehaviour
         activeQuests.Add(newQuest);
 
         OnQuestStarted?.Invoke(newQuest);
-        Debug.Log($"Bắt đầu quest: {questSO.questName}");
+        Debug.Log($"Bắt đầu quest: <b>{questSO.questName.ToUpper()}</b>");
 
         if (autoSave) SaveQuestData();
-
-        return true;
     }
 
     //CẬP NHẬT TIẾN ĐỘ QUEST
@@ -172,15 +148,14 @@ public class QuestManager : MonoBehaviour
     //HOÀN THÀNH QUEST
     public void CompleteQuest(Quest quest)
     {
-        OnQuestCompleted?.Invoke(quest);
         GiveRewards(quest);
-        Debug.Log($"Quest hoàn thành: {quest.questSO.questName}");
+        OnQuestCompleted?.Invoke(quest);
+        Debug.Log($"Quest hoàn thành: <b>{quest.questSO.questName.ToUpper()}</b>");
     }
 
     //TRAO THƯỞNG
     private void GiveRewards(Quest quest)
     {
-        //Chuyển quest sang trại thái đã nộp
         quest.status = QuestStatus.Completed;
         activeQuests.Remove(quest);
         completedQuestIDs.Add(quest.questSO.questID);
@@ -248,22 +223,16 @@ public class QuestManager : MonoBehaviour
         questData.completedQuestIDs = new List<string>(completedQuestIDs);
         questData.saveTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
-
-        //Convert to JSON and save
-        SaveLoadUtils.Save("QuestData", questData, EncryptionType.AES);
-        // string json = JsonUtility.ToJson(saveData, true);
-        // File.WriteAllText(savePath, json);
+        SaveLoadUtils.Save("QuestData", questData, EncryptionType.None);
     }
 
     //LOAD
     public void LoadQuestData()
     {
-        QuestData questData = SaveLoadUtils.Load<QuestData>("QuestData", EncryptionType.AES);
-        // string json = File.ReadAllText(savePath);
+        QuestData questData = SaveLoadUtils.Load<QuestData>("QuestData", EncryptionType.None);
 
         if (questData == null)
         {
-            Debug.Log("Không thể load quest save data");
             return;
         }
 
@@ -296,50 +265,30 @@ public class QuestManager : MonoBehaviour
 
                 activeQuests.Add(quest);
             }
-            else
-            {
-                Debug.LogWarning($"Không tìm thấy quest data cho ID: {questSave.questID}");
-            }
         }
 
-        OnQuestDataLoaded?.Invoke();
         Debug.Log($"Đã load quest data: {questData.activeQuests.Count} active quests, {questData.completedQuestIDs.Count} completed quests");
     }
 
-    // Debug methods
-    [ContextMenu("Save Quest Data")]
-    public void SaveQuestDataDebugXOR()
+
+    //DEBUGS
+    [ContextMenu("Save All Quests")]
+    public void SaveAllQuests()
     {
-        SaveQuestData();
+        SaveLoadUtils.Save("AllQuests", allQuests, EncryptionType.None);
     }
 
-    [ContextMenu("Load Quest Data")]
-    public void LoadQuestDataDebug()
+    [ContextMenu("Clear All Quest")]
+    public void ClearAllQuests()
     {
-        LoadQuestData();
-    }
-
-    [ContextMenu("Load Quest Resource")]
-    public void LoadQuestResourceDebug()
-    {
-        allQuests = Resources.LoadAll("Quests", typeof(QuestSO)).OfType<QuestSO>().ToList();
-        foreach (var quest in allQuests)
-        {
-            StartQuest(quest.questID);
-        }
-    }
-
-    [ContextMenu("Clear Save Data")]
-    public void ClearSaveData()
-    {
-        string savePath = Application.persistentDataPath + "/QuestData.json";
         allQuests.Clear();
         activeQuests.Clear();
         completedQuestIDs.Clear();
+    }
 
-        if (File.Exists(savePath))
-        {
-            File.Delete(savePath);
-        }
+    [ContextMenu("Load All Quests")]
+    public void LoadAllQuests()
+    {
+        allQuests = Resources.LoadAll("Quests", typeof(QuestSO)).OfType<QuestSO>().ToList();
     }
 }

@@ -23,10 +23,24 @@ MonoBehaviour:
     currentAmount: 0
     requiredAmount: 5
     isCompleted: 0
-  expReward: 0
-  goldReward: 0
+  - objectiveID: 
+    description: Kill
+    type: 0
+    targetID: Kill
+    currentAmount: 0
+    requiredAmount: 5
+    isCompleted: 0
+  - objectiveID: 
+    description: Kill
+    type: 0
+    targetID: Kill
+    currentAmount: 0
+    requiredAmount: 5
+    isCompleted: 0
   prerequisiteQuests: []
   requiredLevel: 1
+  expReward: 0
+  goldReward: 0
   autoStart: 1
   autoStartScene: InGame
-  autoStartDelay: 0
+  autoStartDelay: 1

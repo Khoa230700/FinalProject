@@ -14,14 +14,12 @@ public class QuestSO : ScriptableObject
 
     [Header("Required")]
     public List<QuestObjective> objectives = new();
+    public List<QuestSO> prerequisiteQuests = new();
+    public int requiredLevel = 1;
 
     [Header("Rewards")]
     public int expReward;
     public int goldReward;
-
-    [Header("Conditions")]
-    public List<QuestSO> prerequisiteQuests = new();
-    public int requiredLevel = 1;
 
     [Header("Settings")]
     public bool autoStart = false;

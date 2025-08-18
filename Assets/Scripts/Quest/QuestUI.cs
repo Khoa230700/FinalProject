@@ -15,21 +15,30 @@ public class QuestUI : MonoBehaviour
 
     private void Start()
     {
-        // Đăng ký sự kiện
         QuestManager.Instance.OnQuestStarted += OnQuestStarted;
         QuestManager.Instance.OnQuestCompleted += OnQuestCompleted;
         QuestManager.Instance.OnObjectiveUpdated += OnObjectiveUpdated;
 
-        // Hiển thị sẵn các quest đang active
+        // Hiển thị Active Quests
         foreach (var quest in QuestManager.Instance.activeQuests)
         {
             CreateQuestItem(quest);
+        }
+
+        // Hiển thị Completed Quests
+        foreach (var questID in QuestManager.Instance.completedQuestIDs)
+        {
+            QuestSO questSO = QuestManager.Instance.allQuests.Find(q => q.questID == questID);
+            if (questSO != null)
+            {
+                Quest completedQuest = new Quest(questSO);
+                CreateQuestItem(completedQuest, true);
+            }
         }
     }
 
     private void OnDestroy()
     {
-        // Hủy đăng ký sự kiện
         QuestManager.Instance.OnQuestStarted -= OnQuestStarted;
         QuestManager.Instance.OnQuestCompleted -= OnQuestCompleted;
         QuestManager.Instance.OnObjectiveUpdated -= OnObjectiveUpdated;
@@ -41,13 +50,20 @@ public class QuestUI : MonoBehaviour
     private void OnQuestStarted(Quest quest)
     {
         CreateQuestItem(quest);
+
+        if (quest.IsCompleted())
+        {
+            OnQuestCompleted(quest);
+        }
     }
 
     private void OnQuestCompleted(Quest quest)
     {
-        if (questToUI.TryGetValue(quest, out var questItem))
+        UpdateQuestUI(quest);
+
+        foreach (var objective in quest.objectives)
         {
-            questItem.transform.Find("Quest Title - Text").GetComponent<TMP_Text>();
+            UpdateObjectiveUI(objectiveToUI[objective], objective, true);
         }
     }
 
@@ -58,23 +74,19 @@ public class QuestUI : MonoBehaviour
     {
         if (objectiveToUI.TryGetValue(objective, out var objItem))
         {
-            UpdateObjectiveUI(objItem, objective);
+            UpdateObjectiveUI(objItem, objective, objective.isCompleted);
         }
-        else
+
+        if (quest.IsCompleted())
         {
-            // Nếu objective chưa có UI, tạo mới
-            if (questToUI.TryGetValue(quest, out var questItem))
-            {
-                Transform objectiveListParent = questItem.transform.Find("List Quest");
-                CreateObjectiveItem(objective, objectiveListParent);
-            }
+            UpdateQuestUI(quest);
         }
     }
 
     // =====================
     // UI CREATION
     // =====================
-    private void CreateQuestItem(Quest quest)
+    private void CreateQuestItem(Quest quest, bool isCompleted = false)
     {
         if (questToUI.ContainsKey(quest))
             return;
@@ -86,35 +98,66 @@ public class QuestUI : MonoBehaviour
 
         questTitle.text = quest.questSO.questName;
 
-        questToUI[quest] = questItem;
-
-        foreach (var objective in quest.objectives)
+        if (isCompleted)
         {
-            CreateObjectiveItem(objective, objectiveListParent);
+            questTitle.text += "- Completed";
+            foreach (var objective in quest.objectives)
+            {
+                CreateObjectiveItem(objective, objectiveListParent, true);
+            }
         }
+        else
+        {
+            foreach (var objective in quest.objectives)
+            {
+                CreateObjectiveItem(objective, objectiveListParent, objective.isCompleted);
+            }
+        }
+
+        questToUI[quest] = questItem;
 
         animator.Play("In");
     }
 
-    private void CreateObjectiveItem(QuestObjective objective, Transform parent)
+    private void CreateObjectiveItem(QuestObjective objective, Transform parent, bool isCompleted)
     {
         GameObject objItem = Instantiate(questObjectivePf, parent);
-        UpdateObjectiveUI(objItem, objective);
+        UpdateObjectiveUI(objItem, objective, isCompleted);
         objectiveToUI[objective] = objItem;
     }
 
     // =====================
     // UI UPDATE HELPERS
     // =====================
-    private void UpdateObjectiveUI(GameObject objItem, QuestObjective objective)
+    private void UpdateObjectiveUI(GameObject objItem, QuestObjective objective, bool isCompleted)
     {
         TextMeshProUGUI objText = objItem.GetComponentInChildren<TextMeshProUGUI>();
-        string progressText = $"{objective.currentAmount}/{objective.requiredAmount}";
-        objText.text = $"{objective.description} ({progressText})";
 
-        if (objective.isCompleted)
+        if (isCompleted)
         {
             objText.fontStyle = FontStyles.Strikethrough;
+            string progressText = $"{objective.requiredAmount}/{objective.requiredAmount}";
+            objText.text = $"{objective.description} ({progressText})";
+        }
+        else
+        {
+            string progressText = $"{objective.currentAmount}/{objective.requiredAmount}";
+            objText.text = $"{objective.description} ({progressText})";
         }
     }
+
+    private void UpdateQuestUI(Quest quest)
+    {
+        if (questToUI.TryGetValue(quest, out var questItem))
+        {
+            TMP_Text questTitle = questItem.transform.Find("Quest Title - Text").GetComponent<TMP_Text>();
+            questTitle.text = quest.questSO.questName;
+
+            if (quest.status == QuestStatus.Completed && quest.IsCompleted())
+            {
+                questTitle.text += " - Completed";
+            }
+        }
+    }
+
 }

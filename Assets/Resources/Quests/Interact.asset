@@ -23,10 +23,10 @@ MonoBehaviour:
     currentAmount: 0
     requiredAmount: 5
     isCompleted: 0
-  expReward: 0
-  goldReward: 0
   prerequisiteQuests: []
   requiredLevel: 1
+  expReward: 1
+  goldReward: 1
   autoStart: 1
   autoStartScene: InGame
-  autoStartDelay: 0
+  autoStartDelay: 1
