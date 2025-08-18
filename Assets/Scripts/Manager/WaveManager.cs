@@ -8,16 +8,25 @@ public class WaveManager : MonoBehaviour
     [SerializeField] private float timeBetweenWaves = 10f;
     [SerializeField] private SpawnManager spawnManager;
 
-    private int currentWaveIndex = 0;
-    private bool isBetweenWaves = false;
+    [Header("UI References")]
+    [SerializeField] private TimerUI timerUI;
 
-    public void SetWaves(List<WaveData> newWaves)
-    {
-        waves = newWaves;
-    }
+    private int  currentWaveIndex = 0;
+    private bool isBetweenWaves   = false;
+
+    public void SetWaves(List<WaveData> newWaves) => waves = newWaves;
+
     public void StartGame()
     {
         currentWaveIndex = 0;
+
+        // đảm bảo UI tắt hẳn ở wave 1
+        if (timerUI != null)
+        {
+            timerUI.HideUI();
+            timerUI.SetVisible(false);
+        }
+
         StartCoroutine(HandleWave());
     }
 
@@ -25,33 +34,56 @@ public class WaveManager : MonoBehaviour
     {
         while (currentWaveIndex < waves.Count)
         {
-            // Spawn wave hiện tại
+            // Spawn wave hiện tại (wave 1 sẽ không có UI đếm)
             spawnManager.SpawnWave(waves[currentWaveIndex]);
 
-            // Chờ cho wave này kết thúc (tất cả enemy chết)
+            // chờ hết quái
             yield return new WaitUntil(() => spawnManager.ActiveEnemyCount == 0);
 
-            // Nếu chưa phải wave cuối thì nghỉ
+            // nếu còn wave sau thì nghỉ và đếm ngược
             if (currentWaveIndex < waves.Count - 1)
             {
                 isBetweenWaves = true;
-                float timer = timeBetweenWaves;
-                while (timer > 0f && isBetweenWaves)
+
+                if (timerUI != null)
                 {
-                    timer -= Time.deltaTime;
-                    yield return null;
+                    timerUI.HideUI();
+                    timerUI.SetVisible(true); // bật UI để đếm
                 }
+
+                yield return StartCoroutine(WaveCountdown(timeBetweenWaves));
+
                 isBetweenWaves = false;
+
+                if (timerUI != null)
+                {
+                    timerUI.HideUI();
+                    timerUI.SetVisible(false); // tắt lại sau khi đếm xong
+                }
             }
 
-            // Sang wave tiếp theo
             currentWaveIndex++;
+        }
+    }
+
+    private IEnumerator WaveCountdown(float countdown)
+    {
+        float timer = countdown;
+
+        while (timer > 0f && isBetweenWaves)
+        {
+            int seconds = Mathf.CeilToInt(timer);
+
+            if (timerUI != null)
+                timerUI.UpdateUI($"NEXT WAVE IN {seconds}s", timer / countdown);
+
+            yield return null;
+            timer -= Time.deltaTime;
         }
     }
 
     public void SkipBreak()
     {
-        if (isBetweenWaves)
-            isBetweenWaves = false;
+        if (isBetweenWaves) isBetweenWaves = false;
     }
 }
