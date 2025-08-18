@@ -78,8 +78,8 @@ public class AudioManager : MonoBehaviour
     }
 
     public float GetMasterVolume() => masterVolume;
-    public float GetMusicVolume() => musicVolume;
-    public float GetSFXVolume() => sfxVolume; 
+    public float GetMusicVolume() => musicVolume * masterVolume;
+    public float GetSFXVolume() => sfxVolume * masterVolume; 
 }
 
 [Serializable]

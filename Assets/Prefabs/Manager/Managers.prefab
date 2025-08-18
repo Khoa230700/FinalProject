@@ -45,11 +45,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   activeQuests: []
-  allQuests:
-  - {fileID: 11400000, guid: 536236f540015894a825af7a32f4c108, type: 2}
-  - {fileID: 11400000, guid: 27cd2768f5c589c429e645aed4553a54, type: 2}
-  - {fileID: 11400000, guid: cb90d2929f85dfc4c8556a94ec3d1fe6, type: 2}
-  - {fileID: 11400000, guid: edfbaf50c42b2fb42a215ac20bcc5cc9, type: 2}
+  allQuests: []
   completedQuestIDs: []
   autoStart: 1
   autoSave: 0
@@ -167,6 +163,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1223622880234178363}
     m_Modifications:
+    - target: {fileID: 3377239629321501914, guid: 14df1f1b72d3ea9458667a83b59da1db, type: 3}
+      propertyPath: OutputAudioMixerGroup
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 3902696456190431477, guid: 14df1f1b72d3ea9458667a83b59da1db, type: 3}
+      propertyPath: OutputAudioMixerGroup
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 4573073199468110248, guid: 14df1f1b72d3ea9458667a83b59da1db, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
