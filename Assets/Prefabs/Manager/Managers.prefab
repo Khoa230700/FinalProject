@@ -9,6 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6192540578478754620}
+  - component: {fileID: 2930994096812585646}
   m_Layer: 0
   m_Name: QuestManager
   m_TagString: Untagged
@@ -31,6 +32,27 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1223622880234178363}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2930994096812585646
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3359927230151252892}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ca1b0c5122381854bae764157de0fc60, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  activeQuests: []
+  allQuests:
+  - {fileID: 11400000, guid: 536236f540015894a825af7a32f4c108, type: 2}
+  - {fileID: 11400000, guid: 27cd2768f5c589c429e645aed4553a54, type: 2}
+  - {fileID: 11400000, guid: cb90d2929f85dfc4c8556a94ec3d1fe6, type: 2}
+  - {fileID: 11400000, guid: edfbaf50c42b2fb42a215ac20bcc5cc9, type: 2}
+  completedQuestIDs: []
+  autoStart: 1
+  autoSave: 0
 --- !u!1 &4933613455551363215
 GameObject:
   m_ObjectHideFlags: 0
@@ -64,6 +86,7 @@ Transform:
   - {fileID: 810474993195750317}
   - {fileID: 2365888808763273627}
   - {fileID: 6192540578478754620}
+  - {fileID: 676928184531300377}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &331635886478104472
@@ -120,11 +143,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6351472591811511930, guid: b8148b54204e8a2479974bdc839535c8, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8881540389066740988, guid: b8148b54204e8a2479974bdc839535c8, type: 3}
       propertyPath: pressKeyEvents.Array.size
-      value: 6
+      value: 7
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
