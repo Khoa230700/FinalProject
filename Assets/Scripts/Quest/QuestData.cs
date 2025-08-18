@@ -5,7 +5,6 @@ public class QuestData
 {
     public List<QuestDataSO> activeQuests = new();
     public List<string> completedQuestIDs = new();
-    public string saveTime;
 }
 
 [System.Serializable]

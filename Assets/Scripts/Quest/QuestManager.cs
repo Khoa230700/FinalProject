@@ -30,12 +30,11 @@ public class QuestManager : MonoBehaviour
     private void Awake()
     {
         Instance = this;
-        SceneManager.sceneLoaded += OnSceneLoaded;
-        allQuests ??= Resources.LoadAll("Quests", typeof(QuestSO)).OfType<QuestSO>().ToList();
     }
 
     private void Start()
     {
+        allQuests ??= Resources.LoadAll("Quests", typeof(QuestSO)).OfType<QuestSO>().ToList();
         LoadQuestData();
 
         if (autoStart) StartCoroutine(CheckAutoStartQuests());
@@ -43,17 +42,7 @@ public class QuestManager : MonoBehaviour
 
     private void OnDestroy()
     {
-        SceneManager.sceneLoaded -= OnSceneLoaded;
-
         if (autoSave) SaveQuestData();
-    }
-
-    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
-    {
-        if (autoStart)
-        {
-            StartCoroutine(CheckAutoStartQuests());
-        }
     }
 
     //KIỂM TRA CÁC QUEST AUTOSTART
@@ -195,7 +184,7 @@ public class QuestManager : MonoBehaviour
     //SAVE
     public void SaveQuestData()
     {
-        QuestData questData = new();
+        SaveLoadUtils.Data.questData = new QuestData();
 
         //Lưu các quest đang active
         foreach (var quest in activeQuests)
@@ -216,20 +205,20 @@ public class QuestManager : MonoBehaviour
                 });
             }
 
-            questData.activeQuests.Add(questSave);
+            SaveLoadUtils.Data.questData.activeQuests.Add(questSave);
         }
 
         //Lưu id quest đã hoàn thành
-        questData.completedQuestIDs = new List<string>(completedQuestIDs);
-        questData.saveTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+        SaveLoadUtils.Data.questData.completedQuestIDs = completedQuestIDs;
 
-        SaveLoadUtils.Save("QuestData", questData, EncryptionType.None);
+        SaveLoadUtils.Save(EncryptionType.None);
     }
 
     //LOAD
     public void LoadQuestData()
     {
-        QuestData questData = SaveLoadUtils.Load<QuestData>("QuestData", EncryptionType.None);
+        SaveLoadUtils.Load(EncryptionType.None);
+        QuestData questData = SaveLoadUtils.Data.questData;
 
         if (questData == null)
         {
@@ -275,7 +264,7 @@ public class QuestManager : MonoBehaviour
     [ContextMenu("Save All Quests")]
     public void SaveAllQuests()
     {
-        SaveLoadUtils.Save("AllQuests", allQuests, EncryptionType.None);
+        SaveQuestData();
     }
 
     [ContextMenu("Clear All Quest")]

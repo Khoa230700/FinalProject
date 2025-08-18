@@ -13,19 +13,22 @@ public enum EncryptionType
 
 public static class SaveLoadUtils
 {
+    public static GameData Data { get; private set; } = new();
+
     private static string xorKey = "finalproject2025"; //Key cho XOR
     private static string aesKey = "finalproject2025"; //16/24/32 ký tự cho AES
-    private static string filePath = Application.persistentDataPath + "/";
+    private static string filePath = Application.persistentDataPath + "/GameData.json";
 
     // ================== SAVE ==================
-    public static void Save<T>(string fileName, T data, EncryptionType type = EncryptionType.None)
+    public static void Save(EncryptionType type = EncryptionType.None)
     {
         try
         {
-            string json = JsonUtility.ToJson(data, true);
-            string path = filePath + fileName + ".json";
+            Data.saveTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
+            string json = JsonUtility.ToJson(Data, true);
             string finalData = json;
+
             switch (type)
             {
                 case EncryptionType.XOR:
@@ -36,8 +39,8 @@ public static class SaveLoadUtils
                     break;
             }
 
-            File.WriteAllText(path, finalData);
-            Debug.Log($"Save data: {path} ({type})");
+            File.WriteAllText(filePath, finalData);
+            Debug.Log($"Save data: {filePath} ({type})");
         }
         catch (Exception e)
         {
@@ -46,21 +49,20 @@ public static class SaveLoadUtils
     }
 
     // ================== LOAD ==================
-    public static T Load<T>(string fileName, EncryptionType type = EncryptionType.None) where T : class
+    public static void Load(EncryptionType type = EncryptionType.None)
     {
         try
         {
-            string path = filePath + fileName + ".json";
-
-            if (!File.Exists(path))
+            if (!File.Exists(filePath))
             {
-                Debug.Log($"File not found: {path}");
-                return null;
+                Debug.Log($"File not found: {filePath}");
+                Data = new();
+                return;
             }
 
-            string fileData = File.ReadAllText(path);
-
+            string fileData = File.ReadAllText(filePath);
             string json = fileData;
+
             switch (type)
             {
                 case EncryptionType.XOR:
@@ -71,14 +73,13 @@ public static class SaveLoadUtils
                     break;
             }
 
-            T data = JsonUtility.FromJson<T>(json);
-            Debug.Log($"Load data: {data}");
-            return data;
+            Data = JsonUtility.FromJson<GameData>(json) ?? new(); ;
+            Debug.Log($"Load data: {Data.saveTime}");
         }
         catch (Exception e)
         {
             Debug.LogError($"Load failed: {e.Message}");
-            return null;
+            Data = new();
         }
     }
 
