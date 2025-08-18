@@ -34,7 +34,7 @@ public class QuestManager : MonoBehaviour
 
     private void Start()
     {
-        allQuests ??= Resources.LoadAll("Quests", typeof(QuestSO)).OfType<QuestSO>().ToList();
+        if(allQuests == null) allQuests = Resources.LoadAll("Quests", typeof(QuestSO)).OfType<QuestSO>().ToList();
         LoadQuestData();
 
         if (autoStart) StartCoroutine(CheckAutoStartQuests());
@@ -217,8 +217,7 @@ public class QuestManager : MonoBehaviour
     //LOAD
     public void LoadQuestData()
     {
-        SaveLoadUtils.Load(EncryptionType.None);
-        QuestData questData = SaveLoadUtils.Data.questData;
+        QuestData questData = SaveLoadUtils.Load(EncryptionType.None).questData;
 
         if (questData == null)
         {
