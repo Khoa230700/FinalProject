@@ -18,15 +18,15 @@ MonoBehaviour:
   objectives:
   - objectiveID: 
     description: Reach
-    type: 2
+    type: 3
     targetID: Reach
     currentAmount: 0
-    requiredAmount: 5
+    requiredAmount: 1
     isCompleted: 0
-  expReward: 0
-  goldReward: 0
   prerequisiteQuests: []
   requiredLevel: 1
+  expReward: 0
+  goldReward: 0
   autoStart: 1
-  autoStartScene: Test
+  autoStartScene: InGame
   autoStartDelay: 0

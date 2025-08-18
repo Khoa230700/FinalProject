@@ -19,14 +19,14 @@ MonoBehaviour:
   - objectiveID: 
     description: Kill
     type: 0
-    targetID: Kill
+    targetID: Kill1
     currentAmount: 0
     requiredAmount: 5
     isCompleted: 0
   - objectiveID: 
     description: Kill
     type: 0
-    targetID: Kill
+    targetID: Kill2
     currentAmount: 0
     requiredAmount: 5
     isCompleted: 0
