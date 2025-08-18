@@ -28,10 +28,11 @@ public class BombBotAI : MonoBehaviour
     {
         if (isWalking)
         {
-            rb.isKinematic = false;
+            //rb.isKinematic = false;
             rb.linearVelocity = Vector3.forward * speed;
             animator.SetBool("isMoving", true);
             animator.SetFloat("Vertical", value: 1f);
+           
         }
 
     }
@@ -40,17 +41,18 @@ public class BombBotAI : MonoBehaviour
     {
         animator.SetBool("isMoving", false);
         animator.SetFloat("Vertical", value: 0f);
+        animator.SetTrigger("Block");
         rb.linearVelocity = Vector3.zero;
-        rb.isKinematic = true;
+        //rb.isKinematic = true;
     }
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Enemy"))
         {
             isWalking = false;
-            rb.isKinematic = true; 
+            //rb.isKinematic = true; 
             BeHit();
-            //animator.Play("Sit_Idle");
+       
             Debug.Log("Hit Enemy – Stop");
         }
         else
@@ -58,26 +60,27 @@ public class BombBotAI : MonoBehaviour
             if (other.CompareTag("Player"))
             {
                 isWalking = true;
-                rb.isKinematic = false; 
+                //rb.isKinematic = false;
+                
                 Debug.Log("Hit Player – moveon");
             }
         }
     }
-    private GameObject FindNearestEnemy()
-    {
-        GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
-        GameObject nearestEnemy = null;
-        float minDistance = Mathf.Infinity;
-        foreach (GameObject enemy in enemies)
-        {
-            float distance = Vector3.Distance(transform.position, enemy.transform.position);
-            if (distance < minDistance)
-            {
-                minDistance = distance;
-                nearestEnemy = enemy;
-            }
-        }
-        return nearestEnemy;
-    }
+    ////private GameObject FindNearestEnemy()
+    //{
+    //    GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
+    //    GameObject nearestEnemy = null;
+    //    float minDistance = Mathf.Infinity;
+    //    foreach (GameObject enemy in enemies)
+    //    {
+    //        float distance = Vector3.Distance(transform.position, enemy.transform.position);
+    //        if (distance < minDistance)
+    //        {
+    //            minDistance = distance;
+    //            nearestEnemy = enemy;
+    //        }
+    //    }
+    //    return nearestEnemy;
+    //}
 }
 
