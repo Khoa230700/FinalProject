@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿// CSGOScope.cs
+using UnityEngine;
 
 public class CSGOScope : MonoBehaviour
 {
@@ -13,7 +14,9 @@ public class CSGOScope : MonoBehaviour
 
     private float normalFOV;
     private float targetFOV;
-    private bool isScoped = false;
+
+    // Trạng thái scope để PlayerShoot tham chiếu
+    public bool IsScoped { get; private set; } = false;
 
     void Start()
     {
@@ -33,13 +36,9 @@ public class CSGOScope : MonoBehaviour
             return;
 
         if (Input.GetButtonDown("Fire2"))
-        {
             ScopeIn();
-        }
         else if (Input.GetButtonUp("Fire2"))
-        {
             ScopeOut();
-        }
 
         // Mượt FOV về giá trị targetFOV
         playerCamera.fieldOfView = Mathf.Lerp(
@@ -51,18 +50,18 @@ public class CSGOScope : MonoBehaviour
 
     void ScopeIn()
     {
-        isScoped = true;
-
+        IsScoped = true;
         if (scopeOverlayUI != null)
             scopeOverlayUI.SetActive(true);
 
-        targetFOV = playerShoot.gunData.scopeZoom > 0 ? playerShoot.gunData.scopeZoom : scopedFOV;
+        targetFOV = playerShoot.gunData.scopeZoom > 0
+                    ? playerShoot.gunData.scopeZoom
+                    : scopedFOV;
     }
 
     void ScopeOut()
     {
-        isScoped = false;
-
+        IsScoped = false;
         if (scopeOverlayUI != null)
             scopeOverlayUI.SetActive(false);
 

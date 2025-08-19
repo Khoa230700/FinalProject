@@ -39,4 +39,10 @@ public class testPlayerHealth : MonoBehaviour
     //         healthBar.fillAmount = currentHealth / maxHealth;
     //     }
     // }
+
+
+    public interface IHealth
+    {
+        void TakeDamage(float amount);
+    }
 }
