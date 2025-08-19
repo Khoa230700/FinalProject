@@ -1,136 +1,89 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
 
-public class EnemySpawnManager : MonoBehaviour
+public class WaveManager : MonoBehaviour
 {
-    public Transform[] spawnPoints;
+    [SerializeField] private List<WaveData> waves;
+    [SerializeField] private float timeBetweenWaves = 10f;
+    [SerializeField] private SpawnManager spawnManager;
 
-    private int currentWave = 0;
-    private int activeEnemies = 0;
-    private bool waitingForNextWave = false;
+    [Header("UI References")]
+    [SerializeField] private TimerUI timerUI;
 
-    public float timeBetweenWaves = 60f;
-    private bool isSkipping = false;
+    private int  currentWaveIndex = 0;
+    private bool isBetweenWaves   = false;
 
-    private Dictionary<string, int>[] waveConfigs = new Dictionary<string, int>[]
+    public void SetWaves(List<WaveData> newWaves) => waves = newWaves;
+
+    public void StartGame()
     {
-        new Dictionary<string, int> { { "normal", 10 } },
-        new Dictionary<string, int> { { "normal", 30 }, { "shot", 5 } },
-        new Dictionary<string, int> { { "normal", 30 }, { "shot", 5 }, { "bomb", 5 } }
-    };
+        currentWaveIndex = 0;
 
-    void Start()
-    {
-        StartCoroutine(GameLoop());
-    }
-
-    void Update()
-    {
-        if (waitingForNextWave && Input.GetKeyDown(KeyCode.N))
+        // đảm bảo UI tắt hẳn ở wave 1
+        if (timerUI != null)
         {
-            isSkipping = true;
+            timerUI.HideUI();
+            timerUI.SetVisible(false);
         }
+
+        StartCoroutine(HandleWave());
     }
 
-    IEnumerator GameLoop()
+    private IEnumerator HandleWave()
     {
-        yield return null; 
-
-        while (currentWave < waveConfigs.Length)
+        while (currentWaveIndex < waves.Count)
         {
-            // Đợi đến khi enemy wave trước bị tiêu diệt
-            if (currentWave > 0)
-            {
-                yield return new WaitUntil(() => activeEnemies <= 0);
-                waitingForNextWave = true;
+            // Spawn wave hiện tại (wave 1 sẽ không có UI đếm)
+            spawnManager.SpawnWave(waves[currentWaveIndex]);
 
-                float timer = 0f;
-                while (timer < timeBetweenWaves && !isSkipping)
+            // chờ hết quái
+            yield return new WaitUntil(() => spawnManager.ActiveEnemyCount == 0);
+
+            // nếu còn wave sau thì nghỉ và đếm ngược
+            if (currentWaveIndex < waves.Count - 1)
+            {
+                isBetweenWaves = true;
+
+                if (timerUI != null)
                 {
-                    timer += Time.deltaTime;
-                    yield return null;
+                    timerUI.HideUI();
+                    timerUI.SetVisible(true); // bật UI để đếm
                 }
 
-                waitingForNextWave = false;
-                isSkipping = false;
-            }
+                yield return StartCoroutine(WaveCountdown(timeBetweenWaves));
 
-            SpawnWave(currentWave);
-            currentWave++;
-        }
-    }
+                isBetweenWaves = false;
 
-    void SpawnWave(int waveIndex)
-    {
-        StartCoroutine(SpawnWaveGradually(waveIndex));
-    }
-
-    IEnumerator SpawnWaveGradually(int waveIndex)
-    {
-        var config = waveConfigs[waveIndex];
-        float delayBetweenSpawns = 0.3f;
-
-        foreach (var kvp in config)
-        {
-            string tag = kvp.Key;
-            int count = kvp.Value;
-
-            if (tag == "normal")
-            {
-                
-                int perPoint = count / spawnPoints.Length;
-
-                for (int i = 0; i < spawnPoints.Length; i++)
+                if (timerUI != null)
                 {
-                    for (int j = 0; j < perPoint; j++)
-                    {
-                        Transform spawnPoint = spawnPoints[i];
-                        SpawnEnemyFromPool(tag, spawnPoint);
-                        yield return new WaitForSeconds(delayBetweenSpawns);
-                    }
+                    timerUI.HideUI();
+                    timerUI.SetVisible(false); // tắt lại sau khi đếm xong
                 }
             }
-            else
-            {
-                // Những loại còn lại thì spawn ngẫu nhiên như cũ
-                for (int i = 0; i < count; i++)
-                {
-                    Transform spawnPoint = spawnPoints[Random.Range(0, spawnPoints.Length)];
-                    SpawnEnemyFromPool(tag, spawnPoint);
-                    yield return new WaitForSeconds(delayBetweenSpawns);
-                }
-            }
-        }
 
-        Debug.Log($"Wave {waveIndex + 1} spawn completed. Total active: {activeEnemies}");
+            currentWaveIndex++;
+        }
     }
 
-    void SpawnEnemyFromPool(string tag, Transform spawnPoint)
+    private IEnumerator WaveCountdown(float countdown)
     {
-        GameObject enemy = ObjectPooler.Instance.SpawnFromPool(tag, spawnPoint.position, Quaternion.identity);
+        float timer = countdown;
 
-        if (enemy == null)
+        while (timer > 0f && isBetweenWaves)
         {
-            Debug.LogWarning($"No enemy available in pool with tag: {tag}");
-            return;
-        }
+            int seconds = Mathf.CeilToInt(timer);
 
-        EnemyTracker tracker = enemy.GetComponent<EnemyTracker>();
-        if (tracker != null)
-        {
-            tracker.OnDeath = null;
-            tracker.OnDeath = OnEnemyDeath;
-        }
+            if (timerUI != null)
+                timerUI.UpdateUI($"NEXT WAVE IN {seconds}s", timer / countdown);
 
-        activeEnemies++;
+            yield return null;
+            timer -= Time.deltaTime;
+        }
     }
 
-
-
-    void OnEnemyDeath()
+    public void SkipBreak()
     {
-        activeEnemies--;
-        if (activeEnemies < 0) activeEnemies = 0;
+        if (isBetweenWaves) isBetweenWaves = false;
     }
 }

@@ -1,0 +1,47 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 257e4ea5da4d2fe4980a186a43d1210d, type: 3}
+  m_Name: ShootGun
+  m_EditorClassIdentifier: 
+  gunName: Shoot Gun
+  gunType: 3
+  gunSprite: {fileID: 21300000, guid: 935dbf120fb637e43b41e4778304e411, type: 3}
+  damage: 1
+  range: 20
+  pelletCount: 5
+  spreadAngle: 20
+  roundsPerSecond: 5
+  burstCount: 3
+  burstFireRate: 0.1
+  burstCooldown: 0.3
+  fireMode: 0
+  availableFireModes: 00000000
+  magazineSize: 10
+  reserveAmmo: 20
+  reloadTime: 1
+  hasScope: 0
+  scopeZoom: 10
+  crosshairData:
+    normalColor: {r: 1, g: 1, b: 1, a: 1}
+    enemyColor: {r: 1, g: 0, b: 0, a: 1}
+    type: 1
+    staticCrosshair:
+      sprite: {fileID: 0}
+      size: {x: 64, y: 64}
+    dynamicCrosshair:
+      idleScale: 1
+      moveScale: 1.2
+      jumpScale: 1.8
+      bounceSize: 2
+      moveSpeed: 3
+  tracerPrefab: {fileID: 6749693277989217856, guid: dfcafcdd61ac0e447b7e869afc9b8d0c, type: 3}
+  shootSound: {fileID: 0}

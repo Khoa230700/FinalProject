@@ -45,7 +45,7 @@ public class BarUI : MonoBehaviour
     public void UpdateUI()
     {
         barImage.fillAmount = currentValue / maxValue;
-        textObject.text = currentValue.ToString("F0");
+        if(textObject != null) textObject.text = currentValue.ToString("F0");
     }
 
     //* Thiết lập hướng di chuyển của thanh 

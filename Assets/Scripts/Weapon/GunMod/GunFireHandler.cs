@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿// GunFireHandler.cs
+using UnityEngine;
 using System;
 using System.Collections;
 
@@ -7,89 +8,85 @@ public class GunFireHandler : MonoBehaviour
     [Header("References")]
     public PlayerShoot playerShoot;
 
-    [Header("Burst Settings")]
-    [Tooltip("Tổng số viên bắn khi burst")]
-    public int burstCount = 3;
-    [Tooltip("Khoảng giây giữa mỗi viên khi burst")]
-    public float burstFireRate = 0.1f;
-    [Tooltip("Thời gian chờ sau khi burst kết thúc mới được bắn tiếp")]
-    public float burstCooldown = 0.3f;
-
-    [Header("Full-Auto Settings")]
-    [Tooltip("Số viên bắn mỗi giây (chỉ Full-Auto)")]
-    public float roundsPerSecond = 5f;
-
     private GunData gunData;
-    private int modeIndex = 0;
-    private float nextAutoTime = 0f;
+    private int modeIndex;
+    private float nextAutoTime;
+    private float nextBurstTime;
     private Coroutine burstRoutine;
-    private float nextBurstTime = 0f;
 
     void Start()
     {
+        // Lấy data từ PlayerShoot
         gunData = playerShoot.gunData;
         modeIndex = Array.IndexOf(gunData.availableFireModes, gunData.fireMode);
-        roundsPerSecond = gunData.roundsPerSecond;
     }
 
     void Update()
     {
         if (PauseGameUI.isPause) return;
 
+        // Chuyển fire mode khi bấm B
         if (gunData.availableFireModes.Length > 1 && Input.GetKeyDown(KeyCode.B))
         {
             modeIndex = (modeIndex + 1) % gunData.availableFireModes.Length;
-            Debug.Log(">>> Switched to " + gunData.availableFireModes[modeIndex]);
+            gunData.fireMode = gunData.availableFireModes[modeIndex];
         }
 
+        // Reload
         if (Input.GetKeyDown(KeyCode.R))
             playerShoot.Reload();
 
-        switch (gunData.availableFireModes[modeIndex])
+        // Xử lý input theo fireMode
+        switch (gunData.fireMode)
         {
             case GunFireMode.SemiAuto:
-                if (Input.GetMouseButtonDown(0))
-                {
+                if (Input.GetMouseButtonDown(0) && playerShoot.IsReadyToShoot)
                     playerShoot.ShootOneBullet();
-                }
                 break;
 
             case GunFireMode.FullAuto:
-                if (burstRoutine == null
-                    && Input.GetMouseButton(0)
-                    && Time.time >= nextAutoTime)
+                if (Input.GetMouseButtonDown(0))
+                    playerShoot.StartShooting();
+                if (Input.GetMouseButtonUp(0))
+                    playerShoot.StopShooting();
+
+                if (Input.GetMouseButton(0) && Time.time >= nextAutoTime)
                 {
-                    nextAutoTime = Time.time + 1f / roundsPerSecond;
                     playerShoot.ShootOneBullet();
+                    nextAutoTime = Time.time + 1f / gunData.roundsPerSecond;
                 }
                 break;
 
             case GunFireMode.Burst:
-                if (burstRoutine == null && Input.GetMouseButtonDown(0) && Time.time >= nextBurstTime)
+                if (burstRoutine == null &&
+                    Input.GetMouseButtonDown(0) &&
+                    Time.time >= nextBurstTime)
                 {
                     burstRoutine = StartCoroutine(BurstSequence());
                 }
                 break;
 
             case GunFireMode.Safety:
+                // Không làm gì khi ở chế độ Safety
                 break;
         }
     }
 
-    IEnumerator BurstSequence()
+    private IEnumerator BurstSequence()
     {
-        Debug.Log($">>> BurstSequence start ({burstCount} shots)");
-
-        playerShoot.ShootOneBullet();
-
-        for (int i = 1; i < burstCount; i++)
+        for (int i = 0; i < gunData.burstCount; i++)
         {
-            yield return new WaitForSeconds(burstFireRate);
+            if (playerShoot.currentAmmo <= 0) break;
+            while (!playerShoot.IsReadyToShoot)
+                yield return null;
+
             playerShoot.ShootOneBullet();
+
+            if (i < gunData.burstCount - 1)
+                yield return new WaitForSeconds(gunData.burstFireRate);
         }
 
-        Debug.Log(">>> BurstSequence end");
-        nextBurstTime = Time.time + burstCooldown;
+        nextBurstTime = Time.time + gunData.burstCooldown;
         burstRoutine = null;
     }
 }

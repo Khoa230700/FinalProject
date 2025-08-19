@@ -12,46 +12,67 @@ public class Pool
 public class ObjectPooler : MonoBehaviour
 {
     public static ObjectPooler Instance;
-
     public List<Pool> pools;
-    public Dictionary<string, Queue<GameObject>> poolDictionary;
+    private Dictionary<string, Queue<GameObject>> poolDictionary;
+    public bool Initialized { get; private set; }
 
-    void Awake()
+    private void Awake()
     {
+        // Singleton đơn giản (optional)
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
         Instance = this;
+
+        InitializePools();   // <-- chuyển từ Start() sang đây
     }
 
-    void Start()
+    private void InitializePools()
     {
         poolDictionary = new Dictionary<string, Queue<GameObject>>();
 
         foreach (Pool pool in pools)
         {
-            Queue<GameObject> objectPool = new Queue<GameObject>();
-
+            var q = new Queue<GameObject>();
             for (int i = 0; i < pool.size; i++)
             {
-                GameObject obj = Instantiate(pool.prefab, transform);
+                GameObject obj = Instantiate(pool.prefab);
                 obj.SetActive(false);
-                objectPool.Enqueue(obj);
+                q.Enqueue(obj);
             }
-
-            poolDictionary.Add(pool.tag, objectPool);
+            poolDictionary[pool.tag] = q;
         }
+
+        Initialized = true;
     }
 
     public GameObject SpawnFromPool(string tag, Vector3 position, Quaternion rotation)
     {
-        if (!poolDictionary.ContainsKey(tag)) return null;
+        if (!Initialized || poolDictionary == null)
+        {
+            Debug.LogError("ObjectPooler: pools chưa được khởi tạo (poolDictionary null). Hãy kiểm tra thứ tự khởi tạo hoặc Awake().");
+            return null;
+        }
 
-        GameObject obj = poolDictionary[tag].Dequeue();
+        if (!poolDictionary.TryGetValue(tag, out var queue))
+        {
+            Debug.LogError($"ObjectPooler: không có pool với tag '{tag}'. Các tag hiện có: {string.Join(", ", poolDictionary.Keys)}");
+            return null;
+        }
 
-        obj.SetActive(true);
-        obj.transform.position = position;
-        obj.transform.rotation = rotation;
+        var objectToSpawn = queue.Dequeue();
+        if (objectToSpawn == null)
+        {
+            Debug.LogError($"ObjectPooler: phần tử trong pool '{tag}' bị null. Kiểm tra prefab và quá trình Instantiate.");
+            return null;
+        }
 
-        poolDictionary[tag].Enqueue(obj);
+        objectToSpawn.transform.SetPositionAndRotation(position, rotation);
+        objectToSpawn.SetActive(true);
 
-        return obj;
+        queue.Enqueue(objectToSpawn);
+        return objectToSpawn;
     }
 }

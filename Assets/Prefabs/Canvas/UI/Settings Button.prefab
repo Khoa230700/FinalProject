@@ -87,6 +87,7 @@ GameObject:
   - component: {fileID: 222878074729925778}
   - component: {fileID: 114699412838862560}
   - component: {fileID: 95739359722371454}
+  - component: {fileID: 7758664269904622176}
   m_Layer: 5
   m_Name: Settings Button
   m_TagString: Untagged
@@ -203,6 +204,26 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &7758664269904622176
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1252824092768524}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0ad36da87863b1649a9f7ea67e2126c2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  title: 
+  description: 
+  iconSprite: {fileID: 0}
+  iconBackground: {fileID: 0}
+  detailIcon: {fileID: 0}
+  detailBackground: {fileID: 0}
+  detailTitle: {fileID: 0}
+  detailDescription: {fileID: 0}
 --- !u!1 &1448129746274994
 GameObject:
   m_ObjectHideFlags: 0

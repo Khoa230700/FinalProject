@@ -88,6 +88,7 @@ GameObject:
   - component: {fileID: 114699412838862560}
   - component: {fileID: 95739359722371454}
   - component: {fileID: 5333279579363055485}
+  - component: {fileID: -67661087522126134}
   m_Layer: 5
   m_Name: Switch Button
   m_TagString: Untagged
@@ -219,6 +220,26 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isSoundOnHover: 1
   isSoundOnClick: 1
+--- !u!114 &-67661087522126134
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1252824092768524}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0ad36da87863b1649a9f7ea67e2126c2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  detailIcon: {fileID: 0}
+  detailBackground: {fileID: 0}
+  detailTitle: {fileID: 0}
+  detailDescription: {fileID: 0}
+  title: SWITCH
+  description: Switch buttonnnnnnnnnnn
+  iconSprite: {fileID: 21300000, guid: 05284ef55629a0744b5c6f28e99a4292, type: 3}
+  iconBackground: {fileID: 21300000, guid: 283742c0cb80ef64c82ce87747b4d6c5, type: 3}
 --- !u!1 &1448129746274994
 GameObject:
   m_ObjectHideFlags: 0

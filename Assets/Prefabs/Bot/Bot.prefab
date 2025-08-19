@@ -15325,7 +15325,7 @@ Transform:
   m_GameObject: {fileID: 843814326196612637}
   serializedVersion: 2
   m_LocalRotation: {x: -0.91573596, y: 0.35814485, z: -0.15804762, w: 0.09044846}
-  m_LocalPosition: {x: -7.6, y: -16.6, z: 7.6}
+  m_LocalPosition: {x: 40, y: -10, z: -118}
   m_LocalScale: {x: 10.000029, y: 10.000063, z: 9.999904}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -15781,7 +15781,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &3696272339564614228
 Transform:
   m_ObjectHideFlags: 0
@@ -17560,6 +17560,9 @@ GameObject:
   - component: {fileID: 8104397772714493830}
   - component: {fileID: 49863134466986894}
   - component: {fileID: 3972195842001420268}
+  - component: {fileID: 4099589449770915670}
+  - component: {fileID: 4366115670805413203}
+  - component: {fileID: 360368530243009991}
   m_Layer: 8
   m_Name: Bot1
   m_TagString: Untagged
@@ -17704,7 +17707,7 @@ MonoBehaviour:
   bulletPrefab: {fileID: 5406233457063356828, guid: d52bd64184b36634b818446a4ae66655, type: 3}
   bulletParticleSystem: {fileID: 19800000}
   wFX_LightFlicker: {fileID: 11400000}
-  followDistance: 3
+  hitdame: {fileID: 0}
   detectionRange: 15
   fireRate: 1.5
   bulletSpeed: 25
@@ -17823,6 +17826,7 @@ MonoBehaviour:
   - {fileID: 8300000, guid: feb62160ad1f8334ab037017b843d162, type: 3}
   - {fileID: 8300000, guid: 001f691d110d55648871a03f446ffa08, type: 3}
   shoot: {fileID: 8300000, guid: ff0a84dd716bc3149835374e9b6e9dfd, type: 3}
+  melee: []
 --- !u!82 &3972195842001420268
 AudioSource:
   m_ObjectHideFlags: 0
@@ -17920,6 +17924,58 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &4099589449770915670
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7878478308636993138}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d4ff2b05588cc4f4ea6cd862bd3c9ce7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxHealth: 100
+  OnTakeDamage:
+    m_PersistentCalls:
+      m_Calls: []
+  useRegen: 0
+  regenRate: 0
+  regenDelay: 0
+  secPerRegen: 0
+  shield: {fileID: 4366115670805413203}
+--- !u!114 &4366115670805413203
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7878478308636993138}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d4ead857bb0fb1645bb2fa5efdd5b9ee, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxShield: 100
+  useRegen: 0
+  regenRate: 0
+  regenDelay: 0
+  secPerRegen: 0
+--- !u!114 &360368530243009991
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7878478308636993138}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0360dc0e8036e594494f243f3a135207, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  agent: {fileID: 0}
+  player: {fileID: 0}
 --- !u!1 &7878478719322291096
 GameObject:
   m_ObjectHideFlags: 0
