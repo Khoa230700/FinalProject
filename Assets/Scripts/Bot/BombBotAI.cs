@@ -28,11 +28,11 @@ public class BombBotAI : MonoBehaviour
     {
         if (isWalking)
         {
-            //rb.isKinematic = false;
+            rb.isKinematic = false;
             rb.linearVelocity = Vector3.forward * speed;
             animator.SetBool("isMoving", true);
             animator.SetFloat("Vertical", value: 1f);
-           
+            animator.SetBool("Block", false);
         }
 
     }
@@ -41,9 +41,9 @@ public class BombBotAI : MonoBehaviour
     {
         animator.SetBool("isMoving", false);
         animator.SetFloat("Vertical", value: 0f);
-        animator.SetTrigger("Block");
+        animator.SetBool("Block",true);
         rb.linearVelocity = Vector3.zero;
-        //rb.isKinematic = true;
+        rb.isKinematic = true;
     }
     private void OnTriggerEnter(Collider other)
     {
