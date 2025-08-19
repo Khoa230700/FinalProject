@@ -977,7 +977,6 @@ GameObject:
   - component: {fileID: 1316558654747550126}
   - component: {fileID: 5434881562994337880}
   - component: {fileID: 3289584220954763909}
-  - component: {fileID: 7775071814243305905}
   m_Layer: 0
   m_Name: HitEnemy8
   m_TagString: HeadShot
@@ -1064,19 +1063,6 @@ MonoBehaviour:
   ownerHealthSystem: {fileID: 639718399531827442}
   hitboxType: 1
   bloodEffect: {fileID: 8967264388286551387, guid: 75f2e05292738d242a060d01657a4ce5, type: 3}
---- !u!114 &7775071814243305905
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3239438909805355896}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4c71a6787ee5539468cd533cc0144806, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  aimTarget: {fileID: 1219334098712275762}
 --- !u!1 &3314240867215492325
 GameObject:
   m_ObjectHideFlags: 0
@@ -1277,8 +1263,7 @@ GameObject:
   - component: {fileID: 2243277575312782797}
   - component: {fileID: 7891509131991545629}
   - component: {fileID: 639718399531827442}
-  - component: {fileID: 1442766571847242536}
-  - component: {fileID: 4003564455570737929}
+  - component: {fileID: -4696093054594487209}
   m_Layer: 0
   m_Name: Normie
   m_TagString: Enemy
@@ -2812,41 +2797,33 @@ MonoBehaviour:
   maxHealth: 100
   currentHealth: 100
   animator: {fileID: 4440705263268147471}
---- !u!136 &1442766571847242536
-CapsuleCollider:
+--- !u!54 &-4696093054594487209
+Rigidbody:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3738223141133144338}
-  m_Material: {fileID: 0}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
     m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.5
-  m_Height: 1
-  m_Direction: 1
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &4003564455570737929
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3738223141133144338}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bfb390852452ce84f8cf4791c7405347, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1 &3777046724730365686
 GameObject:
   m_ObjectHideFlags: 0
