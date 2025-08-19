@@ -1278,6 +1278,7 @@ GameObject:
   - component: {fileID: 7891509131991545629}
   - component: {fileID: 639718399531827442}
   - component: {fileID: 1442766571847242536}
+  - component: {fileID: 4003564455570737929}
   m_Layer: 0
   m_Name: Normie
   m_TagString: Enemy
@@ -2834,6 +2835,18 @@ CapsuleCollider:
   m_Height: 1
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &4003564455570737929
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3738223141133144338}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bfb390852452ce84f8cf4791c7405347, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &3777046724730365686
 GameObject:
   m_ObjectHideFlags: 0
