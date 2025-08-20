@@ -47,7 +47,7 @@ public class EnemyAI : MonoBehaviour
 
 		if (enmHealth.health > 0) {
 			if (navMeshEnable && other.gameObject.tag.Equals ("Player")) {
-				navAgent.isStopped = false;
+				//navAgent.isStopped = false;
 				PlayerVisible = true;
 
 			}
