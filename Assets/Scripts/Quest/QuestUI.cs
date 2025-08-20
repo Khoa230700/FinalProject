@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -65,6 +66,27 @@ public class QuestUI : MonoBehaviour
         {
             UpdateObjectiveUI(objectiveToUI[objective], objective, true);
         }
+
+        if (questToUI.TryGetValue(quest, out var questItem))
+        {
+            Animator animator = questItem.GetComponent<Animator>();
+            if (animator != null)
+            {
+                StartCoroutine(PlayAndDestroy(questItem, animator, "Out"));
+            }
+        }
+    }
+
+    private IEnumerator PlayAndDestroy(GameObject questItem, Animator animator, string stateName)
+    {
+        yield return new WaitForSeconds(3f);
+
+        animator.Play(stateName);
+
+        float length = animator.GetCurrentAnimatorClipInfo(0).Length;
+        yield return new WaitForSeconds(length + 0.1f);
+
+        Destroy(questItem);
     }
 
     // =====================
@@ -132,10 +154,11 @@ public class QuestUI : MonoBehaviour
     private void UpdateObjectiveUI(GameObject objItem, QuestObjective objective, bool isCompleted)
     {
         TextMeshProUGUI objText = objItem.GetComponentInChildren<TextMeshProUGUI>();
+        Animator objAnimator = objItem.GetComponent<Animator>();
 
         if (isCompleted)
         {
-            objText.fontStyle = FontStyles.Strikethrough;
+            objAnimator.Play("In");
             string progressText = $"{objective.requiredAmount}/{objective.requiredAmount}";
             objText.text = $"{objective.description} ({progressText})";
         }

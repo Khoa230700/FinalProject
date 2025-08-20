@@ -12,7 +12,7 @@ public class QuestSO : ScriptableObject
     public string questName;
     [TextArea(3, 5)] public string description;
 
-    [Header("Required")]
+    [Header("Requirements")]
     public List<QuestObjective> objectives = new();
     public List<QuestSO> prerequisiteQuests = new();
     public int requiredLevel = 1;
@@ -24,7 +24,6 @@ public class QuestSO : ScriptableObject
     [Header("Settings")]
     public bool autoStart = false;
     public string autoStartScene = "";
-    public float autoStartDelay = 0f;
 
 #if UNITY_EDITOR
     void OnValidate()
