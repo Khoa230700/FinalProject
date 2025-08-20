@@ -19,7 +19,7 @@ public class QuestSO : ScriptableObject
 
     [Header("Rewards")]
     public int expReward;
-    public int goldReward;
+    public int coinReward;
 
     [Header("Settings")]
     public bool autoStart = false;

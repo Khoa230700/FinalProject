@@ -156,11 +156,11 @@ public class QuestManager : MonoBehaviour
             Debug.Log($"Nhận được {quest.questSO.expReward} EXP");
         }
 
-        // Thêm Gold
-        if (quest.questSO.goldReward > 0)
+        // Thêm Coin
+        if (quest.questSO.coinReward > 0)
         {
-            // PlayerManager.Instance.AddGold(questData.goldReward);
-            Debug.Log($"Nhận được {quest.questSO.goldReward} Gold");
+            // PlayerManager.Instance.AddCoin(questData.coinReward);
+            Debug.Log($"Nhận được {quest.questSO.coinReward} Coin");
         }
     }
 
