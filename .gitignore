@@ -75,8 +75,7 @@ crashlytics-build.properties
 .vscode/extensions.json
 
 # Thai
-Assets/DemoAssets
-Assets/DemoAssets.meta
 Assets/Plugins
 Assets/Plugins.meta
 Packages/com.singularitygroup.hotreload
+Packages/com.mibdev.fullscreen-editor

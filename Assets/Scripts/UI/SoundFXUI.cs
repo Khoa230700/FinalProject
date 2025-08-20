@@ -17,7 +17,10 @@ public class SoundFXUI : MonoBehaviour, IPointerEnterHandler, IPointerClickHandl
     public void OnPointerClick(PointerEventData eventData)
     {
         if (!isSoundOnClick) return;
-
-        AudioManager.Instance.PlaySFX("Click");
+        
+        if (eventData.button == PointerEventData.InputButton.Left)
+        {
+            AudioManager.Instance.PlaySFX("Click");
+        }
     }
 }
