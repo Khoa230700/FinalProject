@@ -2240,7 +2240,7 @@ MonoBehaviour:
   bulletSpeed: 500
   bulletTimelife: 10
   animator: {fileID: 5462182493676516279}
-  detectionRadius: 10
+  detectionRadius: 100
   moveSpeed: 3.5
   targetLayer:
     serializedVersion: 2
@@ -2285,7 +2285,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 0
+  m_Constraints: 112
   m_CollisionDetection: 0
 --- !u!1 &2344813332677895130
 GameObject:

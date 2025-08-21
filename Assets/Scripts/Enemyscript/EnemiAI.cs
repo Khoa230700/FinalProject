@@ -6,42 +6,34 @@ using NUnit;
 
 public class EnemiAI : MonoBehaviour
 {
-    public Transform player;
-    NavMeshAgent agent;
-    Animator enemyAnimation;
-
-
-    public float maxHealth = 100f;
-    public float currentHealth;
-    public int attackDamage = 15;
-    public float attackSpeed = 1.5f;
-    private float nextAttackTime = 0f;
-
-    public float attackCooldown = 1.5f;
-    private float lastAttackTime;
     public float attackRange = 2f;
-    public float chaseRange = 40f;
+    public float attackCooldown = 1.5f;
+    public int damage = 10;
+
+    private float lastAttackTime;
+    public Animator enemyAnimation;
 
 
-    //new
+    //
     public float detectionRadius = 10f;
     private Transform currentTarget;
     public float moveSpeed = 4f;
     public LayerMask targetLayer;
-    
-    void Start()
-    {
-        agent = GetComponent<NavMeshAgent>();
-        enemyAnimation = GetComponent<Animator>();
-        player = GameObject.FindWithTag("Player").transform;
-    }
 
+
+    private void Start()
+    {
+        //player = GameObject.FindWithTag("Player").transform;
+    }
     void Update()
     {
-        //agent.destination = player.position;
-        enemyAnimation.SetFloat("speed", agent.velocity.magnitude);
+        //IDamageable target = GetClosestDamageableInRange();
 
-        
+        //if (target != null && Time.time >= lastAttackTime + attackCooldown)
+        //{
+        //    target.TakeDamage(damage);
+        //    lastAttackTime = Time.time;
+        //}
 
         FindClosestTarget();
 
@@ -59,25 +51,35 @@ public class EnemiAI : MonoBehaviour
             }
         }
     }
-    
 
-    
-    void Attack()
+    IDamageable GetClosestDamageableInRange()
     {
-        if (Time.time - lastAttackTime >= attackCooldown)
-        {
-            lastAttackTime = Time.time;
-            // damage player()
-            player.GetComponent<PlayerHealth>().TakeDamage(10, 0,this.transform.position);
-            
-            Debug.Log("Enemy attacks the player!");
+        IDamageable[] targets = GameObject.FindObjectsOfType<MonoBehaviour>().OfType<IDamageable>().ToArray();
 
-       
+        IDamageable closest = null;
+        float minDistance = Mathf.Infinity;
+
+        foreach (IDamageable target in targets)
+        {
+            float distance = Vector3.Distance(transform.position, ((MonoBehaviour)target).transform.position);
+            if (distance <= attackRange && distance < minDistance)
+            {
+                closest = target;
+                minDistance = distance;
+            }
         }
-        enemyAnimation.SetTrigger("attack");
+
+        return closest;
+    }
+
+    void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, attackRange);
     }
 
 
+    //
     void FindClosestTarget()
     {
         Collider[] hits = Physics.OverlapSphere(transform.position, detectionRadius, targetLayer);
@@ -101,10 +103,15 @@ public class EnemiAI : MonoBehaviour
         transform.LookAt(currentTarget); // Optional: face the target
     }
 
-
-    void OnDrawGizmosSelected()
+    void Attack()
     {
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, detectionRadius);
+        IDamageable target = GetClosestDamageableInRange();
+
+        if (target != null && Time.time >= lastAttackTime + attackCooldown)
+        {
+            target.TakeDamage(damage);
+            lastAttackTime = Time.time;
+        }
+        enemyAnimation.SetTrigger("attack");
     }
 }
