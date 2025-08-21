@@ -15,6 +15,7 @@ public class ShopPoint : MonoBehaviour
 
     void OnEnable()
     {
+        player = GameObject.FindGameObjectWithTag("Player").transform;
         StartCoroutine(PathLoop());
     }
 
@@ -22,8 +23,6 @@ public class ShopPoint : MonoBehaviour
     {
         if (shopUI == null)
             shopUI = FindAnyObjectByType<ShopUI>();
-
-        player = GameObject.FindGameObjectWithTag("Player").transform;
     }
 
     private void Update()
