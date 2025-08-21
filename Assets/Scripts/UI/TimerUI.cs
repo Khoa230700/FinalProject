@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System.Collections;
 
 public class TimerUI : MonoBehaviour
 {
@@ -10,6 +11,9 @@ public class TimerUI : MonoBehaviour
     [SerializeField] private TextMeshProUGUI[] timeTexts;
     [SerializeField] private Animator waveUI;
 
+    private int timerForShop = 0;
+    private int lastSecondPlayed = -1;
+
     private void Awake()
     {
         // Ẩn UI ngay khi vào game để wave 1 không bị hiện
@@ -17,14 +21,21 @@ public class TimerUI : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-    public void UpdateUI(string text, float fillAmount)
+    public void UpdateUI(string text, float fillAmount, int seconds = 0)
     {
+        timerForShop = seconds;
+        if (seconds <= 5f && seconds != lastSecondPlayed)
+        {
+            lastSecondPlayed = seconds;
+            AudioManager.Instance.PlaySFX("Tick");
+        }
+
         foreach (var txt in timeTexts)
         {
             if (txt != null) txt.text = text;
         }
 
-        if (leftBar)  leftBar.fillAmount  = Mathf.Clamp01(fillAmount);
+        if (leftBar) leftBar.fillAmount = Mathf.Clamp01(fillAmount);
         if (rightBar) rightBar.fillAmount = Mathf.Clamp01(fillAmount);
 
         if (fillAmount <= 0f && waveUI != null)
@@ -39,7 +50,7 @@ public class TimerUI : MonoBehaviour
         {
             if (txt != null) txt.text = "";
         }
-        if (leftBar)  leftBar.fillAmount  = 0f;
+        if (leftBar) leftBar.fillAmount = 0f;
         if (rightBar) rightBar.fillAmount = 0f;
     }
 
@@ -48,27 +59,27 @@ public class TimerUI : MonoBehaviour
     {
         gameObject.SetActive(visible);
     }
+    
+    public int GetTimerForShop() => timerForShop;
 }
 
+// private void Start()
+// {
+//     StartCoroutine(StartWaveCountdown(10f));
+// }
 
-    // private void Start()
-    // {
-    //     StartCoroutine(StartWaveCountdown(10f));
-    // }
+// IEnumerator StartWaveCountdown(float countdown)
+// {
+//     float timer = countdown;
 
-    // IEnumerator StartWaveCountdown(float countdown)
-    // {
-    //     float timer = countdown;
+//     while (timer > 0f)
+//     {
+//         int seconds = Mathf.CeilToInt(timer);
+//         UpdateUI($"NEXT WAVE IN {seconds}s", seconds / countdown, seconds);
 
-    //     while (timer > 0f)
-    //     {
-    //         int seconds = Mathf.CeilToInt(timer);
-    //         UpdateUI($"NEXT WAVE IN {seconds}s", seconds / countdown);
+//         yield return null;
+//         timer -= Time.deltaTime;
+//     }
 
-    //         yield return null;
-    //         timer -= Time.deltaTime;
-    //     }
-
-    //     UpdateUI("WAVE STARTED!", 0f);
-    // }
-
+//     UpdateUI("WAVE STARTED!", 0f);
+// }
