@@ -11,7 +11,7 @@ public class EnemiAI : MonoBehaviour
     public int damage = 10;
 
     private float lastAttackTime;
-
+    public Animator enemyAnimation;
 
 
     //
@@ -112,6 +112,6 @@ public class EnemiAI : MonoBehaviour
             target.TakeDamage(damage);
             lastAttackTime = Time.time;
         }
-        //enemyAnimation.SetTrigger("attack");
+        enemyAnimation.SetTrigger("attack");
     }
 }
