@@ -19,7 +19,7 @@ public class PlayerHealthSystem : BaseHealthSystem
     [Header("Movement Settings")]
     public float baseMoveSpeed = 5f;
     private float currentMoveSpeed;
-    public bool IsDown { get; private set; } = false;
+   
     public event System.Action<float, float> OnShieldChanged;
 
     protected override void Start()
@@ -81,9 +81,5 @@ public class PlayerHealthSystem : BaseHealthSystem
         EvenBus.PlayerDied();
         GameManager.Instance.ChangeState(GameManager.GameState.GameOver);
     }
-    public void Revive()
-    {
-        IsDown = false;
-        Debug.Log("✅ Player revived! HP = " + currentHealth + " Shield = " + currentShield);
-    }
+  
 }
