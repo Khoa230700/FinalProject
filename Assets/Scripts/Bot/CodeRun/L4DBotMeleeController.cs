@@ -21,83 +21,59 @@ public class L4DBotMeleeController : MonoBehaviour
 
     private void Start()
     {
-        animator = GetComponent<Animator>();
+        //animator = GetComponent<Animator>();
+        animator = GetComponentInChildren<Animator>();
         //agent.updateRotation = false; // Ta tự xử lý quay mặt
     }
 
     private void Update()
     {
-        NavMeshHit hit;
-        if (NavMesh.SamplePosition(transform.position, out hit, 5f, NavMesh.AllAreas))
+
+        float distToPlayer = Vector3.Distance(transform.position, player.position);
+        Debug.Log("Distance to Player: " + distToPlayer);
+
+        // 1. Nếu player còn xa → chạy lại gần player
+        if (distToPlayer > agent.stoppingDistance)
         {
-            transform.position = hit.position; // Đặt lại vị trí sát NavMesh gần nhất
+            agent.isStopped = false;
+            agent.SetDestination(player.position);
+            currentTarget = null;
+
+            Vector3 localVelocity = transform.InverseTransformDirection(agent.velocity);
+            animator.SetBool("isMoving", true);
+            animator.SetFloat("Horizontal", localVelocity.x);
+            animator.SetFloat("Vertical", localVelocity.z);
+            AudioBotManager.Instance.PlayBotSound();
+            return;
         }
-        EnsureOnNavMesh();
-        agent.SetDestination(player.position);
-    //    float distToPlayer = Vector3.Distance(transform.position, player.position);
-    //    Debug.Log("Distance to Player: " + distToPlayer);
-    //    Luôn chạy theo Player nếu quá xa
-    //    if (distToPlayer >= agent.stoppingDistance)
-    //    {
-    //        SafeStopAgent(false);
-    //        agent.SetDestination(player.position);
-    //        currentTarget = null;
 
-    //        if (!HasReachedDestination())
-    //        {
-    //            Vector3 localVelocity = transform.InverseTransformDirection(agent.velocity);
-    //            animator.SetBool("isMoving", true);
-    //            animator.SetFloat("Horizontal", localVelocity.x);
-    //            animator.SetFloat("Vertical", localVelocity.z);
-    //            AudioBotManager.Instance.PlayBotSound();
-    //        }
-    //        else
-    //        {
-    //            animator.SetFloat("Horizontal", 0f);
-    //            animator.SetFloat("Vertical", 0f);
-    //            animator.SetBool("isMoving", false);
-    //            AudioBotManager.Instance.StopBotSound();
-    //        }
+        // 2. Player đã gần → đứng yên cạnh player, chỉ phản ứng khi có zombie lọt vào tầm
+        currentTarget = FindNearestVisibleZombie();
 
-    //        return;
-    //    }
+        if (currentTarget != null)
+        {
+            float distToTarget = Vector3.Distance(transform.position, currentTarget.transform.position);
 
-    //    Nếu player gần → bắt đầu tìm zombie
-    //   currentTarget = FindNearestVisibleZombie();
-    //    if (currentTarget != null)
-    //    {
-    //        float distToTarget = Vector3.Distance(transform.position, currentTarget.transform.position);
-    //        if (distToTarget >= attackRange)
-    //        {
-    //            LẠI GẦN ZOMBIE
-    //                SafeStopAgent(false);
-    //            agent.SetDestination(currentTarget.transform.position);
-    //            Vector3 localVelocity = transform.InverseTransformDirection(agent.velocity);
-    //            animator.SetFloat("Horizontal", localVelocity.x);
-    //            animator.SetFloat("Vertical", localVelocity.z);
-    //            animator.SetBool("isMoving", true);
-    //            AudioBotManager.Instance.PlayBotSound();
-    //        }
-    //        else
-    //        {
-    //            TẤN CÔNG
-    //                SafeStopAgent(true);
-    //            transform.LookAt(new Vector3(currentTarget.transform.position.x, transform.position.y, currentTarget.transform.position.z));
-    //            animator.SetFloat("Horizontal", 0f);
-    //            animator.SetFloat("Vertical", 0f);
-    //            animator.SetBool("isMoving", false);
-    //            StartCoroutine(TriggerAttack());
+            if (distToTarget <= attackRange) // chỉ đánh khi zombie tự lại gần
+            {
+                agent.isStopped = true;
+                transform.LookAt(new Vector3(currentTarget.transform.position.x, transform.position.y, currentTarget.transform.position.z));
+                animator.SetBool("isMoving", false);
+                animator.SetFloat("Horizontal", 0f);
+                animator.SetFloat("Vertical", 0f);
+                StartCoroutine(TriggerAttack());
+                return;
+            }
+        }
 
-    //        }
-    //        return;
-    //    }
+        // 3. Không có zombie gần → đứng yên cạnh player
+        agent.isStopped = true;
+        animator.SetBool("isMoving", false);
+        animator.SetFloat("Horizontal", 0f);
+        animator.SetFloat("Vertical", 0f);
+        AudioBotManager.Instance.StopBotSound();
+    }
 
-    //    // Nếu không có zombie → đứng yên gần player
-    //    SafeStopAgent(true);
-    //    animator.SetBool("isMoving", false);
-
-    //}
-}
 
     private GameObject FindNearestVisibleZombie()
     {
@@ -144,7 +120,6 @@ public class L4DBotMeleeController : MonoBehaviour
             yield break;
 
         lastAttackTime = Time.time;
-
         AttackCombo = Random.Range(0, 3);
         animator.SetInteger("AttackCombo", AttackCombo);
         yield return null;
@@ -175,23 +150,5 @@ public class L4DBotMeleeController : MonoBehaviour
                agent.remainingDistance <= agent.stoppingDistance &&
                (!agent.hasPath || agent.velocity.sqrMagnitude < 0.01f);
     }
-    private void SafeStopAgent(bool stop)
-    {
-        if (agent != null && agent.isOnNavMesh)
-        {
-            agent.isStopped = stop;
-        }
-    }
-    void EnsureOnNavMesh()
-    {
-        if (agent != null && !agent.isOnNavMesh)
-        {
-            NavMeshHit hit;
-            if (NavMesh.SamplePosition(transform.position, out hit, 2f, NavMesh.AllAreas))
-            {
-                transform.position = hit.position;
-                agent.Warp(hit.position); // Teleport về đúng chỗ
-            }
-        }
-    }
+  
 }
