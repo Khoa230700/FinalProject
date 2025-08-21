@@ -1,10 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using Unity.Mathematics;
-using UnityEditor.Overlays;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -26,6 +23,7 @@ public class QuestManager : MonoBehaviour
     public Action<Quest> OnQuestStarted;
     public Action<Quest> OnQuestCompleted;
     public Action<Quest, QuestObjective> OnObjectiveUpdated;
+    public Action OnWaveSpawned;
 
     private void Awake()
     {
@@ -34,45 +32,41 @@ public class QuestManager : MonoBehaviour
 
     private void Start()
     {
-        if(allQuests == null) allQuests = Resources.LoadAll("Quests", typeof(QuestSO)).OfType<QuestSO>().ToList();
+        allQuests = Resources.LoadAll("Quests", typeof(QuestSO)).OfType<QuestSO>().ToList();
         LoadQuestData();
 
         if (autoStart) StartCoroutine(CheckAutoStartQuests());
+
+        OnWaveSpawned += WaveSpawned;
     }
 
     private void OnDestroy()
     {
         if (autoSave) SaveQuestData();
+
+        OnWaveSpawned -= WaveSpawned;
+    }
+
+    private void WaveSpawned()
+    {
+        StartCoroutine(CheckAutoStartQuests());
     }
 
     //KIỂM TRA CÁC QUEST AUTOSTART
     private IEnumerator CheckAutoStartQuests()
     {
-        yield return new WaitForSeconds(0.5f); //Đợi scene load
+        yield return new WaitForSeconds(0.5f);
 
         string currentScene = SceneManager.GetActiveScene().name;
 
-        //Tìm quét auto start cho scene hiện tại
-        var autoStartQuests = allQuests.Where(q => q.autoStart &&
-                                            (string.IsNullOrEmpty(q.autoStartScene) ||
-                                            q.autoStartScene == currentScene)).ToList();
+        var autoStartQuests = allQuests.Where(q =>
+            q.autoStart &&
+            (string.IsNullOrEmpty(q.autoStartScene) || q.autoStartScene == currentScene)
+        ).ToList();
 
         foreach (var questData in autoStartQuests)
         {
-            //Kiểm tra quest chưa được start và thỏa mãn điều kiện
-            if (!completedQuestIDs.Contains(questData.questID) &&
-                !activeQuests.Any(q => q.questSO.questID == questData.questID))
-            {
-                if (questData.autoStartDelay > 0)
-                {
-                    yield return new WaitForSeconds(questData.autoStartDelay);
-                }
-
-                if (CheckQuestRequirements(questData))
-                {
-                    StartQuest(questData.questID);
-                }
-            }
+            StartQuest(questData.questID);
         }
     }
 
@@ -138,17 +132,22 @@ public class QuestManager : MonoBehaviour
     public void CompleteQuest(Quest quest)
     {
         GiveRewards(quest);
+
+        quest.status = QuestStatus.Completed;
+        activeQuests.Remove(quest);
+        completedQuestIDs.Add(quest.questSO.questID);
+
         OnQuestCompleted?.Invoke(quest);
         Debug.Log($"Quest hoàn thành: <b>{quest.questSO.questName.ToUpper()}</b>");
+
+        if (autoSave) SaveQuestData();
+
+        OnWaveSpawned?.Invoke();
     }
 
     //TRAO THƯỞNG
     private void GiveRewards(Quest quest)
     {
-        quest.status = QuestStatus.Completed;
-        activeQuests.Remove(quest);
-        completedQuestIDs.Add(quest.questSO.questID);
-
         // Thêm EXP
         if (quest.questSO.expReward > 0)
         {
@@ -156,11 +155,10 @@ public class QuestManager : MonoBehaviour
             Debug.Log($"Nhận được {quest.questSO.expReward} EXP");
         }
 
-        // Thêm Gold
-        if (quest.questSO.goldReward > 0)
+        // Thêm Coin
+        if (quest.questSO.coinReward > 0)
         {
-            // PlayerManager.Instance.AddGold(questData.goldReward);
-            Debug.Log($"Nhận được {quest.questSO.goldReward} Gold");
+            CoinManager.Instance.AddCoins(quest.questSO.coinReward);
         }
     }
 

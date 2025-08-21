@@ -32,10 +32,56 @@ Transform:
   - {fileID: 2354836469984998929}
   - {fileID: 810474993195750317}
   - {fileID: 2365888808763273627}
+  - {fileID: 7215287233572224576}
   - {fileID: 6192540578478754620}
   - {fileID: 676928184531300377}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &5537525904628658975
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7215287233572224576}
+  - component: {fileID: 4059007056087667639}
+  m_Layer: 0
+  m_Name: CoinManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7215287233572224576
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5537525904628658975}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1223622880234178363}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4059007056087667639
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5537525904628658975}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5076a08faa5dea84f87d08734aa6d8fa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  currentCoins: 0
 --- !u!1001 &331635886478104472
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -223,6 +269,18 @@ PrefabInstance:
     - target: {fileID: 4573073199468110248, guid: 14df1f1b72d3ea9458667a83b59da1db, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8384407385408940040, guid: 14df1f1b72d3ea9458667a83b59da1db, type: 3}
+      propertyPath: sfxSounds.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8384407385408940040, guid: 14df1f1b72d3ea9458667a83b59da1db, type: 3}
+      propertyPath: sfxSounds.Array.data[2].clip
+      value: 
+      objectReference: {fileID: 8300000, guid: a88bbd03652790744aa2069effbae280, type: 3}
+    - target: {fileID: 8384407385408940040, guid: 14df1f1b72d3ea9458667a83b59da1db, type: 3}
+      propertyPath: sfxSounds.Array.data[2].name
+      value: Tick
       objectReference: {fileID: 0}
     - target: {fileID: 8692463403194364449, guid: 14df1f1b72d3ea9458667a83b59da1db, type: 3}
       propertyPath: m_Name
