@@ -49,7 +49,7 @@ public class EnemyM : MonoBehaviour
 
         yield return new WaitForSeconds(2f);
 
-        tracker?.OnDeath?.Invoke();
+        tracker?.OnDeath2?.Invoke();
         gameObject.SetActive(false);
     }
 
