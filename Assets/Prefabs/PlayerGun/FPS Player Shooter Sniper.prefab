@@ -1666,7 +1666,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &5782188107627114610
 Transform:
   m_ObjectHideFlags: 0
@@ -1725,7 +1725,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerStats: {fileID: 11400000, guid: 8606be53847325644b6794de9ebc91ad, type: 2}
-  csgoScope: {fileID: 0}
+  csgoScope: {fileID: 5506603170031170302}
 --- !u!114 &8544334847368187436
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1758,7 +1758,7 @@ MonoBehaviour:
   crosshairManager: {fileID: 0}
   weaponList:
   - {fileID: 1559585607835018549}
-  - {fileID: 0}
+  - {fileID: 4538897647001835457}
 --- !u!114 &3333216709070746405
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1766,7 +1766,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2393662489545346051}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ea983425b7ed1df41b6144159dd331fb, type: 3}
   m_Name: 
@@ -1788,7 +1788,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2393662489545346051}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 006da952c04e82a4e8caf19e99cae503, type: 3}
   m_Name: 
@@ -2249,6 +2249,8 @@ GameObject:
   - component: {fileID: 6735874983057613581}
   - component: {fileID: 4599666131355921185}
   - component: {fileID: 8987884527693232970}
+  - component: {fileID: 6418266595371665982}
+  - component: {fileID: 1259983044333161423}
   m_Layer: 0
   m_Name: PlayerScriptHandGun
   m_TagString: Untagged
@@ -2284,7 +2286,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   armsAnimator: {fileID: 2228220168125291594}
-  playerMovement: {fileID: 0}
+  playerMovement: {fileID: 8575215206317879289}
   playerShoot: {fileID: 8987884527693232970}
 --- !u!114 &8987884527693232970
 MonoBehaviour:
@@ -2303,9 +2305,44 @@ MonoBehaviour:
   armsAnimator: {fileID: 2228220168125291594}
   weaponUI: {fileID: 0}
   csgoScope: {fileID: 0}
-  muzzleFlashParticle: {fileID: 0}
+  muzzleFlashParticle: {fileID: 198481540338831756, guid: 49aa1d4c5624e66418cbfbe9784d6f23, type: 3}
   currentAmmo: 0
   reserveAmmo: 0
+--- !u!95 &6418266595371665982
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3017086631067894870}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 0}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &1259983044333161423
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3017086631067894870}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d6a8a70bdebd564983c289b53988cb4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerShoot: {fileID: 8987884527693232970}
 --- !u!1 &3174400239139745003
 GameObject:
   m_ObjectHideFlags: 0
@@ -2792,6 +2829,8 @@ GameObject:
   - component: {fileID: 7724663403961437395}
   - component: {fileID: 2709914288158444020}
   - component: {fileID: 186762147422348795}
+  - component: {fileID: 5748523995275120256}
+  - component: {fileID: 6622687071838135418}
   m_Layer: 0
   m_Name: PlayerScriptSnipe
   m_TagString: Untagged
@@ -2827,7 +2866,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   armsAnimator: {fileID: 7737834752848102791}
-  playerMovement: {fileID: 0}
+  playerMovement: {fileID: 8575215206317879289}
   playerShoot: {fileID: 186762147422348795}
 --- !u!114 &186762147422348795
 MonoBehaviour:
@@ -2845,10 +2884,45 @@ MonoBehaviour:
   shootPoint: {fileID: 1547085161081651443}
   armsAnimator: {fileID: 7737834752848102791}
   weaponUI: {fileID: 0}
-  csgoScope: {fileID: 0}
+  csgoScope: {fileID: 5506603170031170302}
   muzzleFlashParticle: {fileID: 0}
   currentAmmo: 0
   reserveAmmo: 0
+--- !u!95 &5748523995275120256
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4316861964416297682}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 0}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &6622687071838135418
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4316861964416297682}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d6a8a70bdebd564983c289b53988cb4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerShoot: {fileID: 186762147422348795}
 --- !u!1 &4387964970173615564
 GameObject:
   m_ObjectHideFlags: 0
@@ -2875,7 +2949,7 @@ Transform:
   m_GameObject: {fileID: 4387964970173615564}
   serializedVersion: 2
   m_LocalRotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: -0, y: 0.17838714, z: 0.2709468}
+  m_LocalPosition: {x: -0, y: 0.227, z: 0.34}
   m_LocalScale: {x: 1.6221849, y: 1.6221849, z: 1.6221849}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4160,6 +4234,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5530440991906503931}
   - component: {fileID: 5506603170031170302}
+  - component: {fileID: 6064994175220001128}
   m_Layer: 0
   m_Name: Scope
   m_TagString: Untagged
@@ -4199,6 +4274,22 @@ MonoBehaviour:
   playerShoot: {fileID: 186762147422348795}
   scopedFOV: 10
   zoomSpeed: 8
+--- !u!114 &6064994175220001128
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5933912962101103974}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 05af1c85df2c37a4fb30fc63aae73dac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mainCamera: {fileID: 6698248995052356686}
+  scopeLens: {fileID: 4128772428749821544}
+  scopeOverlayUI: {fileID: 424012912021214882}
+  csgoScope: {fileID: 5506603170031170302}
 --- !u!1 &5982616735339148963
 GameObject:
   m_ObjectHideFlags: 0
@@ -6163,7 +6254,7 @@ Transform:
   m_GameObject: {fileID: 9126336712150412277}
   serializedVersion: 2
   m_LocalRotation: {x: -0.94255656, y: -0.0602199, z: -0.3237069, w: 0.056342993}
-  m_LocalPosition: {x: -0.39058006, y: -0.26261413, z: 0.4033068}
+  m_LocalPosition: {x: -0.2044, y: -0.248, z: 0.272}
   m_LocalScale: {x: 1.6221877, y: 1.6221817, z: 1.6221875}
   m_ConstrainProportionsScale: 0
   m_Children: []
