@@ -32,7 +32,7 @@ public class L4DBotController : MonoBehaviour
        
         fireCooldown -= Time.deltaTime;
         float distToPlayer = Vector3.Distance(transform.position, player.position);
-        Debug.Log("Distance to Player: " + distToPlayer);
+        // Debug.Log("Distance to Player: " + distToPlayer);
         // Nếu player quá xa thì chạy theo player, không bắn
         if (distToPlayer > agent.stoppingDistance )
         {
