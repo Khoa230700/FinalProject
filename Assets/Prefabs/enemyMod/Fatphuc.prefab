@@ -989,6 +989,7 @@ GameObject:
   - component: {fileID: 2627525649373999735}
   - component: {fileID: 7253536405624064325}
   - component: {fileID: -6100191757446191242}
+  - component: {fileID: -7673066498880708693}
   m_Layer: 2
   m_Name: Fatphuc
   m_TagString: Untagged
@@ -2727,6 +2728,18 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 112
   m_CollisionDetection: 0
+--- !u!114 &-7673066498880708693
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2428255698981894573}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bfb390852452ce84f8cf4791c7405347, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2514346375837288734
 GameObject:
   m_ObjectHideFlags: 0
