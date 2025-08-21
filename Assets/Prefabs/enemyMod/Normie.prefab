@@ -1264,6 +1264,7 @@ GameObject:
   - component: {fileID: 7891509131991545629}
   - component: {fileID: 639718399531827442}
   - component: {fileID: -4696093054594487209}
+  - component: {fileID: -3733984237469163191}
   m_Layer: 0
   m_Name: Normie
   m_TagString: Enemy
@@ -2717,7 +2718,7 @@ NavMeshAgent:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3738223141133144338}
   m_Enabled: 1
-  m_AgentTypeID: -334000983
+  m_AgentTypeID: 0
   m_Radius: 0.5
   m_Speed: 4
   m_Acceleration: 2
@@ -2769,15 +2770,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0a5bf044ded3e4478520fc37655c4a5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  player: {fileID: 0}
-  maxHealth: 100
-  currentHealth: 0
-  attackDamage: 15
-  attackSpeed: 1.5
+  attackRange: 2.5
   attackCooldown: 1.5
-  attackRange: 2
-  chaseRange: 40
-  detectionRadius: 50
+  damage: 10
+  enemyAnimation: {fileID: 4440705263268147471}
+  detectionRadius: 100
   moveSpeed: 4
   targetLayer:
     serializedVersion: 2
@@ -2822,8 +2819,20 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 0
+  m_Constraints: 112
   m_CollisionDetection: 0
+--- !u!114 &-3733984237469163191
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3738223141133144338}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bfb390852452ce84f8cf4791c7405347, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &3777046724730365686
 GameObject:
   m_ObjectHideFlags: 0
