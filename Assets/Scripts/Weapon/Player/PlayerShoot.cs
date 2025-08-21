@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class PlayerShoot : MonoBehaviour
+public class PlayerShoot : MonoBehaviour, IWeapon, IReloadable
 {
     [Header("Data & References")]
     public GunData gunData;
@@ -10,7 +10,7 @@ public class PlayerShoot : MonoBehaviour
     public WeaponUI weaponUI;
 
     [Header("Aiming")]
-    public CSGOScope csgoScope;               // Kéo thả trong Inspector nếu có scope
+    public CSGOScope csgoScope;
 
     [SerializeField] private ParticleSystem muzzleFlashParticle;
 
@@ -31,6 +31,48 @@ public class PlayerShoot : MonoBehaviour
 
     public bool IsReadyToShoot { get; private set; } = true;
 
+    // --------- IWeapon adapters ---------
+    public void OnSelected(WeaponUI ui)
+    {
+        weaponUI = ui;
+        if (weaponUI != null)
+        {
+            weaponUI.gunData = gunData;
+            weaponUI.SetWeaponSprite(gunData.gunSprite);
+            weaponUI.SetFireMode(gunData.fireMode);
+            weaponUI.CreateBulletUI();
+            weaponUI.UpdateAmmoUI(currentAmmo, reserveAmmo);
+        }
+        // Nếu bạn có CrosshairUI, set tại đây từ gunData.crosshairData
+        // crosshairManager?.SetCrosshairData(gunData.crosshairData);
+    }
+
+    public void OnDeselected() { /* không cần gì thêm */ }
+
+    public void StartFiring() => StartShooting();
+    public void StopFiring() => StopShooting();
+    public void FireOnce() => ShootOneBullet();
+
+    public Coroutine SwitchOut(MonoBehaviour runner)
+        => runner.StartCoroutine(SwitchOutRoutine());
+    public Coroutine SwitchIn(MonoBehaviour runner)
+        => runner.StartCoroutine(SwitchInRoutine());
+
+    private IEnumerator SwitchOutRoutine()
+    {
+        IsSwitchingWeapon = true;
+        armsAnimator.SetTrigger("Hide");
+        yield return new WaitForSeconds(0.3f);
+    }
+
+    private IEnumerator SwitchInRoutine()
+    {
+        armsAnimator.SetTrigger("Get");
+        yield return new WaitForSeconds(0.3f);
+        IsSwitchingWeapon = false;
+    }
+    // --------- /IWeapon adapters ---------
+
     public void StartShooting()
     {
         if (!IsShooting)
@@ -42,7 +84,6 @@ public class PlayerShoot : MonoBehaviour
         if (IsShooting)
         {
             IsShooting = false;
-            // Nếu đang scoped thì về AimingIdle, còn lại về Idle
             if (csgoScope != null && csgoScope.IsScoped)
                 armsAnimator.CrossFade("AimingIdle", 0.08f);
             else
@@ -57,7 +98,6 @@ public class PlayerShoot : MonoBehaviour
 
         currentAmmo--;
 
-        // Chọn animation tùy scoped hay không
         bool scoped = (csgoScope != null && csgoScope.IsScoped);
         string anim = scoped ? "AimingShot" : "Shot";
         armsAnimator.SetBool("Walk", false);
@@ -68,15 +108,12 @@ public class PlayerShoot : MonoBehaviour
         if (gunData.shootSound != null)
             AudioSource.PlayClipAtPoint(gunData.shootSound, shootPoint.position);
 
-        int count = (gunData.gunType == GunType.Shotgun)
-                    ? gunData.pelletCount
-                    : 1;
-
+        int count = (gunData.gunType == GunType.Shotgun) ? gunData.pelletCount : 1;
         for (int i = 0; i < count; i++)
         {
             Vector3 dir = (count == 1)
-                          ? shootPoint.forward
-                          : GetSpreadDirection(shootPoint.forward, gunData.spreadAngle);
+                ? shootPoint.forward
+                : GetSpreadDirection(shootPoint.forward, gunData.spreadAngle);
 
             Ray ray = new Ray(shootPoint.position, dir);
             if (Physics.Raycast(ray, out RaycastHit hit, gunData.range))
@@ -107,9 +144,8 @@ public class PlayerShoot : MonoBehaviour
 
     private IEnumerator ResetShotAnimation()
     {
-        // Đợi clip "Shot" hoặc "AimingShot" kết thúc
         while (!armsAnimator.GetCurrentAnimatorStateInfo(0).IsName("Shot")
-               && !armsAnimator.GetCurrentAnimatorStateInfo(0).IsName("AimingShot"))
+            && !armsAnimator.GetCurrentAnimatorStateInfo(0).IsName("AimingShot"))
             yield return null;
 
         float wait = armsAnimator.GetCurrentAnimatorStateInfo(0).length
@@ -117,14 +153,9 @@ public class PlayerShoot : MonoBehaviour
         yield return new WaitForSeconds(wait);
 
         if (csgoScope != null && csgoScope.IsScoped)
-        {
-            // Giữ AimingIdle giữa các shot khi scoped
             armsAnimator.CrossFade("AimingIdle", 0.08f);
-        }
         else if (!Input.GetMouseButton(0) || gunData.fireMode != GunFireMode.FullAuto)
-        {
             StopShooting();
-        }
     }
 
     public void Reload()
@@ -154,19 +185,5 @@ public class PlayerShoot : MonoBehaviour
         isReloading = false;
         armsAnimator.ResetTrigger("Recharge");
         armsAnimator.SetTrigger("Idle");
-    }
-
-    public IEnumerator SwitchOut()
-    {
-        IsSwitchingWeapon = true;
-        armsAnimator.SetTrigger("Hide");
-        yield return new WaitForSeconds(0.3f);
-    }
-
-    public IEnumerator SwitchIn()
-    {
-        armsAnimator.SetTrigger("Get");
-        yield return new WaitForSeconds(0.3f);
-        IsSwitchingWeapon = false;
     }
 }
