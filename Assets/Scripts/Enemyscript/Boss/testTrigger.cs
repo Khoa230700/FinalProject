@@ -12,7 +12,7 @@ public class testTrigger : MonoBehaviour
             var health = other.GetComponent<testPlayerHealth>();
             if (health != null)
             {
-                health.TakeDamage(damagePerSecond * Time.deltaTime);
+                //health.TakeDamage(damagePerSecond * Time.deltaTime);
                 //health.TakeDamage(10);
             }
         }
