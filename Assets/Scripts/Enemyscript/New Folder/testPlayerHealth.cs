@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class testPlayerHealth : MonoBehaviour
+public class testPlayerHealth : MonoBehaviour, IDamageable
 {
     public float maxHealth = 100f;
     public float currentHealth;
