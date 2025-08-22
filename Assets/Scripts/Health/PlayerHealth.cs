@@ -14,7 +14,7 @@ public class PlayerHealth : HealthBase
     [Header("References")]
     [SerializeField] private BarUI barUI;
     [SerializeField] private PlayerShield shield;
-
+    public bool IsDown { get; private set; } = false;
     private Coroutine regenRoutine;
 
     protected override void Start()
@@ -81,5 +81,10 @@ public class PlayerHealth : HealthBase
     private void UpdateUI()
     {
         barUI.SetValue(currentHealth);
+    }
+    public void Revive()
+    {
+        IsDown = false;
+        Debug.Log("✅ Player revived! HP = " + currentHealth );
     }
 }
