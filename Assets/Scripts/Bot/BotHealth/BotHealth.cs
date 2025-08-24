@@ -2,7 +2,7 @@ using System.Collections;
 using UnityEngine;
 using static UnityEngine.Rendering.DebugUI;
 
-public class BotHealth : HealthBase , IDamageInter
+public class BotHealth : HealthBase , IDamageable
 {
     [Header("Regeneration")]
     public bool useRegen;
@@ -18,31 +18,31 @@ public class BotHealth : HealthBase , IDamageInter
         shield ??= GetComponent<BotShield>();
     }
 
-    //* Nh?n sát th??ng qua lá ch?n và tính toán sát th??ng còn l?i, thêm kh? n?ng xuyên lá ch?n , thêm vào ?i?m va ch?m
+    //* Nh?n sï¿½t th??ng qua lï¿½ ch?n vï¿½ tï¿½nh toï¿½n sï¿½t th??ng cï¿½n l?i, thï¿½m kh? n?ng xuyï¿½n lï¿½ ch?n , thï¿½m vï¿½o ?i?m va ch?m
     public override void TakeDamage(float damage, float penetrationPercent = 0f, Vector3 hitPoint = default)
     {
-        //* Kh?i ??ng tái t?o khi nh?n sát th??ng
+        //* Kh?i ??ng tï¿½i t?o khi nh?n sï¿½t th??ng
         if (regenRoutine != null) StopCoroutine(regenRoutine);
         if (useRegen) regenRoutine = StartCoroutine(RegenRoutine());
 
         penetrationPercent = Mathf.Clamp01(penetrationPercent / 100f);
 
-        float damageThroughShield = damage * (1f - penetrationPercent); //* Sát th??ng vào lá ch?n
-        float damageBypassShield = damage * penetrationPercent; //* Sát th??ng xuyên qua lá ch?n
-        float leftoverDamage = (shield != null && shield.HasShield()) //* Sát th??ng còn l?i sau khi lá ch?n h?p th?
+        float damageThroughShield = damage * (1f - penetrationPercent); //* Sï¿½t th??ng vï¿½o lï¿½ ch?n
+        float damageBypassShield = damage * penetrationPercent; //* Sï¿½t th??ng xuyï¿½n qua lï¿½ ch?n
+        float leftoverDamage = (shield != null && shield.HasShield()) //* Sï¿½t th??ng cï¿½n l?i sau khi lï¿½ ch?n h?p th?
         ? shield.TakeDamage(damageThroughShield)
             : damageThroughShield;
 
-        float finalHealthDamage = leftoverDamage + damageBypassShield; //* T?ng sát th??ng vào máu
+        float finalHealthDamage = leftoverDamage + damageBypassShield; //* T?ng sï¿½t th??ng vï¿½o mï¿½u
 
-        OnTakeDamage?.Invoke(-finalHealthDamage, hitPoint); //* G?i s? ki?n khi MÁU nh?n sát th??ng
-        //OnTakeDamage?.Invoke(-damage, hitPoint); //* G?i s? ki?n khi nh?n sát th??ng
+        OnTakeDamage?.Invoke(-finalHealthDamage, hitPoint); //* G?i s? ki?n khi Mï¿½U nh?n sï¿½t th??ng
+        //OnTakeDamage?.Invoke(-damage, hitPoint); //* G?i s? ki?n khi nh?n sï¿½t th??ng
 
         UpdateHealth(-finalHealthDamage);
 
     }
 
-    //* Tái t?o máu theo th?i gian
+    //* Tï¿½i t?o mï¿½u theo th?i gian
     private IEnumerator RegenRoutine()
     {
         yield return new WaitForSeconds(regenDelay);
@@ -58,7 +58,7 @@ public class BotHealth : HealthBase , IDamageInter
         regenRoutine = null;
     }
 
-    //* H?i máu (+ h?i, - tr?)
+    //* H?i mï¿½u (+ h?i, - tr?)
     protected override void UpdateHealth(float amount)
     {
         currentHealth = Mathf.Clamp(currentHealth + amount, 0, maxHealth);
@@ -73,7 +73,7 @@ public class BotHealth : HealthBase , IDamageInter
         Debug.Log("Die!");
     }
 
-    public void TakeDamage(int amount)
+    public void TakeDamage(float amount)
     {
        
     }

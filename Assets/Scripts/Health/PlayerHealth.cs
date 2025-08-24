@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-public class PlayerHealth : HealthBase
+public class PlayerHealth : HealthBase, IDamageable
 {
     [Header("Regeneration")]
     public bool useRegen;
@@ -21,6 +21,11 @@ public class PlayerHealth : HealthBase
     {
         base.Start();
         shield ??= GetComponent<PlayerShield>();
+    }
+
+    public void TakeDamage(float amount)
+    {
+        TakeDamage(amount,0f,Vector3.zero);
     }
 
     //* Nhận sát thương qua lá chắn và tính toán sát thương còn lại, thêm khả năng xuyên lá chắn , thêm vào điểm va chạm
