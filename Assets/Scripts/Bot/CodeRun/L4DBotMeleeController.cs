@@ -30,7 +30,7 @@ public class L4DBotMeleeController : MonoBehaviour
     {
 
         float distToPlayer = Vector3.Distance(transform.position, player.position);
-        Debug.Log("Distance to Player: " + distToPlayer);
+        // Debug.Log("Distance to Player: " + distToPlayer);
 
         // 1. Nếu player còn xa → chạy lại gần player
         if (distToPlayer > agent.stoppingDistance)
