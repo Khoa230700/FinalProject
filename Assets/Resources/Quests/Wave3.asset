@@ -10,30 +10,38 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 19c1a55a65e88f44280c5bd48b9fe731, type: 3}
-  m_Name: Test2
+  m_Name: Wave3
   m_EditorClassIdentifier: 
-  questID: Test2
-  questName: Test2
-  description: Test2
+  questID: K7db0596a-3709-496b-9098-42c293b829e1
+  questName: Kill all enemies!
+  description: 
   objectives:
   - objectiveID: 
-    description: Collect
-    type: 1
-    targetID: Collect
+    description: Kill Normie
+    type: 0
+    targetID: Normie
     currentAmount: 0
-    requiredAmount: 1
+    requiredAmount: 25
     isCompleted: 0
   - objectiveID: 
-    description: Collect
-    type: 1
-    targetID: Collect
+    description: Kill Fatphuc
+    type: 0
+    targetID: Fatphuc
+    currentAmount: 0
+    requiredAmount: 6
+    isCompleted: 0
+  - objectiveID: 
+    description: Kill Tail
+    type: 0
+    targetID: Tail
     currentAmount: 0
     requiredAmount: 4
     isCompleted: 0
   prerequisiteQuests:
-  - {fileID: 11400000, guid: a419b6c536f9cb94682bbd71609ab6c8, type: 2}
+  - {fileID: 11400000, guid: 8bb333312c9e7114196dcb20a68f918c, type: 2}
+  - {fileID: 11400000, guid: 727e957bbf5f1144eb47cd77a82bab4d, type: 2}
   requiredLevel: 1
   expReward: 0
-  coinReward: 2000
+  coinReward: 1000
   autoStart: 1
-  autoStartScene: InGame
+  autoStartScene: SceneMainGame

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-public class PlayerHealth : HealthBase
+public class PlayerHealth : HealthBase, IDamageable
 {
     [Header("Regeneration")]
     public bool useRegen;
@@ -14,13 +14,18 @@ public class PlayerHealth : HealthBase
     [Header("References")]
     [SerializeField] private BarUI barUI;
     [SerializeField] private PlayerShield shield;
-
+    public bool IsDown { get; private set; } = false;
     private Coroutine regenRoutine;
 
     protected override void Start()
     {
         base.Start();
         shield ??= GetComponent<PlayerShield>();
+    }
+
+    public void TakeDamage(float amount)
+    {
+        TakeDamage(amount,0f,Vector3.zero);
     }
 
     //* Nhận sát thương qua lá chắn và tính toán sát thương còn lại, thêm khả năng xuyên lá chắn , thêm vào điểm va chạm
@@ -81,5 +86,10 @@ public class PlayerHealth : HealthBase
     private void UpdateUI()
     {
         barUI.SetValue(currentHealth);
+    }
+    public void Revive()
+    {
+        IsDown = false;
+        Debug.Log("✅ Player revived! HP = " + currentHealth );
     }
 }

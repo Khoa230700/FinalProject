@@ -6,7 +6,7 @@ public class BombBotAI : MonoBehaviour
     protected Rigidbody rb;
     protected CapsuleCollider capsuleCollider;
     protected Animator animator;
-    protected float speed = 2f;
+    protected float speed = 5f;
     protected float cooldownBeaten;
     private bool isWalking = true;
 
@@ -47,7 +47,7 @@ public class BombBotAI : MonoBehaviour
     }
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Enemy"))
+        if (other.CompareTag("Enemy") )
         {
             isWalking = false;
             //rb.isKinematic = true; 
@@ -66,21 +66,6 @@ public class BombBotAI : MonoBehaviour
             }
         }
     }
-    ////private GameObject FindNearestEnemy()
-    //{
-    //    GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
-    //    GameObject nearestEnemy = null;
-    //    float minDistance = Mathf.Infinity;
-    //    foreach (GameObject enemy in enemies)
-    //    {
-    //        float distance = Vector3.Distance(transform.position, enemy.transform.position);
-    //        if (distance < minDistance)
-    //        {
-    //            minDistance = distance;
-    //            nearestEnemy = enemy;
-    //        }
-    //    }
-    //    return nearestEnemy;
-    //}
+   
 }
 

@@ -29,7 +29,7 @@ public class EnemyM : MonoBehaviour
     public void TakeDamage(float amount)
     {
         if (isDead) return;
-        Debug.Log(currentHealth);
+        // Debug.Log(currentHealth);
 
         currentHealth -= amount;
         currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
@@ -49,7 +49,7 @@ public class EnemyM : MonoBehaviour
 
         yield return new WaitForSeconds(2f);
 
-        tracker?.OnDeath?.Invoke();
+        tracker?.OnDeath2?.Invoke();
         gameObject.SetActive(false);
     }
 
