@@ -186,4 +186,11 @@ public class PlayerShoot : MonoBehaviour, IWeapon, IReloadable
         armsAnimator.ResetTrigger("Recharge");
         armsAnimator.SetTrigger("Idle");
     }
+
+    //SHOP
+    public void Refill()
+    {
+        reserveAmmo = gunData.reserveAmmo;
+        currentAmmo = gunData.magazineSize;
+    }
 }
