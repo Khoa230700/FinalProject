@@ -47,7 +47,6 @@ public class GunData : ScriptableObject
     public float scopeZoom = 10f;
 
     [Header("UI & Effects")]
-    public CrosshairData crosshairData;      // Data cho crosshair UI
     public GameObject tracerPrefab;
     public AudioClip shootSound;
 }
