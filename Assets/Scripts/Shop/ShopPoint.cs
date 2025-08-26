@@ -12,18 +12,18 @@ public class ShopPoint : MonoBehaviour
 
     private bool playerInRange = false;
     private Transform player;
+    private Coroutine pathCoroutine;
 
     void OnEnable()
     {
-        StartCoroutine(PathLoop());
+        player = GameObject.FindGameObjectWithTag("Player").transform;
+        pathCoroutine = StartCoroutine(PathLoop());
     }
 
     private void Start()
     {
         if (shopUI == null)
             shopUI = FindAnyObjectByType<ShopUI>();
-
-        player = GameObject.FindGameObjectWithTag("Player").transform;
     }
 
     private void Update()
@@ -40,6 +40,7 @@ public class ShopPoint : MonoBehaviour
         {
             playerInRange = true;
             shopNotification.SetActive(true);
+            if(pathCoroutine != null) StopCoroutine(pathCoroutine);
         }
     }
 
@@ -50,7 +51,8 @@ public class ShopPoint : MonoBehaviour
             playerInRange = false;
             shopNotification.SetActive(false);
 
-            if (shopUI.IsOpen) shopUI.Hide();
+            if (shopUI.isOpen) shopUI.Hide();
+            if(pathCoroutine != null) pathCoroutine = StartCoroutine(PathLoop());
         }
     }
 

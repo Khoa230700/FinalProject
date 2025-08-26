@@ -13,7 +13,8 @@ MonoBehaviour:
   m_Name: Axe
   m_EditorClassIdentifier: 
   weaponName: Axe
-  weaponSprite: {fileID: 21300000, guid: d5a67aafeb80e2740b1fd5833bd546ab, type: 3}
+  weaponSprite: {fileID: 21300000, guid: 75386887422a8a547a9a08db92dbc90c, type: 3}
+  weaponSpriteFullColor: {fileID: 21300000, guid: 792184f92e74bb745b43f5e135106cf5, type: 3}
   baseDamage: 1
   baseRange: 1
   baseRadius: 5
@@ -28,7 +29,7 @@ MonoBehaviour:
   animSwings:
   - Attack_1
   - Attack_2
-  animSwing: Attack_1
+  animSwing: w
   swingSfx: {fileID: 0}
   hitSfx: {fileID: 0}
   damageByLevel:

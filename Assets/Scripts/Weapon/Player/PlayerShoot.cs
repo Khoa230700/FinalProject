@@ -22,18 +22,22 @@ public class PlayerShoot : MonoBehaviour, IWeapon, IReloadable
 
     private Coroutine shotResetCoroutine;
 
-    private int _lastShotFrame = -1;
+    private bool initialized = false;
+
+    public void Initialize()
+    {
+        if (initialized) return;
+        currentAmmo = gunData.magazineSize;
+        reserveAmmo = gunData.reserveAmmo;
+        initialized = true;
+    }
 
     void Start()
     {
-        currentAmmo = gunData.magazineSize;
-        reserveAmmo = gunData.reserveAmmo;
+        Initialize();
         weaponUI?.UpdateAmmoUI(currentAmmo, reserveAmmo);
     }
 
-    /// <summary>
-    /// Gate to throttle semi-auto weapons (e.g., sniper) to respect a minimum interval between shots.
-    /// </summary>
     public bool IsReadyToShoot { get; private set; } = true;
 
     // --------- IWeapon adapters ---------
@@ -98,16 +102,8 @@ public class PlayerShoot : MonoBehaviour, IWeapon, IReloadable
 
     public void ShootOneBullet()
     {
-        if (PauseGameUI.isPause || isReloading || currentAmmo <= 0) return;
-
-        // Chặn gọi trùng trong cùng frame
-        if (Time.frameCount == _lastShotFrame) return;
-        _lastShotFrame = Time.frameCount;
-
-        if (!IsReadyToShoot) return;
-
-        // Đặt cờ khóa ngay lập tức để tránh race
-        IsReadyToShoot = false;
+        if (PauseGameUI.isPause || isReloading || currentAmmo <= 0)
+            return;
 
         currentAmmo--;
 
@@ -146,24 +142,6 @@ public class PlayerShoot : MonoBehaviour, IWeapon, IReloadable
 
         if (shotResetCoroutine != null) StopCoroutine(shotResetCoroutine);
         shotResetCoroutine = StartCoroutine(ResetShotAnimation());
-
-        // Cooldown SemiAuto (sniper ~1s)
-        float cooldown = 0f;
-        if (gunData.fireMode == GunFireMode.SemiAuto)
-        {
-            cooldown = gunData.semiAutoMinInterval;
-            if (gunData.gunType == GunType.SniperRifle && cooldown <= 0f)
-                cooldown = 1f;
-        }
-        StartCoroutine(ShotCooldown(cooldown));
-    }
-
-    private IEnumerator ShotCooldown(float t)
-    {
-        //IsReadyToShoot = false;
-        // IsReadyToShoot đã false ở trên
-        if (t > 0f) yield return new WaitForSeconds(t);
-        IsReadyToShoot = true;
     }
 
     private Vector3 GetSpreadDirection(Vector3 forward, float angle)
@@ -216,5 +194,47 @@ public class PlayerShoot : MonoBehaviour, IWeapon, IReloadable
         isReloading = false;
         armsAnimator.ResetTrigger("Recharge");
         armsAnimator.SetTrigger("Idle");
+    }
+
+    //SHOP
+    public int AddAmmo(int amount)
+    {
+        if (amount <= 0) return 0;
+
+        int bulletsAdded = 0;
+
+        // Add to currentAmmo
+        int magazineSpace = gunData.magazineSize - currentAmmo;
+        int toMagazine = Mathf.Min(amount, magazineSpace);
+        currentAmmo += toMagazine;
+        bulletsAdded += toMagazine;
+        amount -= toMagazine;
+
+        // Add to reserveAmmo
+        if (amount > 0)
+        {
+            int reserveSpace = gunData.reserveAmmo - reserveAmmo;
+            int toReserve = Mathf.Min(amount, reserveSpace);
+            reserveAmmo += toReserve;
+            bulletsAdded += toReserve;
+        }
+
+        weaponUI?.UpdateAmmoUI(currentAmmo, reserveAmmo);
+
+        Debug.Log($"Added {bulletsAdded} bullets to {gunData.name}. Current: {currentAmmo}/{gunData.magazineSize}, Reserve: {reserveAmmo}/{gunData.reserveAmmo}");
+
+        return bulletsAdded;
+    }
+
+    public bool NeedsRefill()
+    {
+        return currentAmmo < gunData.magazineSize || reserveAmmo < gunData.reserveAmmo;
+    }
+
+    public int GetAmmoNeeded()
+    {
+        int currentAmmoNeeded = gunData.magazineSize - currentAmmo;
+        int reserveAmmoNeeded = gunData.reserveAmmo - reserveAmmo;
+        return currentAmmoNeeded + reserveAmmoNeeded;
     }
 }

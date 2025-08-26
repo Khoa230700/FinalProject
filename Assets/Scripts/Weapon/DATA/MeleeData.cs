@@ -6,6 +6,7 @@ public class MeleeData : ScriptableObject
     [Header("Identity/UI")]
     public string weaponName = "Knife";
     public Sprite weaponSprite;
+    public Sprite weaponSpriteFullColor;
 
     [Header("Core Stats")]
     public float baseDamage = 40f;
