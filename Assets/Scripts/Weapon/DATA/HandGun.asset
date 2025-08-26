@@ -14,23 +14,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gunName: HandGun
   gunType: 0
+  gunSlot: 1
+  gunSprite: {fileID: 21300000, guid: 5737e13576346fd45ac90d4848cd0023, type: 3}
+  gunSpriteFullColor: {fileID: 21300000, guid: 0b9c5e089d0e39f4abca228e3d8f5317, type: 3}
   damage: 1
   range: 10
+  pelletCount: 1
+  spreadAngle: 0
   roundsPerSecond: 1
-  accuracy: 1
+  burstCount: 3
+  burstFireRate: 0.1
+  burstCooldown: 0.3
+  fireMode: 0
+  availableFireModes: 00000000
   magazineSize: 7
   reserveAmmo: 30
   reloadTime: 1.5
-  fireMode: 0
-  availableFireModes: 00000000
-  recoil: 5
-  bulletSpeed: 4
-  penetrationPower: 4
-  weight: 4
-  gunSprite: {fileID: 21300000, guid: 91dea8ec0cf657d4e95f33dba2fb7e0a, type: 3}
-  bulletPrefab: {fileID: 6749693277989217856, guid: dfcafcdd61ac0e447b7e869afc9b8d0c, type: 3}
-  shootSound: {fileID: 0}
-  tracerPrefab: {fileID: 6749693277989217856, guid: dfcafcdd61ac0e447b7e869afc9b8d0c, type: 3}
   hasScope: 0
   scopeZoom: 0
   crosshairData:
@@ -46,3 +45,5 @@ MonoBehaviour:
       jumpScale: 1.8
       bounceSize: 2
       moveSpeed: 3
+  tracerPrefab: {fileID: 6749693277989217856, guid: dfcafcdd61ac0e447b7e869afc9b8d0c, type: 3}
+  shootSound: {fileID: 0}
