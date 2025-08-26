@@ -16,6 +16,7 @@ public class EquipDescriptionsUI : MonoBehaviour
     [SerializeField] private PropertyUI magSizeUI;
     [SerializeField] private PropertyUI speedUI;
     [SerializeField] private PropertyUI reloadUI;
+    [SerializeField] private PropertyUI reserveUI;
 
     [Header("Action Buttons")]
     [SerializeField] private Button refillButton;
@@ -73,6 +74,7 @@ public class EquipDescriptionsUI : MonoBehaviour
         magSizeUI.gameObject.SetActive(true);
         speedUI.gameObject.SetActive(true);
         reloadUI.gameObject.SetActive(true);
+        reserveUI.gameObject.SetActive(false);
     }
 
     public void HideDescription()
@@ -89,6 +91,7 @@ public class EquipDescriptionsUI : MonoBehaviour
         magSizeUI.gameObject.SetActive(false);
         speedUI.gameObject.SetActive(false);
         reloadUI.gameObject.SetActive(false);
+        reserveUI.gameObject.SetActive(false);
 
         // Hide all buttons
         HideButton(refillButton);
@@ -102,10 +105,12 @@ public class EquipDescriptionsUI : MonoBehaviour
         magSizeUI.SetValue(gunData.magazineSize, 100f);
         speedUI.SetValue(gunData.roundsPerSecond, 20f, "0.0");
         reloadUI.SetValue(gunData.reloadTime, 10f, "0.0");
+        reserveUI.SetValue(gunData.reserveAmmo);
 
         // Show all properties for guns
         magSizeUI.gameObject.SetActive(true);
         reloadUI.gameObject.SetActive(true);
+        reserveUI.gameObject.SetActive(true);
     }
 
     private void SetMeleeProperties(MeleeData meleeData, int level)
@@ -117,6 +122,7 @@ public class EquipDescriptionsUI : MonoBehaviour
         // Hide irrelevant properties for melee
         magSizeUI.gameObject.SetActive(false);
         reloadUI.gameObject.SetActive(false);
+        reserveUI.gameObject.SetActive(false);
     }
 
     private void ShowButton(Button button)

@@ -51,7 +51,7 @@ public class ShopPoint : MonoBehaviour
             playerInRange = false;
             shopNotification.SetActive(false);
 
-            if (shopUI.IsOpen) shopUI.Hide();
+            if (shopUI.isOpen) shopUI.Hide();
             if(pathCoroutine != null) pathCoroutine = StartCoroutine(PathLoop());
         }
     }

@@ -392,13 +392,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 24a2f92432ff9fb42b0417521bb28091, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  costText: {fileID: 233497309598081397}
   upgradeBarParent: {fileID: 1599922672191839316}
   avatar: {fileID: 6419145667589581756}
   ammo: {fileID: 287745817523229569}
-  refillButton: {fileID: 0}
-  equipButton: {fileID: 6576204886238039218}
-  refillCost: 100
+  priceText: {fileID: 233497309598081397}
 --- !u!1 &792114703223743725
 GameObject:
   m_ObjectHideFlags: 0
@@ -1062,7 +1059,7 @@ GameObject:
   - component: {fileID: 4052671955160377979}
   - component: {fileID: 233497309598081397}
   m_Layer: 5
-  m_Name: Cost
+  m_Name: Price
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

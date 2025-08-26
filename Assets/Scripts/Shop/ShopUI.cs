@@ -1,16 +1,11 @@
 using System.Collections;
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 public class ShopUI : MonoBehaviour
 {
-    [Header("Animation")]
-    [SerializeField] private Animator shopAnimator;
-
-    [Header("UI References")]
     [SerializeField] private GameObject canvasSetting;
 
-    [Header("Equipment Slots")]
+    [Header("EquipItemUI Slots")]
     [SerializeField] private EquipItemUI primaryUI;
     [SerializeField] private EquipItemUI secondaryUI;
     [SerializeField] private EquipItemUI meleeUI;
@@ -18,76 +13,43 @@ public class ShopUI : MonoBehaviour
     [SerializeField] private EquipItemUI shieldUI;
 
     // State
-    private bool isOpen = false;
+    public bool isOpen = false;
     private Coroutine currentRoutine;
 
     // Cached references
+    private Animator shopAnimator;
     private PressKeyEvent pressKeyEvent;
     private EquipDescriptionsUI equipDescriptionsUI;
-    public IWeapon[] allWeapon; //Test - should be private in production
-
-    public bool IsOpen => isOpen;
-
-    #region Unity Lifecycle
+    private IWeapon[] allWeapon;
 
     private void Start()
     {
-        InitializeReferences();
-        CacheWeapons();
+        pressKeyEvent = canvasSetting?.GetComponent<PressKeyEvent>();
+        equipDescriptionsUI = FindAnyObjectByType<EquipDescriptionsUI>();
+        shopAnimator = GetComponent<Animator>();
+
+        allWeapon = GameObject.FindWithTag("Player")?.GetComponentsInChildren<IWeapon>(true);
     }
-
-    #endregion
-
-    #region Public Methods
 
     public void Show()
     {
-        if (currentRoutine != null)
-            StopCoroutine(currentRoutine);
+        if (currentRoutine != null) StopCoroutine(currentRoutine);
 
-        UpdateAllEquipmentUI();
+        foreach (var weapon in allWeapon)
+        {
+            UpdateWeaponUI(weapon);
+        }
+
         currentRoutine = StartCoroutine(ShowCoroutine());
         isOpen = true;
     }
 
     public void Hide()
     {
-        if (currentRoutine != null)
-            StopCoroutine(currentRoutine);
+        if (currentRoutine != null) StopCoroutine(currentRoutine);
 
         currentRoutine = StartCoroutine(HideCoroutine());
         isOpen = false;
-    }
-
-    #endregion
-
-    #region Private Methods
-
-    private void InitializeReferences()
-    {
-        if (canvasSetting != null)
-            pressKeyEvent = canvasSetting.GetComponent<PressKeyEvent>();
-
-        equipDescriptionsUI = FindAnyObjectByType<EquipDescriptionsUI>();
-    }
-
-    private void CacheWeapons()
-    {
-        GameObject player = GameObject.FindWithTag("Player");
-        if (player != null)
-        {
-            allWeapon = player.GetComponentsInChildren<IWeapon>(true);
-        }
-    }
-
-    private void UpdateAllEquipmentUI()
-    {
-        if (allWeapon == null) return;
-
-        foreach (var weapon in allWeapon)
-        {
-            UpdateWeaponUI(weapon);
-        }
     }
 
     private void UpdateWeaponUI(IWeapon weapon)
@@ -107,85 +69,49 @@ public class ShopUI : MonoBehaviour
 
     private void UpdateGunUI(PlayerShoot gun)
     {
-        var equipUI = GetEquipUIForGun(gun.gunData.gunSlot);
-        if (equipUI != null)
+        if (gun.currentAmmo == 0 && gun.reserveAmmo == 0)
         {
-            equipUI.UpdateGunUI(gun.gunData, gun.currentAmmo, gun.reserveAmmo);
-            equipUI.BindWeapon(gun);
+            gun.Initialize();
+        }
+
+        switch (gun.gunData.gunSlot)
+        {
+            case GunSlot.Primary:
+                primaryUI.UpdateGunSlotUI(gun, gun.currentAmmo, gun.reserveAmmo);
+                break;
+            case GunSlot.Secondary:
+                secondaryUI.UpdateGunSlotUI(gun, gun.currentAmmo, gun.reserveAmmo);
+                break;
         }
     }
 
     private void UpdateMeleeUI(MeleeWeapon melee)
     {
         if (meleeUI != null)
-        {
-            meleeUI.UpdateMeleeUI(melee.data, melee.level);
-            meleeUI.BindWeapon(melee);
-        }
+            meleeUI.UpdateMeleeSlotUI(melee, melee.level);
     }
-
-    private EquipItemUI GetEquipUIForGun(GunSlot gunSlot)
-    {
-        return gunSlot switch
-        {
-            GunSlot.Primary => primaryUI,
-            GunSlot.Secondary => secondaryUI,
-            _ => null
-        };
-    }
-
-    #endregion
-
-    #region Coroutines
 
     private IEnumerator ShowCoroutine()
     {
-        // Disable other UI
-        SetCanvasSettingActive(false);
-        SetPressKeyEventEnabled(false);
+        canvasSetting.SetActive(false);
+        pressKeyEvent.enabled = false;
 
-        // Play animation
         shopAnimator.Play("In");
-        yield return new WaitForSeconds(GetAnimationLength());
+        yield return new WaitForSeconds(shopAnimator.GetCurrentAnimatorStateInfo(0).length);
 
         currentRoutine = null;
     }
 
     private IEnumerator HideCoroutine()
     {
-        // Play animation
         shopAnimator.Play("Out");
-        yield return new WaitForSeconds(GetAnimationLength());
+        yield return new WaitForSeconds(shopAnimator.GetCurrentAnimatorStateInfo(0).length);
 
-        // Re-enable other UI
-        SetCanvasSettingActive(true);
-        SetPressKeyEventEnabled(true);
+        canvasSetting.SetActive(true);
+        pressKeyEvent.enabled = true;
 
-        // Hide description panel
-        if (equipDescriptionsUI != null)
-            equipDescriptionsUI.HideDescription();
+        equipDescriptionsUI.HideDescription();
 
         currentRoutine = null;
     }
-
-    private float GetAnimationLength()
-    {
-        if (shopAnimator != null)
-            return shopAnimator.GetCurrentAnimatorStateInfo(0).length;
-        return 0f;
-    }
-
-    private void SetCanvasSettingActive(bool active)
-    {
-        if (canvasSetting != null)
-            canvasSetting.SetActive(active);
-    }
-
-    private void SetPressKeyEventEnabled(bool enabled)
-    {
-        if (pressKeyEvent != null)
-            pressKeyEvent.enabled = enabled;
-    }
-
-    #endregion
 }

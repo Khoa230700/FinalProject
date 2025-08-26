@@ -5,29 +5,33 @@ using UnityEngine.UI;
 
 public class EquipItemUI : MonoBehaviour, ISelectHandler
 {
+    private static EquipItemUI currentSelected;
+
     [Header("UI Elements")]
-    public TMP_Text costText;
     public Transform upgradeBarParent;
     public Image avatar;
     public TMP_Text ammo;
+    public TMP_Text priceText;
 
-    private GunData gunData;
-    private MeleeData meleeData;
+    //Cache
+    private GunData gunData = null;
+    private MeleeData meleeData = null;
     private int meleeLevel;
     private IWeapon weaponRef;
 
-    // Cached references
+    //References
     private EquipDescriptionsUI equipDescriptionsUI;
+    private ShopManager shopManager;
+    private Animator animator;
 
     private void Awake()
     {
-        // Cache references early
         equipDescriptionsUI = FindAnyObjectByType<EquipDescriptionsUI>();
+        shopManager = FindAnyObjectByType<ShopManager>();
+        animator = GetComponent<Animator>();
     }
 
-    #region Public Methods
-
-    public void UpdateGunUI(GunData gun, int currentAmmo, int reserveAmmo)
+    public void UpdateGunSlotUI(PlayerShoot gun, int currentAmmo, int reserveAmmo)
     {
         if (gun == null)
         {
@@ -35,15 +39,18 @@ public class EquipItemUI : MonoBehaviour, ISelectHandler
             return;
         }
 
-        gunData = gun;
-        meleeData = null; // Clear melee data
+        gunData = gun.gunData;
+        weaponRef = gun;
 
-        avatar.sprite = gun.gunSprite;
+        avatar.sprite = gunData.gunSprite;
         ammo.text = $"{currentAmmo}/{reserveAmmo}";
         ammo.gameObject.SetActive(true);
+
+        // Update refill price
+        UpdateRefillPrice(gun);
     }
 
-    public void UpdateMeleeUI(MeleeData melee, int level)
+    public void UpdateMeleeSlotUI(MeleeWeapon melee, int level)
     {
         if (melee == null)
         {
@@ -51,33 +58,66 @@ public class EquipItemUI : MonoBehaviour, ISelectHandler
             return;
         }
 
-        meleeData = melee;
+        meleeData = melee.data;
         meleeLevel = level;
-        gunData = null; // Clear gun data
+        weaponRef = melee;
 
-        avatar.sprite = melee.weaponSprite;
+        avatar.sprite = meleeData.weaponSprite;
         ammo.gameObject.SetActive(false);
+
+        // Hide refill price for melee weapons
+        if (priceText != null)
+            priceText.gameObject.SetActive(false);
     }
 
-    public void BindWeapon(IWeapon weapon)
+    private void UpdateRefillPrice(PlayerShoot gun)
     {
-        weaponRef = weapon;
+        if (priceText == null || shopManager == null) return;
+
+        if (gun.NeedsRefill())
+        {
+            int refillCost = shopManager.GetRefillCost(gun);
+            priceText.text = $"$ {refillCost}";
+            priceText.gameObject.SetActive(true);
+
+            // Change color based on affordability
+            bool canAfford = CoinManager.Instance.HasEnoughCoins(refillCost);
+            priceText.color = canAfford ? new Color(0.392f, 0.698f, 0.812f) : Color.red;
+        }
+        else
+        {
+            priceText.text = "Full Ammo";
+            priceText.color = new Color(0.392f, 0.698f, 0.812f);
+            priceText.gameObject.SetActive(true);
+        }
     }
 
     public void OnSelect(BaseEventData eventData)
     {
+        ApplySelection();
+    }
+
+    private void ApplySelection()
+    {
         if (equipDescriptionsUI == null) return;
 
-        // Clear previous button listeners
+        if (currentSelected != null && currentSelected != this)
+        {
+            currentSelected.animator.SetBool("IsSelected", false);
+        }
+
+        currentSelected = this;
+        animator.SetBool("IsSelected", true);
+
         equipDescriptionsUI.ClearButtonListeners();
 
         if (gunData != null)
         {
-            SetupGunSelection();
+            UpdateGunDescription();
         }
         else if (meleeData != null)
         {
-            SetupMeleeSelection();
+            UpdateMeleeDescription();
         }
         else
         {
@@ -85,75 +125,75 @@ public class EquipItemUI : MonoBehaviour, ISelectHandler
         }
     }
 
-    #endregion
-
-    #region Private Methods
-
-    private void SetupGunSelection()
+    private void UpdateGunDescription()
     {
         equipDescriptionsUI.UpdateDescriptionUI(gunData: gunData);
 
         // Setup refill button
         if (equipDescriptionsUI.RefillButton != null)
         {
-            equipDescriptionsUI.RefillButton.onClick.AddListener(OnRefillClicked);
+            equipDescriptionsUI.RefillButton.onClick.AddListener(RefillClicked);
+
+            // Update refill button text and interactability
+            var gun = weaponRef as PlayerShoot;
+            if (gun != null)
+            {
+                bool needsRefill = gun.NeedsRefill();
+                int refillCost = shopManager.GetRefillCost(gun);
+                bool canAfford = CoinManager.Instance.HasEnoughCoins(refillCost);
+
+                // Update button text
+                TMP_Text buttonText = equipDescriptionsUI.RefillButton.GetComponentInChildren<TMP_Text>();
+                if (buttonText != null)
+                {
+                    if (!needsRefill)
+                        buttonText.text = "Full Ammo";
+                    else
+                        buttonText.text = $"Refill ({refillCost})";
+                }
+
+                // Update button interactability
+                equipDescriptionsUI.RefillButton.interactable = needsRefill && canAfford;
+            }
+        }
+
+        // Setup upgrade button
+        if (equipDescriptionsUI.UpgradeButton != null)
+        {
+            equipDescriptionsUI.UpgradeButton.onClick.AddListener(UpgradeClicked);
         }
     }
 
-    private void SetupMeleeSelection()
+    private void UpdateMeleeDescription()
     {
         equipDescriptionsUI.UpdateDescriptionUI(meleeData: meleeData, meleeLevel: meleeLevel);
 
         // Setup upgrade button
         if (equipDescriptionsUI.UpgradeButton != null)
         {
-            equipDescriptionsUI.UpgradeButton.onClick.AddListener(OnUpgradeClicked);
+            equipDescriptionsUI.UpgradeButton.onClick.AddListener(UpgradeClicked);
         }
     }
 
-    private bool CanAffordRefill(IWeapon weapon)
+    public void RefillClicked()
     {
-        // TODO: Implement money check
-        // return PlayerMoney.Instance.HasEnoughMoney(gun.gunData.refillCost);
-        return true; // Temporary
-    }
+        if (weaponRef == null) return;
 
-    public void Refill(IWeapon weapon)
-    {
-        if (weapon == null) return;
-        if (CanAffordRefill(weapon)) return;
+        bool success = shopManager.RefillAmmo(weaponRef as PlayerShoot);
 
-        if (weapon is PlayerShoot gun)
+        // Update UI after refill attempt
+        if (success && weaponRef is PlayerShoot gun)
         {
-            // TODO: Check money before purchasing
-            gun.Refill();
-            // TODO: Deduct money
-            UpdateGunUI(gun.gunData, gun.currentAmmo, gun.reserveAmmo);
-        }
-        else
-        {
-            // TODO: Show insufficient funds message
-            Debug.Log("Insufficient funds for refill");
+            UpdateGunSlotUI(gun, gun.currentAmmo, gun.reserveAmmo);
+
+            // Refresh the selection to update button states
+            ApplySelection();
         }
     }
 
-    private void OnRefillClicked()
+    private void UpgradeClicked()
     {
-        if (weaponRef != null)
-        {
-            Refill(weaponRef);
-        }
-    }
-
-    private void OnUpgradeClicked()
-    {
-        if (weaponRef is MeleeWeapon meleeWeapon)
-        {
-            // TODO: Implement upgrade logic
-            // Example: meleeWeapon.Upgrade();
-            // Then update UI: UpdateMeleeUI(meleeWeapon.data, meleeWeapon.level);
-            Debug.Log($"Upgrading {meleeWeapon.data.weaponName}");
-        }
+        Debug.Log($"Upgrading {weaponRef.GetType().Name}");
     }
 
     private void ClearUI()
@@ -166,7 +206,7 @@ public class EquipItemUI : MonoBehaviour, ISelectHandler
             avatar.sprite = null;
         if (ammo != null)
             ammo.text = "";
+        if (priceText != null)
+            priceText.gameObject.SetActive(false);
     }
-
-    #endregion
 }
