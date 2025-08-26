@@ -32,18 +32,6 @@ MonoBehaviour:
   reloadTime: 1.5
   hasScope: 0
   scopeZoom: 0
-  crosshairData:
-    normalColor: {r: 1, g: 1, b: 1, a: 1}
-    enemyColor: {r: 1, g: 0, b: 0, a: 1}
-    type: 1
-    staticCrosshair:
-      sprite: {fileID: 0}
-      size: {x: 64, y: 64}
-    dynamicCrosshair:
-      idleScale: 1
-      moveScale: 1.2
-      jumpScale: 1.8
-      bounceSize: 2
-      moveSpeed: 3
   tracerPrefab: {fileID: 6749693277989217856, guid: dfcafcdd61ac0e447b7e869afc9b8d0c, type: 3}
   shootSound: {fileID: 0}
+  bulletRefillCost: 100

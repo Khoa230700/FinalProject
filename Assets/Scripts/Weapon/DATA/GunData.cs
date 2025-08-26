@@ -49,4 +49,7 @@ public class GunData : ScriptableObject
     [Header("UI & Effects")]
     public GameObject tracerPrefab;
     public AudioClip shootSound;
+
+    [Header("Shop")]
+    public int bulletRefillCost = 10; // cost mỗi viên đạn
 }

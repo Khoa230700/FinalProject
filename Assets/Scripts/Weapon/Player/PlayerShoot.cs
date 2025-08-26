@@ -22,10 +22,19 @@ public class PlayerShoot : MonoBehaviour, IWeapon, IReloadable
 
     private Coroutine shotResetCoroutine;
 
-    void Start()
+    private bool initialized = false;
+
+    public void Initialize()
     {
+        if (initialized) return;
         currentAmmo = gunData.magazineSize;
         reserveAmmo = gunData.reserveAmmo;
+        initialized = true;
+    }
+
+    void Start()
+    {
+        Initialize();
         weaponUI?.UpdateAmmoUI(currentAmmo, reserveAmmo);
     }
 
@@ -188,10 +197,44 @@ public class PlayerShoot : MonoBehaviour, IWeapon, IReloadable
     }
 
     //SHOP
-    public void Refill()
+    public int AddAmmo(int amount)
     {
-        reserveAmmo = gunData.reserveAmmo;
-        currentAmmo = gunData.magazineSize;
+        if (amount <= 0) return 0;
+
+        int bulletsAdded = 0;
+
+        // Add to currentAmmo
+        int magazineSpace = gunData.magazineSize - currentAmmo;
+        int toMagazine = Mathf.Min(amount, magazineSpace);
+        currentAmmo += toMagazine;
+        bulletsAdded += toMagazine;
+        amount -= toMagazine;
+
+        // Add to reserveAmmo
+        if (amount > 0)
+        {
+            int reserveSpace = gunData.reserveAmmo - reserveAmmo;
+            int toReserve = Mathf.Min(amount, reserveSpace);
+            reserveAmmo += toReserve;
+            bulletsAdded += toReserve;
+        }
+
         weaponUI?.UpdateAmmoUI(currentAmmo, reserveAmmo);
+
+        Debug.Log($"Added {bulletsAdded} bullets to {gunData.name}. Current: {currentAmmo}/{gunData.magazineSize}, Reserve: {reserveAmmo}/{gunData.reserveAmmo}");
+
+        return bulletsAdded;
+    }
+
+    public bool NeedsRefill()
+    {
+        return currentAmmo < gunData.magazineSize || reserveAmmo < gunData.reserveAmmo;
+    }
+
+    public int GetAmmoNeeded()
+    {
+        int currentAmmoNeeded = gunData.magazineSize - currentAmmo;
+        int reserveAmmoNeeded = gunData.reserveAmmo - reserveAmmo;
+        return currentAmmoNeeded + reserveAmmoNeeded;
     }
 }
