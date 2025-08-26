@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<<< HEAD:Assets/Vefects.meta
+guid: c4688a85685ed8545bb5bde2933f0186
+========
 guid: 310aa47dd98c673418795a891403f79a
+>>>>>>>> Thanh3:Assets/Scripts/Weapon/FlashLight.meta
 folderAsset: yes
 DefaultImporter:
   externalObjects: {}

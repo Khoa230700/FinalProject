@@ -43,7 +43,6 @@ public class WaveManager : MonoBehaviour
             // nếu còn wave sau thì nghỉ và đếm ngược
             if (currentWaveIndex < waves.Count - 1)
             {
-                QuestManager.Instance.OnWaveSpawned?.Invoke();
                 isBetweenWaves = true;
 
                 if (timerUI != null)
@@ -81,6 +80,8 @@ public class WaveManager : MonoBehaviour
             yield return null;
             timer -= Time.deltaTime;
         }
+
+        QuestManager.Instance.OnWaveSpawned?.Invoke();
     }
 
     public void SkipBreak()

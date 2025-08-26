@@ -3,6 +3,7 @@ using UnityEngine;
 
 public enum GunType { Handgun, AssaultRifle, SniperRifle, Shotgun }
 public enum GunFireMode { SemiAuto, FullAuto, Burst, Safety }
+public enum GunSlot { Primary, Secondary }
 
 [CreateAssetMenu(fileName = "NewGunData", menuName = "Gun/Gun Data")]
 public class GunData : ScriptableObject
@@ -10,7 +11,9 @@ public class GunData : ScriptableObject
     [Header("Identity")]
     public string gunName;
     public GunType gunType;
+    public GunSlot gunSlot;
     public Sprite gunSprite;           // Hình ảnh cho UI
+    public Sprite gunSpriteFullColor;           // Hình ảnh cho UI
 
     [Header("Ballistics")]
     public int damage;
@@ -44,7 +47,9 @@ public class GunData : ScriptableObject
     public float scopeZoom = 10f;
 
     [Header("UI & Effects")]
-    public CrosshairData crosshairData;      // Data cho crosshair UI
     public GameObject tracerPrefab;
     public AudioClip shootSound;
+
+    [Header("Shop")]
+    public int bulletRefillCost = 10; // cost mỗi viên đạn
 }

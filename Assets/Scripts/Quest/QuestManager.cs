@@ -142,7 +142,7 @@ public class QuestManager : MonoBehaviour
 
         if (autoSave) SaveQuestData();
 
-        OnWaveSpawned?.Invoke();
+        // OnWaveSpawned?.Invoke();
     }
 
     //TRAO THƯỞNG
