@@ -192,5 +192,6 @@ public class PlayerShoot : MonoBehaviour, IWeapon, IReloadable
     {
         reserveAmmo = gunData.reserveAmmo;
         currentAmmo = gunData.magazineSize;
+        weaponUI?.UpdateAmmoUI(currentAmmo, reserveAmmo);
     }
 }

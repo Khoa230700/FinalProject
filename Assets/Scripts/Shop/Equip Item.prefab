@@ -396,6 +396,9 @@ MonoBehaviour:
   upgradeBarParent: {fileID: 1599922672191839316}
   avatar: {fileID: 6419145667589581756}
   ammo: {fileID: 287745817523229569}
+  refillButton: {fileID: 0}
+  equipButton: {fileID: 6576204886238039218}
+  refillCost: 100
 --- !u!1 &792114703223743725
 GameObject:
   m_ObjectHideFlags: 0

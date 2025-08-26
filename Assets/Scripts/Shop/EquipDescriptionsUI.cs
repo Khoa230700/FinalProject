@@ -17,50 +17,55 @@ public class EquipDescriptionsUI : MonoBehaviour
     [SerializeField] private PropertyUI speedUI;
     [SerializeField] private PropertyUI reloadUI;
 
+    [Header("Action Buttons")]
+    [SerializeField] private Button refillButton;
+    [SerializeField] private Button upgradeButton;
+
+    public Button RefillButton => refillButton;
+    public Button UpgradeButton => upgradeButton;
+
     private void Start()
     {
         HideDescription();
     }
 
-    public void SetGunDescriptionUI(GunData gunData)
+    public void UpdateDescriptionUI(GunData gunData = null, MeleeData meleeData = null, int meleeLevel = 0)
     {
-        if (gunData == null) return;
-        ResetUI();
+        if (gunData == null && meleeData == null)
+        {
+            HideDescription();
+            return;
+        }
 
-        // Info
-        nameText.text = gunData.gunName;
-        typeText.text = gunData.gunType.ToString();
-        // priceText.text = $"${gunData.price}"; //TODO
-        avatarImage.sprite = gunData.gunSpriteFullColor;
+        ShowDescription();
 
-        // Properties
-        damageUI.SetValue(gunData.damage, 100f);
-        rangeUI.SetValue(gunData.range, 100f);
-        magSizeUI.SetValue(gunData.magazineSize, 100f);
-        speedUI.SetValue(gunData.roundsPerSecond, 20f, "0.0");
-        reloadUI.SetValue(gunData.reloadTime, 10f, "0.0");
+        if (gunData != null)
+        {
+            // --- Gun ---
+            nameText.text = gunData.gunName;
+            typeText.text = gunData.gunType.ToString();
+            avatarImage.sprite = gunData.gunSpriteFullColor;
+
+            SetGunProperties(gunData);
+
+            ShowButton(refillButton);
+            ShowButton(upgradeButton);
+        }
+        else if (meleeData != null)
+        {
+            // --- Melee ---
+            nameText.text = meleeData.weaponName;
+            typeText.text = "Melee";
+            avatarImage.sprite = meleeData.weaponSpriteFullColor;
+
+            SetMeleeProperties(meleeData, meleeLevel);
+
+            HideButton(refillButton);
+            ShowButton(upgradeButton);
+        }
     }
 
-    public void SetMeleeDescriptionUI(MeleeData meleeData, int level)
-    {
-        if (meleeData == null) return;
-        ResetUI();
-
-        // Info
-        nameText.text = meleeData.weaponName;
-        typeText.text = "Melee";
-        // priceText.text = $"${meleeData.price}"; //TODO
-        avatarImage.sprite = meleeData.weaponSpriteFullColor;
-
-        // Properties
-        damageUI.SetValue(meleeData.GetDamage(level), 100f);
-        rangeUI.SetValue(meleeData.GetRange(level), 10f);
-        magSizeUI.gameObject.SetActive(false);
-        speedUI.SetValue(1f / meleeData.GetCooldown(level), 10f, "0.0");
-        reloadUI.gameObject.SetActive(false);
-    }
-
-    private void ResetUI()
+    private void ShowDescription()
     {
         avatarImage.gameObject.SetActive(true);
         damageUI.gameObject.SetActive(true);
@@ -72,15 +77,71 @@ public class EquipDescriptionsUI : MonoBehaviour
 
     public void HideDescription()
     {
+        // Reset text
         nameText.text = "Name";
         typeText.text = "Type";
-        priceText.text = "$";
+        priceText.text = "";
 
+        // Hide all UI elements
         avatarImage.gameObject.SetActive(false);
         damageUI.gameObject.SetActive(false);
         rangeUI.gameObject.SetActive(false);
         magSizeUI.gameObject.SetActive(false);
         speedUI.gameObject.SetActive(false);
         reloadUI.gameObject.SetActive(false);
+
+        // Hide all buttons
+        HideButton(refillButton);
+        HideButton(upgradeButton);
+    }
+
+    private void SetGunProperties(GunData gunData)
+    {
+        damageUI.SetValue(gunData.damage, 100f);
+        rangeUI.SetValue(gunData.range, 100f);
+        magSizeUI.SetValue(gunData.magazineSize, 100f);
+        speedUI.SetValue(gunData.roundsPerSecond, 20f, "0.0");
+        reloadUI.SetValue(gunData.reloadTime, 10f, "0.0");
+
+        // Show all properties for guns
+        magSizeUI.gameObject.SetActive(true);
+        reloadUI.gameObject.SetActive(true);
+    }
+
+    private void SetMeleeProperties(MeleeData meleeData, int level)
+    {
+        damageUI.SetValue(meleeData.GetDamage(level), 100f);
+        rangeUI.SetValue(meleeData.GetRange(level), 10f);
+        speedUI.SetValue(1f / meleeData.GetCooldown(level), 10f, "0.0");
+
+        // Hide irrelevant properties for melee
+        magSizeUI.gameObject.SetActive(false);
+        reloadUI.gameObject.SetActive(false);
+    }
+
+    private void ShowButton(Button button)
+    {
+        if (button != null)
+        {
+            button.gameObject.SetActive(true);
+            button.interactable = true;
+        }
+    }
+
+    private void HideButton(Button button)
+    {
+        if (button != null)
+        {
+            button.gameObject.SetActive(false);
+            button.onClick.RemoveAllListeners(); // Clean up listeners
+        }
+    }
+
+    public void ClearButtonListeners()
+    {
+        if (refillButton != null)
+            refillButton.onClick.RemoveAllListeners();
+        if (upgradeButton != null)
+            upgradeButton.onClick.RemoveAllListeners();
     }
 }
