@@ -25,6 +25,7 @@ MonoBehaviour:
   burstCooldown: 0.3
   fireMode: 0
   availableFireModes: 00000000
+  semiAutoMinInterval: 1
   magazineSize: 5
   reserveAmmo: 25
   reloadTime: 1

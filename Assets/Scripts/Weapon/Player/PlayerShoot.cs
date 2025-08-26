@@ -22,6 +22,8 @@ public class PlayerShoot : MonoBehaviour, IWeapon, IReloadable
 
     private Coroutine shotResetCoroutine;
 
+    private int _lastShotFrame = -1;
+
     void Start()
     {
         currentAmmo = gunData.magazineSize;
@@ -29,6 +31,9 @@ public class PlayerShoot : MonoBehaviour, IWeapon, IReloadable
         weaponUI?.UpdateAmmoUI(currentAmmo, reserveAmmo);
     }
 
+    /// <summary>
+    /// Gate to throttle semi-auto weapons (e.g., sniper) to respect a minimum interval between shots.
+    /// </summary>
     public bool IsReadyToShoot { get; private set; } = true;
 
     // --------- IWeapon adapters ---------
@@ -93,8 +98,16 @@ public class PlayerShoot : MonoBehaviour, IWeapon, IReloadable
 
     public void ShootOneBullet()
     {
-        if (PauseGameUI.isPause || isReloading || currentAmmo <= 0)
-            return;
+        if (PauseGameUI.isPause || isReloading || currentAmmo <= 0) return;
+
+        // Chặn gọi trùng trong cùng frame
+        if (Time.frameCount == _lastShotFrame) return;
+        _lastShotFrame = Time.frameCount;
+
+        if (!IsReadyToShoot) return;
+
+        // Đặt cờ khóa ngay lập tức để tránh race
+        IsReadyToShoot = false;
 
         currentAmmo--;
 
@@ -133,6 +146,24 @@ public class PlayerShoot : MonoBehaviour, IWeapon, IReloadable
 
         if (shotResetCoroutine != null) StopCoroutine(shotResetCoroutine);
         shotResetCoroutine = StartCoroutine(ResetShotAnimation());
+
+        // Cooldown SemiAuto (sniper ~1s)
+        float cooldown = 0f;
+        if (gunData.fireMode == GunFireMode.SemiAuto)
+        {
+            cooldown = gunData.semiAutoMinInterval;
+            if (gunData.gunType == GunType.SniperRifle && cooldown <= 0f)
+                cooldown = 1f;
+        }
+        StartCoroutine(ShotCooldown(cooldown));
+    }
+
+    private IEnumerator ShotCooldown(float t)
+    {
+        //IsReadyToShoot = false;
+        // IsReadyToShoot đã false ở trên
+        if (t > 0f) yield return new WaitForSeconds(t);
+        IsReadyToShoot = true;
     }
 
     private Vector3 GetSpreadDirection(Vector3 forward, float angle)

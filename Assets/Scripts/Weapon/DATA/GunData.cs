@@ -33,6 +33,10 @@ public class GunData : ScriptableObject
     public GunFireMode fireMode;
     public GunFireMode[] availableFireModes;
 
+    [Header("Fire Rate Limits")]
+    [Tooltip("Khoảng cách tối thiểu giữa 2 phát (SemiAuto). 0 = không giới hạn")]
+    public float semiAutoMinInterval = 0f; // đặt 1.0 cho sniper
+
     [Header("Magazine")]
     public int magazineSize;
     public int reserveAmmo;
