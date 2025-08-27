@@ -10,64 +10,108 @@ public class DamagedUI : MonoBehaviour
     [SerializeField] private DamagedFader damageIndicatorFader;
     [SerializeField] private float indicatorDistance = 128f;
 
+    [Header("Fallback (nếu không đọc được từ hệ thống HP)")]
+    [SerializeField] private float fallbackMaxHealth = 100f;
+    [SerializeField] private float fallbackMaxShield = 0f;
+
     private Transform player;
     private Vector3 lastHitPoint;
-    private PlayerHealth playerHealth;
-    private PlayerShield playerShield;
+
+    // Hệ mới
+    private BaseHealthSystem baseHealth;
+    private PlayerHealthSystem playerHealthSystem;
+
+    // cache từ event
+    private float cachedMaxShield = -1f;
+    private float cachedMaxHealth = -1f;
 
     private void Start()
     {
-        player ??= GameObject.FindGameObjectWithTag("Player").transform;
-        playerHealth = player.GetComponent<PlayerHealth>();
-        playerShield = player.GetComponent<PlayerShield>();
-        playerHealth?.OnTakeDamage.AddListener(OnTakeDamage);
+        var playerGO = GameObject.FindGameObjectWithTag("Player");
+        if (playerGO == null)
+        {
+            Debug.LogWarning("[DamagedUI] Không tìm thấy Player theo tag 'Player'.");
+            return;
+        }
+
+        player = playerGO.transform;
+        baseHealth = player.GetComponent<BaseHealthSystem>();
+        playerHealthSystem = player.GetComponent<PlayerHealthSystem>();
+
+        // Nghe sát thương (UnityEvent<float, Vector3>)
+        if (baseHealth != null && baseHealth.OnTakeDamage != null)
+            baseHealth.OnTakeDamage.AddListener(OnTakeDamage);
+        else
+            Debug.LogWarning("[DamagedUI] Không thấy BaseHealthSystem.OnTakeDamage");
+
+        // Nghe thay đổi HP để lấy maxHealth
+        if (baseHealth != null)
+            baseHealth.OnHealthChanged += OnHealthChanged;
+
+        // Nghe thay đổi Shield để lấy maxShield
+        if (playerHealthSystem != null)
+            playerHealthSystem.OnShieldChanged += OnShieldChanged;
     }
 
     private void OnDestroy()
     {
-        playerHealth?.OnTakeDamage.RemoveListener(OnTakeDamage);
-    }
-
-    //* Goi khi nhân vật bị thương
-    private void OnTakeDamage(float delta, Vector3 hitPoint)
-    {
-        if (delta >= 0f) return;  //* Chỉ xử lý khi nhận sát thương
-
-        float maxEffectiveHealth = playerHealth.maxHealth;
-        if (playerShield != null)
+        if (baseHealth != null)
         {
-            maxEffectiveHealth += playerShield.maxShield;
+            if (baseHealth.OnTakeDamage != null)
+                baseHealth.OnTakeDamage.RemoveListener(OnTakeDamage);
+            baseHealth.OnHealthChanged -= OnHealthChanged;
         }
 
-        float normalizedDamage = Mathf.Abs(delta) / maxEffectiveHealth;
-        bloodScreenFader.DoFadeCycle(this, normalizedDamage);
+        if (playerHealthSystem != null)
+            playerHealthSystem.OnShieldChanged -= OnShieldChanged;
+    }
 
-        if (hitPoint != Vector3.zero)
+    private void OnHealthChanged(float current, float max)
+    {
+        cachedMaxHealth = max;
+    }
+
+    private void OnShieldChanged(float current, float max)
+    {
+        cachedMaxShield = max;
+    }
+
+    /// <summary>
+    /// delta âm khi nhận damage; hitPoint có thể là Vector3.zero nếu không biết.
+    /// </summary>
+    private void OnTakeDamage(float delta, Vector3 hitPoint)
+    {
+        if (delta >= 0f) return; // chỉ xử lý khi nhận sát thương
+
+        float maxH = (cachedMaxHealth > 0f) ? cachedMaxHealth : fallbackMaxHealth;
+        float maxS = (cachedMaxShield >= 0f) ? cachedMaxShield : fallbackMaxShield;
+
+        float maxEffectiveHealth = Mathf.Max(1f, maxH + maxS);
+        float normalizedDamage = Mathf.Clamp01(Mathf.Abs(delta) / maxEffectiveHealth);
+
+        if (bloodScreenFader != null)
+            bloodScreenFader.DoFadeCycle(this, normalizedDamage);
+
+        if (hitPoint != Vector3.zero && damageIndicatorFader != null)
         {
             lastHitPoint = hitPoint;
-            damageIndicatorFader.DoFadeCycle(this, 1f); //* Hiện thị chỉ báo sát thương với alpha = 1
+            damageIndicatorFader.DoFadeCycle(this, 1f); // hiện indicator
         }
     }
 
     private void Update()
     {
-        if (!damageIndicatorFader.Fading) return;
+        if (player == null || damageIndicatorFader == null || !damageIndicatorFader.Fading) return;
 
-        //* Hướng nhìn của người chơi
-        Vector3 lookDir = Vector3.ProjectOnPlane(player.forward, Vector3.up).normalized; 
-
-        //* Hướng từ nhân vật đến điểm va chạm
+        Vector3 lookDir = Vector3.ProjectOnPlane(player.forward, Vector3.up).normalized;
         Vector3 dirToHit = Vector3.ProjectOnPlane(lastHitPoint - player.position, Vector3.up).normalized;
+        Vector3 right = Vector3.Cross(lookDir, Vector3.up);
+        float angle = Vector3.Angle(lookDir, dirToHit) * Mathf.Sign(Vector3.Dot(right, dirToHit));
 
-        //* Phương ngang của nhân vật, (bên phải)
-        Vector3 right = Vector3.Cross(lookDir, Vector3.up); 
-
-        //* Góc giữa hướng nhìn và hướng đến điểm va chạm, với dấu hiệu để xác định bên trái hay phải
-        float angle = Vector3.Angle(lookDir, dirToHit) * Mathf.Sign(Vector3.Dot(right, dirToHit)); 
-
-        //* Xoay và đặt vị trí
-        damageIndicator.localEulerAngles = Vector3.forward * angle;
-        damageIndicator.localPosition = Quaternion.Euler(0f, 0f, angle) * Vector3.up * indicatorDistance;
-
-    }    
+        if (damageIndicator != null)
+        {
+            damageIndicator.localEulerAngles = Vector3.forward * angle;
+            damageIndicator.localPosition = Quaternion.Euler(0f, 0f, angle) * Vector3.up * indicatorDistance;
+        }
+    }
 }
