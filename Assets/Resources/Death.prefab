@@ -155,7 +155,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   countdown: {fileID: 3282822653929955237}
   number: {fileID: 1330898690077511028}
-  timer: 5
+  timer: 10
 --- !u!82 &2915852677575797218
 AudioSource:
   m_ObjectHideFlags: 0

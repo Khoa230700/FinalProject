@@ -1,117 +1,131 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class ShopUI : MonoBehaviour
 {
     [SerializeField] private GameObject canvasSetting;
+    [SerializeField] private EquipItemUI[] itemSlots = new EquipItemUI[5]; // [primary, secondary, melee, health, shield]
 
-    [Header("EquipItemUI Slots")]
-    [SerializeField] private EquipItemUI primaryUI;
-    [SerializeField] private EquipItemUI secondaryUI;
-    [SerializeField] private EquipItemUI meleeUI;
-    [SerializeField] private EquipItemUI medicUI;
-    [SerializeField] private EquipItemUI shieldUI;
+    public bool isOpen { get; private set; }
+    public bool canOpen { get; set; } = true;
 
-    // State
-    public bool isOpen = false;
+    private Animator animator;
+    private PressKeyEvent pressKeyEvent;
+    private EquipDescriptionsUI descriptionsUI;
     private Coroutine currentRoutine;
 
-    // Cached references
-    private Animator shopAnimator;
-    private PressKeyEvent pressKeyEvent;
-    private EquipDescriptionsUI equipDescriptionsUI;
-    private IWeapon[] allWeapon;
+    // Cached player components
+    private IWeapon[] weapons;
+    private PlayerHealth playerHealth;
+    private PlayerShield playerShield;
 
     private void Start()
     {
+        animator = GetComponent<Animator>();
         pressKeyEvent = canvasSetting?.GetComponent<PressKeyEvent>();
-        equipDescriptionsUI = FindAnyObjectByType<EquipDescriptionsUI>();
-        shopAnimator = GetComponent<Animator>();
+        descriptionsUI = FindAnyObjectByType<EquipDescriptionsUI>();
 
-        allWeapon = GameObject.FindWithTag("Player")?.GetComponentsInChildren<IWeapon>(true);
+        CachePlayerComponents();
+    }
+
+    private void OnEnable()
+    {
+        CoinManager.Instance.OnCoinChanged += OnCoinsChanged;
+    }
+
+    private void OnDisable()
+    {
+        CoinManager.Instance.OnCoinChanged -= OnCoinsChanged;
+    }
+    private void CachePlayerComponents()
+    {
+        var player = GameObject.FindWithTag("Player");
+        if (player == null) return;
+
+        weapons = player.GetComponentsInChildren<IWeapon>(true);
+        playerHealth = player.GetComponent<PlayerHealth>();
+        playerShield = player.GetComponent<PlayerShield>();
     }
 
     public void Show()
     {
-        if (currentRoutine != null) StopCoroutine(currentRoutine);
+        if (isOpen || !canOpen) return;
 
-        foreach (var weapon in allWeapon)
-        {
-            UpdateWeaponUI(weapon);
-        }
-
-        currentRoutine = StartCoroutine(ShowCoroutine());
         isOpen = true;
+
+        EventSystem.current?.SetSelectedGameObject(itemSlots[0]?.gameObject);
+        UpdateAllSlots();
+
+        if (currentRoutine != null) StopCoroutine(currentRoutine);
+        currentRoutine = StartCoroutine(AnimateShop("In", () =>
+        {
+            canvasSetting?.SetActive(false);
+            if (pressKeyEvent) pressKeyEvent.enabled = false;
+        }));
     }
 
     public void Hide()
     {
-        if (currentRoutine != null) StopCoroutine(currentRoutine);
-
-        currentRoutine = StartCoroutine(HideCoroutine());
         isOpen = false;
+
+        if (currentRoutine != null) StopCoroutine(currentRoutine);
+        currentRoutine = StartCoroutine(AnimateShop("Out", () =>
+        {
+            canvasSetting?.SetActive(true);
+            if (pressKeyEvent) pressKeyEvent.enabled = true;
+            descriptionsUI?.HideDescription();
+        }));
     }
 
-    private void UpdateWeaponUI(IWeapon weapon)
+    private void UpdateAllSlots()
     {
-        if (weapon == null) return;
-
-        switch (weapon)
+        // Update weapon slots
+        foreach (var weapon in weapons)
         {
-            case PlayerShoot gun:
-                UpdateGunUI(gun);
-                break;
-            case MeleeWeapon melee:
-                UpdateMeleeUI(melee);
-                break;
+            if (weapon is PlayerShoot gun)
+            {
+                if (gun.currentAmmo == 0 && gun.reserveAmmo == 0) gun.Initialize();
+
+                int slotIndex = gun.gunData.gunSlot == GunSlot.Primary ? 0 : 1;
+                itemSlots[slotIndex]?.UpdateSlot(gun, "Gun", 0, gun.currentAmmo, gun.reserveAmmo);
+            }
+            else if (weapon is MeleeWeapon melee)
+            {
+                itemSlots[2]?.UpdateSlot(melee, "Melee", melee.level);
+            }
+        }
+
+        // Update stat slots
+        itemSlots[3]?.UpdateSlot(playerHealth, "Health");
+        itemSlots[4]?.UpdateSlot(playerShield, "Shield");
+
+        // Force refresh all slots to update button states
+        RefreshAllSlots();
+    }
+
+    public void RefreshAllSlots()
+    {
+        foreach (var slot in itemSlots)
+        {
+            slot?.RefreshUI();
         }
     }
 
-    private void UpdateGunUI(PlayerShoot gun)
+    public void OnCoinsChanged(int oldCoin, int newCoin)
     {
-        if (gun.currentAmmo == 0 && gun.reserveAmmo == 0)
+        if (isOpen)
         {
-            gun.Initialize();
-        }
-
-        switch (gun.gunData.gunSlot)
-        {
-            case GunSlot.Primary:
-                primaryUI.UpdateGunSlotUI(gun, gun.currentAmmo, gun.reserveAmmo);
-                break;
-            case GunSlot.Secondary:
-                secondaryUI.UpdateGunSlotUI(gun, gun.currentAmmo, gun.reserveAmmo);
-                break;
+            RefreshAllSlots();
         }
     }
 
-    private void UpdateMeleeUI(MeleeWeapon melee)
+    private IEnumerator AnimateShop(string animationName, System.Action onComplete = null)
     {
-        if (meleeUI != null)
-            meleeUI.UpdateMeleeSlotUI(melee, melee.level);
-    }
+        animator.Play(animationName);
+        yield return new WaitForSeconds(animator.GetCurrentAnimatorStateInfo(0).length);
 
-    private IEnumerator ShowCoroutine()
-    {
-        canvasSetting.SetActive(false);
-        pressKeyEvent.enabled = false;
-
-        shopAnimator.Play("In");
-        yield return new WaitForSeconds(shopAnimator.GetCurrentAnimatorStateInfo(0).length);
-
-        currentRoutine = null;
-    }
-
-    private IEnumerator HideCoroutine()
-    {
-        shopAnimator.Play("Out");
-        yield return new WaitForSeconds(shopAnimator.GetCurrentAnimatorStateInfo(0).length);
-
-        canvasSetting.SetActive(true);
-        pressKeyEvent.enabled = true;
-
-        equipDescriptionsUI.HideDescription();
-
+        onComplete?.Invoke();
         currentRoutine = null;
     }
 }

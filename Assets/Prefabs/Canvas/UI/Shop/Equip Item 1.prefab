@@ -260,7 +260,7 @@ GameObject:
   - component: {fileID: 1326952650646077578}
   - component: {fileID: 5040596534670380171}
   m_Layer: 5
-  m_Name: Equip Item
+  m_Name: Equip Item 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

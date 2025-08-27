@@ -244,7 +244,7 @@ public class PlayerShoot : MonoBehaviour, IWeapon, IReloadable
 
         weaponUI?.UpdateAmmoUI(currentAmmo, reserveAmmo);
 
-        Debug.Log($"Added {bulletsAdded} bullets to {gunData.name}. Current: {currentAmmo}/{gunData.magazineSize}, Reserve: {reserveAmmo}/{gunData.reserveAmmo}");
+        // Debug.Log($"Added {bulletsAdded} bullets to {gunData.name}. Current: {currentAmmo}/{gunData.magazineSize}, Reserve: {reserveAmmo}/{gunData.reserveAmmo}");
 
         return bulletsAdded;
     }
