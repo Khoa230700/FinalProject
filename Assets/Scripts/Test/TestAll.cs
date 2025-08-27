@@ -9,7 +9,7 @@ public class TestAll : MonoBehaviour
     void Update()
     {
         // Test damage
-        if (Input.GetKey(KeyCode.T))
+        if (Input.GetKeyDown(KeyCode.T))
         {
             GameObject.FindGameObjectWithTag("Player")
                 .GetComponent<PlayerHealth>()

@@ -84,9 +84,9 @@ public class BarUI : MonoBehaviour
         currentValue = Mathf.Clamp(newValue, 0, maxValue);
 
         UpdateUI();
-        
+
         if (delayedBarImage == null) return;
-        if (currentValue >= oldValue)
+        if (currentValue >= oldValue || currentValue <= 0)
             delayedBarImage.fillAmount = barImage.fillAmount;
         else
             delayedRoutine = StartCoroutine(AnimateDelayedBar(currentValue));
