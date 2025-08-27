@@ -7,7 +7,7 @@ public class PlayerHealth : MonoBehaviour, IDamageable
 {
     [Header("Settings")]
     public float maxHealth = 100;
-    [HideInInspector] public float currentHealth;
+    public float currentHealth;
     [HideInInspector] public UnityEvent<float, Vector3> OnTakeDamage;
 
     [Header("Regeneration")]

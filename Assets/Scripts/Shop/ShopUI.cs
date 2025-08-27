@@ -14,6 +14,7 @@ public class ShopUI : MonoBehaviour
 
     // State
     public bool isOpen = false;
+    public bool canOpen = true;
     private Coroutine currentRoutine;
 
     // Cached references
@@ -21,6 +22,7 @@ public class ShopUI : MonoBehaviour
     private PressKeyEvent pressKeyEvent;
     private EquipDescriptionsUI equipDescriptionsUI;
     private IWeapon[] allWeapon;
+    private PlayerHealth playerHealth;
 
     private void Start()
     {
@@ -29,27 +31,34 @@ public class ShopUI : MonoBehaviour
         shopAnimator = GetComponent<Animator>();
 
         allWeapon = GameObject.FindWithTag("Player")?.GetComponentsInChildren<IWeapon>(true);
+        playerHealth = GameObject.FindWithTag("Player")?.GetComponent<PlayerHealth>();
     }
 
     public void Show()
     {
-        if (currentRoutine != null) StopCoroutine(currentRoutine);
+        if (isOpen || !canOpen) return;
+        
+        isOpen = true;
 
+        // Update weapon UIs
         foreach (var weapon in allWeapon)
         {
             UpdateWeaponUI(weapon);
         }
 
+        // Update health UI
+        UpdateHealthUI();
+
+        if (currentRoutine != null) StopCoroutine(currentRoutine);
         currentRoutine = StartCoroutine(ShowCoroutine());
-        isOpen = true;
     }
 
     public void Hide()
     {
-        if (currentRoutine != null) StopCoroutine(currentRoutine);
-
-        currentRoutine = StartCoroutine(HideCoroutine());
         isOpen = false;
+
+        if (currentRoutine != null) StopCoroutine(currentRoutine);
+        currentRoutine = StartCoroutine(HideCoroutine());
     }
 
     private void UpdateWeaponUI(IWeapon weapon)
@@ -89,6 +98,14 @@ public class ShopUI : MonoBehaviour
     {
         if (meleeUI != null)
             meleeUI.UpdateMeleeSlotUI(melee, melee.level);
+    }
+
+    private void UpdateHealthUI()
+    {
+        if (medicUI != null && playerHealth != null)
+        {
+            medicUI.UpdateHealthSlotUI(playerHealth);
+        }
     }
 
     private IEnumerator ShowCoroutine()

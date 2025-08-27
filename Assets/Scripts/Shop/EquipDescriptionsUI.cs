@@ -21,6 +21,8 @@ public class EquipDescriptionsUI : MonoBehaviour
     [Header("Action Buttons")]
     [SerializeField] private Button refillButton;
     [SerializeField] private Button upgradeButton;
+    [SerializeField] private Sprite healthIconSprite; // Assign health icon in inspector
+
 
     public Button RefillButton => refillButton;
     public Button UpgradeButton => upgradeButton;
@@ -30,9 +32,9 @@ public class EquipDescriptionsUI : MonoBehaviour
         HideDescription();
     }
 
-    public void UpdateDescriptionUI(GunData gunData = null, MeleeData meleeData = null, int meleeLevel = 0)
+    public void UpdateDescriptionUI(GunData gunData = null, MeleeData meleeData = null, int meleeLevel = 0, PlayerHealth playerHealth = null)
     {
-        if (gunData == null && meleeData == null)
+        if (gunData == null && meleeData == null && playerHealth == null)
         {
             HideDescription();
             return;
@@ -64,6 +66,56 @@ public class EquipDescriptionsUI : MonoBehaviour
             HideButton(refillButton);
             ShowButton(upgradeButton);
         }
+        else if (playerHealth != null)
+        {
+            nameText.text = "Medical Kit";
+            typeText.text = "Health";
+            avatarImage.sprite = healthIconSprite; // Use health icon
+
+            SetHealthProperties();
+
+            ShowButton(refillButton); // Will be used as "Heal" button
+            HideButton(upgradeButton);
+        }
+    }
+
+    private void SetGunProperties(GunData gunData)
+    {
+        damageUI.SetValue(gunData.damage, 100f);
+        rangeUI.SetValue(gunData.range, 100f);
+        magSizeUI.SetValue(gunData.magazineSize, 100f);
+        speedUI.SetValue(gunData.roundsPerSecond, 20f, "0.0");
+        reloadUI.SetValue(gunData.reloadTime, 10f, "0.0");
+        reserveUI.SetValue(gunData.reserveAmmo);
+
+        // Show all properties for guns
+        magSizeUI.gameObject.SetActive(true);
+        reloadUI.gameObject.SetActive(true);
+        reserveUI.gameObject.SetActive(true);
+    }
+
+    private void SetMeleeProperties(MeleeData meleeData, int level)
+    {
+        damageUI.SetValue(meleeData.GetDamage(level), 100f);
+        rangeUI.SetValue(meleeData.GetRange(level), 10f);
+        speedUI.SetValue(1f / meleeData.GetCooldown(level), 10f, "0.0");
+
+        // Hide irrelevant properties for melee
+        magSizeUI.gameObject.SetActive(false);
+        reloadUI.gameObject.SetActive(false);
+        reserveUI.gameObject.SetActive(false);
+    }
+
+    private void SetHealthProperties()
+    {
+        // Hide all UI elements
+        avatarImage.gameObject.SetActive(true);
+        damageUI.gameObject.SetActive(false);
+        rangeUI.gameObject.SetActive(false);
+        magSizeUI.gameObject.SetActive(false);
+        speedUI.gameObject.SetActive(false);
+        reloadUI.gameObject.SetActive(false);
+        reserveUI.gameObject.SetActive(false);
     }
 
     private void ShowDescription()
@@ -96,33 +148,6 @@ public class EquipDescriptionsUI : MonoBehaviour
         // Hide all buttons
         HideButton(refillButton);
         HideButton(upgradeButton);
-    }
-
-    private void SetGunProperties(GunData gunData)
-    {
-        damageUI.SetValue(gunData.damage, 100f);
-        rangeUI.SetValue(gunData.range, 100f);
-        magSizeUI.SetValue(gunData.magazineSize, 100f);
-        speedUI.SetValue(gunData.roundsPerSecond, 20f, "0.0");
-        reloadUI.SetValue(gunData.reloadTime, 10f, "0.0");
-        reserveUI.SetValue(gunData.reserveAmmo);
-
-        // Show all properties for guns
-        magSizeUI.gameObject.SetActive(true);
-        reloadUI.gameObject.SetActive(true);
-        reserveUI.gameObject.SetActive(true);
-    }
-
-    private void SetMeleeProperties(MeleeData meleeData, int level)
-    {
-        damageUI.SetValue(meleeData.GetDamage(level), 100f);
-        rangeUI.SetValue(meleeData.GetRange(level), 10f);
-        speedUI.SetValue(1f / meleeData.GetCooldown(level), 10f, "0.0");
-
-        // Hide irrelevant properties for melee
-        magSizeUI.gameObject.SetActive(false);
-        reloadUI.gameObject.SetActive(false);
-        reserveUI.gameObject.SetActive(false);
     }
 
     private void ShowButton(Button button)

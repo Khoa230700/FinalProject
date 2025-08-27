@@ -2,53 +2,84 @@ using UnityEngine;
 
 public class ShopManager : MonoBehaviour
 {
-    public bool RefillAmmo(PlayerShoot gun, int bulletsToBuy = -1)
+    [Header("Settings")]
+    public int healCostPerHP = 1;
+
+    //AMMO
+    public bool RefillAmmo(PlayerShoot gun)
     {
         if (gun == null) return false;
 
-        if (bulletsToBuy == -1)
-            bulletsToBuy = gun.GetAmmoNeeded();
+        int availableCoins = CoinManager.Instance.GetCoins();
+        if (availableCoins <= 0) return false;
 
-        bulletsToBuy = Mathf.Min(bulletsToBuy, gun.GetAmmoNeeded());
-        if (bulletsToBuy <= 0) return false;
+        int bulletsNeeded = gun.gunData.magazineSize + gun.gunData.reserveAmmo - (gun.currentAmmo + gun.reserveAmmo);
+        if (bulletsNeeded <= 0) return false;
 
-        int cost = CalculateRefillCost(gun, bulletsToBuy);
-        if (!CoinManager.Instance.HasEnoughCoins(cost)) return false;
+        int maxAffordableBullets = availableCoins / gun.gunData.bulletRefillCost;
+        int bulletsToBuy = Mathf.Min(bulletsNeeded, maxAffordableBullets);
+        int totalCost = bulletsToBuy * gun.gunData.bulletRefillCost;
 
-        CoinManager.Instance.RemoveCoins(cost);
-        int added = gun.AddAmmo(bulletsToBuy);
-
-        Debug.Log($"Refilled {added} bullets for {gun.gunData.name}. Cost: {cost} coins");
-        return true;
-    }
-
-    public bool CanRefill(PlayerShoot gun, int bulletsToBuy)
-    {
-        if (gun == null) return false;
-        int cost = CalculateRefillCost(gun, bulletsToBuy);
-        return CoinManager.Instance.HasEnoughCoins(cost);
-    }
-
-    public int CalculateRefillCost(PlayerShoot gun, int bulletsToBuy)
-    {
-        if (gun == null) return 0;
-
-        int maxBullets = gun.GetAmmoNeeded();
-        if (bulletsToBuy == -1) bulletsToBuy = maxBullets;
-
-        // Nếu refill full thì áp dụng cost cho max
-        if (bulletsToBuy >= maxBullets)
+        if (bulletsToBuy > 0)
         {
-            int fullCost = maxBullets * gun.gunData.bulletRefillCost;
-            return fullCost;
+            gun.AddAmmo(bulletsToBuy);
+            CoinManager.Instance.RemoveCoins(totalCost);
+            return true;
         }
 
-        return bulletsToBuy * gun.gunData.bulletRefillCost;
+        return false;
     }
 
-    public int GetRefillCost(PlayerShoot gun, int bulletsToBuy = -1)
+    public int GetRefillCost(PlayerShoot gun)
     {
         if (gun == null) return 0;
-        return CalculateRefillCost(gun, bulletsToBuy);
+
+        int bulletsNeeded = gun.gunData.magazineSize + gun.gunData.reserveAmmo - (gun.currentAmmo + gun.reserveAmmo);
+        return bulletsNeeded * gun.gunData.bulletRefillCost;
+    }
+
+    public bool NeedsRefill(PlayerShoot gun)
+    {
+        if (gun == null) return false;
+        return (gun.currentAmmo + gun.reserveAmmo) < (gun.gunData.magazineSize + gun.gunData.reserveAmmo);
+    }
+
+    //HEALTH
+    public bool HealPlayer(PlayerHealth player)
+    {
+        if (player == null) return false;
+
+        int availableCoins = CoinManager.Instance.GetCoins();
+        if (availableCoins <= 0) return false;
+
+        int missingHP = (int)(player.maxHealth - player.currentHealth);
+        if (missingHP <= 0) return false;
+
+        int maxAffordableHP = availableCoins / healCostPerHP;
+        int healAmount = Mathf.Min(missingHP, maxAffordableHP);
+        int cost = healAmount * healCostPerHP;
+
+        if (healAmount > 0)
+        {
+            player.UpdateHealth(healAmount);
+            CoinManager.Instance.RemoveCoins(cost);
+            return true;
+        }
+
+        return false;
+    }
+
+    public int GetHealCost(PlayerHealth player)
+    {
+        if (player == null) return 0;
+
+        int missingHP = (int)(player.maxHealth - player.currentHealth);
+        return missingHP * healCostPerHP;
+    }
+
+    public bool NeedsHealing(PlayerHealth player)
+    {
+        if (player == null) return false;
+        return player.currentHealth < player.maxHealth;
     }
 }

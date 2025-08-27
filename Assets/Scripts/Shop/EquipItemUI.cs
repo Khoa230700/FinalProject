@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class EquipItemUI : MonoBehaviour, ISelectHandler
+public class EquipItemUI : MonoBehaviour, ISelectHandler, IPointerClickHandler
 {
     private static EquipItemUI currentSelected;
 
@@ -12,12 +12,16 @@ public class EquipItemUI : MonoBehaviour, ISelectHandler
     public Image avatar;
     public TMP_Text ammo;
     public TMP_Text priceText;
+    public Image sliderBar;
 
     //Cache
     private GunData gunData = null;
     private MeleeData meleeData = null;
+    private PlayerHealth playerHealthRef = null;
     private int meleeLevel;
     private IWeapon weaponRef;
+    private string currentItemType;
+    private float lastClickTime = 0f;
 
     //References
     private EquipDescriptionsUI equipDescriptionsUI;
@@ -39,8 +43,10 @@ public class EquipItemUI : MonoBehaviour, ISelectHandler
             return;
         }
 
+        currentItemType = "Gun";
         gunData = gun.gunData;
         weaponRef = gun;
+        playerHealthRef = null;
 
         avatar.sprite = gunData.gunSprite;
         ammo.text = $"{currentAmmo}/{reserveAmmo}";
@@ -58,9 +64,11 @@ public class EquipItemUI : MonoBehaviour, ISelectHandler
             return;
         }
 
+        currentItemType = "Melee";
         meleeData = melee.data;
         meleeLevel = level;
         weaponRef = melee;
+        playerHealthRef = null;
 
         avatar.sprite = meleeData.weaponSprite;
         ammo.gameObject.SetActive(false);
@@ -70,18 +78,53 @@ public class EquipItemUI : MonoBehaviour, ISelectHandler
             priceText.gameObject.SetActive(false);
     }
 
+    public void UpdateHealthSlotUI(PlayerHealth playerHealth)
+    {
+        if (playerHealth == null)
+        {
+            ClearUI();
+            return;
+        }
+
+        currentItemType = "Health";
+        playerHealthRef = playerHealth;
+        weaponRef = null;
+        gunData = null;
+        meleeData = null;
+
+        ammo.text = $"{(int)playerHealth.currentHealth}/{(int)playerHealth.maxHealth}";
+        sliderBar.fillAmount = playerHealth.currentHealth / playerHealth.maxHealth;
+        ammo.gameObject.SetActive(true);
+
+        // Update heal price
+        UpdateHealPrice(playerHealth);
+    }
+
     private void UpdateRefillPrice(PlayerShoot gun)
     {
         if (priceText == null || shopManager == null) return;
 
-        if (gun.NeedsRefill())
+        if (shopManager.NeedsRefill(gun))
         {
             int refillCost = shopManager.GetRefillCost(gun);
-            priceText.text = $"$ {refillCost}";
+            int availableCoins = CoinManager.Instance.GetCoins();
+
+            // Show partial refill cost if can't afford full
+            if (availableCoins < refillCost && availableCoins > 0)
+            {
+                int maxAffordableBullets = availableCoins / gun.gunData.bulletRefillCost;
+                int partialCost = maxAffordableBullets * gun.gunData.bulletRefillCost;
+                priceText.text = $"$ {partialCost}";
+            }
+            else
+            {
+                priceText.text = $"$ {refillCost}";
+            }
+
             priceText.gameObject.SetActive(true);
 
             // Change color based on affordability
-            bool canAfford = CoinManager.Instance.HasEnoughCoins(refillCost);
+            bool canAfford = CoinManager.Instance.HasEnoughCoins(gun.gunData.bulletRefillCost);
             priceText.color = canAfford ? new Color(0.392f, 0.698f, 0.812f) : Color.red;
         }
         else
@@ -92,36 +135,38 @@ public class EquipItemUI : MonoBehaviour, ISelectHandler
         }
     }
 
-    public void OnSelect(BaseEventData eventData)
+    private void UpdateHealPrice(PlayerHealth playerHealth)
     {
-        ApplySelection();
-    }
+        if (priceText == null || shopManager == null) return;
 
-    private void ApplySelection()
-    {
-        if (equipDescriptionsUI == null) return;
-
-        if (currentSelected != null && currentSelected != this)
+        if (shopManager.NeedsHealing(playerHealth))
         {
-            currentSelected.animator.SetBool("IsSelected", false);
-        }
+            int healCost = shopManager.GetHealCost(playerHealth);
+            int availableCoins = CoinManager.Instance.GetCoins();
 
-        currentSelected = this;
-        animator.SetBool("IsSelected", true);
+            // Show partial heal cost if can't afford full
+            if (availableCoins < healCost && availableCoins >= shopManager.healCostPerHP)
+            {
+                int maxAffordableHP = availableCoins / shopManager.healCostPerHP;
+                int partialCost = maxAffordableHP * shopManager.healCostPerHP;
+                priceText.text = $"$ {partialCost}";
+            }
+            else
+            {
+                priceText.text = $"$ {healCost}";
+            }
 
-        equipDescriptionsUI.ClearButtonListeners();
+            priceText.gameObject.SetActive(true);
 
-        if (gunData != null)
-        {
-            UpdateGunDescription();
-        }
-        else if (meleeData != null)
-        {
-            UpdateMeleeDescription();
+            // Change color based on affordability
+            bool canAfford = CoinManager.Instance.HasEnoughCoins(shopManager.healCostPerHP);
+            priceText.color = canAfford ? new Color(0.392f, 0.698f, 0.812f) : Color.red;
         }
         else
         {
-            equipDescriptionsUI.HideDescription();
+            priceText.text = "Full Health";
+            priceText.color = new Color(0.392f, 0.698f, 0.812f);
+            priceText.gameObject.SetActive(true);
         }
     }
 
@@ -138,22 +183,33 @@ public class EquipItemUI : MonoBehaviour, ISelectHandler
             var gun = weaponRef as PlayerShoot;
             if (gun != null)
             {
-                bool needsRefill = gun.NeedsRefill();
+                bool needsRefill = shopManager.NeedsRefill(gun);
                 int refillCost = shopManager.GetRefillCost(gun);
-                bool canAfford = CoinManager.Instance.HasEnoughCoins(refillCost);
+                int availableCoins = CoinManager.Instance.GetCoins();
+                bool canAffordSome = availableCoins >= gun.gunData.bulletRefillCost;
 
                 // Update button text
                 TMP_Text buttonText = equipDescriptionsUI.RefillButton.GetComponentInChildren<TMP_Text>();
                 if (buttonText != null)
                 {
                     if (!needsRefill)
+                    {
                         buttonText.text = "Full Ammo";
+                    }
+                    else if (availableCoins < refillCost && canAffordSome)
+                    {
+                        int maxAffordableBullets = availableCoins / gun.gunData.bulletRefillCost;
+                        int partialCost = maxAffordableBullets * gun.gunData.bulletRefillCost;
+                        buttonText.text = $"Refill ({partialCost})";
+                    }
                     else
+                    {
                         buttonText.text = $"Refill ({refillCost})";
+                    }
                 }
 
                 // Update button interactability
-                equipDescriptionsUI.RefillButton.interactable = needsRefill && canAfford;
+                equipDescriptionsUI.RefillButton.interactable = needsRefill && canAffordSome;
             }
         }
 
@@ -175,6 +231,48 @@ public class EquipItemUI : MonoBehaviour, ISelectHandler
         }
     }
 
+    private void UpdateHealthDescription()
+    {
+        equipDescriptionsUI.UpdateDescriptionUI(playerHealth: playerHealthRef);
+
+        // Setup heal button (reuse RefillButton for healing)
+        if (equipDescriptionsUI.RefillButton != null)
+        {
+            equipDescriptionsUI.RefillButton.onClick.AddListener(HealClicked);
+
+            if (playerHealthRef != null)
+            {
+                bool needsHealing = shopManager.NeedsHealing(playerHealthRef);
+                int healCost = shopManager.GetHealCost(playerHealthRef);
+                int availableCoins = CoinManager.Instance.GetCoins();
+                bool canAffordSome = availableCoins >= shopManager.healCostPerHP;
+
+                // Update button text
+                TMP_Text buttonText = equipDescriptionsUI.RefillButton.GetComponentInChildren<TMP_Text>();
+                if (buttonText != null)
+                {
+                    if (!needsHealing)
+                    {
+                        buttonText.text = "Full Health";
+                    }
+                    else if (availableCoins < healCost && canAffordSome)
+                    {
+                        int maxAffordableHP = availableCoins / shopManager.healCostPerHP;
+                        int partialCost = maxAffordableHP * shopManager.healCostPerHP;
+                        buttonText.text = $"Heal ({partialCost})";
+                    }
+                    else
+                    {
+                        buttonText.text = $"Heal ({healCost})";
+                    }
+                }
+
+                // Update button interactability
+                equipDescriptionsUI.RefillButton.interactable = needsHealing && canAffordSome;
+            }
+        }
+    }
+
     public void RefillClicked()
     {
         if (weaponRef == null) return;
@@ -191,9 +289,36 @@ public class EquipItemUI : MonoBehaviour, ISelectHandler
         }
     }
 
+    public void HealClicked()
+    {
+        if (playerHealthRef == null) return;
+
+        bool success = shopManager.HealPlayer(playerHealthRef);
+
+        // Update UI after heal attempt
+        if (success)
+        {
+            UpdateHealthSlotUI(playerHealthRef);
+
+            // Refresh the selection to update button states
+            ApplySelection();
+        }
+    }
+
     private void UpgradeClicked()
     {
-        Debug.Log($"Upgrading {weaponRef.GetType().Name}");
+        switch (currentItemType)
+        {
+            case "Gun":
+                Debug.Log($"Upgrading {weaponRef.GetType().Name}");
+                break;
+            case "Melee":
+                Debug.Log($"Upgrading {weaponRef.GetType().Name}");
+                break;
+            case "Health":
+                Debug.Log("Upgrading Health/Medical item");
+                break;
+        }
     }
 
     private void ClearUI()
@@ -201,6 +326,7 @@ public class EquipItemUI : MonoBehaviour, ISelectHandler
         gunData = null;
         meleeData = null;
         weaponRef = null;
+        playerHealthRef = null;
 
         if (avatar != null)
             avatar.sprite = null;
@@ -208,5 +334,59 @@ public class EquipItemUI : MonoBehaviour, ISelectHandler
             ammo.text = "";
         if (priceText != null)
             priceText.gameObject.SetActive(false);
+    }
+
+    public void OnSelect(BaseEventData eventData)
+    {
+        ApplySelection();
+    }
+
+    private void ApplySelection()
+    {
+        if (equipDescriptionsUI == null) return;
+
+        if (currentSelected != null && currentSelected != this)
+        {
+            currentSelected.animator.SetBool("IsSelected", false);
+        }
+
+        currentSelected = this;
+        animator.SetBool("IsSelected", true);
+
+        equipDescriptionsUI.ClearButtonListeners();
+
+        switch (currentItemType)
+        {
+            case "Gun":
+                if (gunData != null) UpdateGunDescription();
+                break;
+            case "Melee":
+                if (meleeData != null) UpdateMeleeDescription();
+                break;
+            case "Health":
+                if (playerHealthRef != null) UpdateHealthDescription();
+                break;
+            default:
+                equipDescriptionsUI.HideDescription();
+                break;
+        }
+    }
+
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        if (Time.time - lastClickTime < 0.3f)
+        {
+            switch (currentItemType)
+            {
+                case "Gun":
+                    RefillClicked();
+                    break;
+                case "Health":
+                    HealClicked();
+                    break;
+            }
+        }
+
+        lastClickTime = Time.time;
     }
 }
