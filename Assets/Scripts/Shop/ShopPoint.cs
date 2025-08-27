@@ -100,6 +100,6 @@ public class ShopPoint : MonoBehaviour
         }
 
         if (arrow != null)
-            Destroy(arrow, 0.5f);
+            Destroy(arrow, 5f);
     }
 }
