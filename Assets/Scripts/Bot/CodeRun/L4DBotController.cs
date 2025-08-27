@@ -18,7 +18,7 @@ public class L4DBotController : MonoBehaviour
 
     private NavMeshAgent agent;
     private Animator animator;
-    private float fireCooldown = 0f;
+    public float fireCooldown = 0f;
     private GameObject currentTarget;
 
     private void Start()
@@ -51,14 +51,12 @@ public class L4DBotController : MonoBehaviour
 
         
         currentTarget = FindNearestVisibleZombie();
-
         if (currentTarget != null)
         {
             float distToTarget = Vector3.Distance(transform.position, currentTarget.transform.position);
-
             if (distToTarget <= detectionRange)
             {
-               
+                Debug.Log("Shooting at target: ");
                 agent.isStopped = true;
               
                 agent.SetDestination(transform.position);
@@ -73,7 +71,7 @@ public class L4DBotController : MonoBehaviour
 
                 if (fireCooldown <= 0f)
                 {
-                    
+                   
                     animator.SetTrigger("shoot");
                     Shoot(currentTarget.transform);
                     AudioBotManager.Instance.ShootSound();
@@ -127,7 +125,7 @@ public class L4DBotController : MonoBehaviour
         Vector3 direction = (targetPoint - firePoint.position).normalized;
         float distance = Vector3.Distance(firePoint.position, targetPoint);
 
-        Debug.DrawRay(firePoint.position, direction * distance, Color.red);
+    
         if (Physics.Raycast(firePoint.position, direction, out RaycastHit hit,distance))
         {
             return hit.collider.CompareTag("Enemy");
@@ -138,6 +136,7 @@ public class L4DBotController : MonoBehaviour
 
     private void Shoot(Transform target)
     {
+        Debug.Log("Shooting at target: " + target.name);
         if (firePoint == null || target == null) return;
 
         Vector3 aimPoint = GetAimPoint(target);
@@ -158,7 +157,7 @@ public class L4DBotController : MonoBehaviour
             {
                 wFX_LightFlicker.FlickerOnce();
             }
-            var hb = hit.collider.GetComponent<Hitbox>();
+            var hb = hit.collider.GetComponentInChildren<Hitbox>();
             if (hb != null )
             {
                
@@ -169,7 +168,7 @@ public class L4DBotController : MonoBehaviour
             var health = hit.collider.GetComponent<EnemyM>();
             if (health != null)
             {
-                health.TakeDamage(20); // tuỳ vào hệ thống bạn dùng
+                health.TakeDamage(20); 
             }
 
           
@@ -186,10 +185,9 @@ public class L4DBotController : MonoBehaviour
         if (col != null)
             return col.transform.position;
 
-        EnemiAI ai = target.GetComponent<EnemiAI>();
+        EnemiAI ai = target.GetComponentInChildren<EnemiAI>();
         if (ai != null && target.gameObject.CompareTag("Enemy"))
             return target.position + Vector3.up * 1.5f;
-
         return target.position + Vector3.up * 1.2f;
 
       
