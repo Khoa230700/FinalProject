@@ -11,4 +11,15 @@ public class PlayerStats : ScriptableObject
 
     [Range(0f, 1f)]
     public float airControlMultiplier = 0.5f; // điều khiển trên không
+
+    // >>> NEW: Vitals <<<
+    [Header("Vitals")]
+    public float maxHealth = 100f;
+    public float maxShield = 50f;
+
+    [Tooltip("Hồi shield mỗi giây (0 = tắt hồi)")]
+    public float shieldRegenPerSecond = 15f;
+
+    [Tooltip("Trễ hồi shield sau khi bị trúng đòn")]
+    public float shieldRegenDelay = 3f;
 }
