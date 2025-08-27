@@ -2,8 +2,12 @@ using System.Collections;
 using UnityEngine;
 using static UnityEngine.Rendering.DebugUI;
 
-public class BotHealth : HealthBase , IDamageable
+public class BotHealth : MonoBehaviour, IDamageable
 {
+    [Header("Settings")]
+    public float maxHealth = 100;
+    [HideInInspector] public float currentHealth;
+
     [Header("Regeneration")]
     public bool useRegen;
     public float regenRate;
@@ -12,14 +16,14 @@ public class BotHealth : HealthBase , IDamageable
     private Coroutine regenRoutine;
     [SerializeField] private BotShield shield;
 
-    protected override void Start()
+    private void Start()
     {
-        base.Start();
+        UpdateHealth(maxHealth);
         shield ??= GetComponent<BotShield>();
     }
 
     //* Nh?n s�t th??ng qua l� ch?n v� t�nh to�n s�t th??ng c�n l?i, th�m kh? n?ng xuy�n l� ch?n , th�m v�o ?i?m va ch?m
-    public override void TakeDamage(float damage, float penetrationPercent = 0f, Vector3 hitPoint = default)
+    public void TakeDamage(float damage, float penetrationPercent = 0f, Vector3 hitPoint = default)
     {
         //* Kh?i ??ng t�i t?o khi nh?n s�t th??ng
         if (regenRoutine != null) StopCoroutine(regenRoutine);
@@ -35,7 +39,7 @@ public class BotHealth : HealthBase , IDamageable
 
         float finalHealthDamage = leftoverDamage + damageBypassShield; //* T?ng s�t th??ng v�o m�u
 
-        OnTakeDamage?.Invoke(-finalHealthDamage, hitPoint); //* G?i s? ki?n khi M�U nh?n s�t th??ng
+        // OnTakeDamage?.Invoke(-finalHealthDamage, hitPoint); //* G?i s? ki?n khi M�U nh?n s�t th??ng
         //OnTakeDamage?.Invoke(-damage, hitPoint); //* G?i s? ki?n khi nh?n s�t th??ng
 
         UpdateHealth(-finalHealthDamage);
@@ -59,7 +63,7 @@ public class BotHealth : HealthBase , IDamageable
     }
 
     //* H?i m�u (+ h?i, - tr?)
-    protected override void UpdateHealth(float amount)
+    public void UpdateHealth(float amount)
     {
         currentHealth = Mathf.Clamp(currentHealth + amount, 0, maxHealth);
       
@@ -68,7 +72,7 @@ public class BotHealth : HealthBase , IDamageable
             Die();
     }
 
-    protected override void Die()
+    public void Die()
     {
         Debug.Log("Die!");
     }
