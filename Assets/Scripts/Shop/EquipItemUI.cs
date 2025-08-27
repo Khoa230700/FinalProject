@@ -18,9 +18,10 @@ public class EquipItemUI : MonoBehaviour, ISelectHandler, IPointerClickHandler
     private GunData gunData = null;
     private MeleeData meleeData = null;
     private PlayerHealth playerHealthRef = null;
-    private int meleeLevel;
-    private IWeapon weaponRef;
-    private string currentItemType;
+    private PlayerShield playerShieldRef = null;
+    private IWeapon weaponRef = null;
+    private int meleeLevel = 0;
+    private string currentItemType = null;
     private float lastClickTime = 0f;
 
     //References
@@ -78,26 +79,46 @@ public class EquipItemUI : MonoBehaviour, ISelectHandler, IPointerClickHandler
             priceText.gameObject.SetActive(false);
     }
 
-    public void UpdateHealthSlotUI(PlayerHealth playerHealth)
+    public void UpdateStatSlotUI(object statObject, string type)
     {
-        if (playerHealth == null)
-        {
-            ClearUI();
-            return;
-        }
-
-        currentItemType = "Health";
-        playerHealthRef = playerHealth;
+        currentItemType = type;
         weaponRef = null;
         gunData = null;
         meleeData = null;
+        playerHealthRef = null;
+        playerShieldRef = null;
 
-        ammo.text = $"{(int)playerHealth.currentHealth}/{(int)playerHealth.maxHealth}";
-        sliderBar.fillAmount = playerHealth.currentHealth / playerHealth.maxHealth;
+        float current = 0f;
+        float max = 1f;
+
+        switch (type)
+        {
+            case "Health":
+                if (statObject is PlayerHealth ph)
+                {
+                    playerHealthRef = ph;
+                    current = ph.currentHealth;
+                    max = ph.maxHealth;
+
+                    UpdateHealPrice(ph);
+                }
+                break;
+
+            case "Shield":
+                if (statObject is PlayerShield ps)
+                {
+                    playerShieldRef = ps;
+                    current = ps.currentShield;
+                    max = ps.maxShield;
+
+                    UpdateShieldPrice(ps);
+                }
+                break;
+        }
+
+        ammo.text = $"{(int)current}/{(int)max}";
+        sliderBar.fillAmount = current / max;
         ammo.gameObject.SetActive(true);
-
-        // Update heal price
-        UpdateHealPrice(playerHealth);
     }
 
     private void UpdateRefillPrice(PlayerShoot gun)
@@ -139,7 +160,7 @@ public class EquipItemUI : MonoBehaviour, ISelectHandler, IPointerClickHandler
     {
         if (priceText == null || shopManager == null) return;
 
-        if (shopManager.NeedsHealing(playerHealth))
+        if (shopManager.NeedsHeal(playerHealth))
         {
             int healCost = shopManager.GetHealCost(playerHealth);
             int availableCoins = CoinManager.Instance.GetCoins();
@@ -165,6 +186,40 @@ public class EquipItemUI : MonoBehaviour, ISelectHandler, IPointerClickHandler
         else
         {
             priceText.text = "Full Health";
+            priceText.color = new Color(0.392f, 0.698f, 0.812f);
+            priceText.gameObject.SetActive(true);
+        }
+    }
+    private void UpdateShieldPrice(PlayerShield playerShield)
+    {
+        if (priceText == null || shopManager == null) return;
+
+        if (shopManager.NeedsShield(playerShield))
+        {
+            int shieldCost = shopManager.GetShieldCost(playerShield);
+            int availableCoins = CoinManager.Instance.GetCoins();
+
+            // Show partial shield cost if can't afford full
+            if (availableCoins < shieldCost && availableCoins >= shopManager.shieldCostPerPoint)
+            {
+                int maxAffordableHP = availableCoins / shopManager.healCostPerHP;
+                int partialCost = maxAffordableHP * shopManager.healCostPerHP;
+                priceText.text = $"$ {partialCost}";
+            }
+            else
+            {
+                priceText.text = $"$ {shieldCost}";
+            }
+
+            priceText.gameObject.SetActive(true);
+
+            // Change color based on affordability
+            bool canAfford = CoinManager.Instance.HasEnoughCoins(shopManager.healCostPerHP);
+            priceText.color = canAfford ? new Color(0.392f, 0.698f, 0.812f) : Color.red;
+        }
+        else
+        {
+            priceText.text = "Full Shield";
             priceText.color = new Color(0.392f, 0.698f, 0.812f);
             priceText.gameObject.SetActive(true);
         }
@@ -231,45 +286,77 @@ public class EquipItemUI : MonoBehaviour, ISelectHandler, IPointerClickHandler
         }
     }
 
-    private void UpdateHealthDescription()
+    private void UpdateStatDescription<T>(T statRef, string statType)
     {
-        equipDescriptionsUI.UpdateDescriptionUI(playerHealth: playerHealthRef);
+        if (statRef == null) return;
 
-        // Setup heal button (reuse RefillButton for healing)
+        // Cập nhật UI description (sử dụng EquipDescriptionsUI chung)
+        if (statType == "Health" && statRef is PlayerHealth health)
+        {
+            equipDescriptionsUI.UpdateDescriptionUI(playerHealth: health);
+        }
+        else if (statType == "Shield" && statRef is PlayerShield shield)
+        {
+            equipDescriptionsUI.UpdateDescriptionUI(playerShield: shield);
+        }
+
+        // Setup Refill/Heal/Recharge button
         if (equipDescriptionsUI.RefillButton != null)
         {
-            equipDescriptionsUI.RefillButton.onClick.AddListener(HealClicked);
+            equipDescriptionsUI.RefillButton.onClick.RemoveAllListeners(); // tránh trùng listener
 
-            if (playerHealthRef != null)
+            equipDescriptionsUI.RefillButton.onClick.AddListener(() =>
             {
-                bool needsHealing = shopManager.NeedsHealing(playerHealthRef);
-                int healCost = shopManager.GetHealCost(playerHealthRef);
-                int availableCoins = CoinManager.Instance.GetCoins();
-                bool canAffordSome = availableCoins >= shopManager.healCostPerHP;
+                if (statType == "Health" && statRef is PlayerHealth h)
+                    shopManager.HealPlayer(h);
+                else if (statType == "Shield" && statRef is PlayerShield s)
+                    shopManager.ShieldPlayer(s);
 
-                // Update button text
-                TMP_Text buttonText = equipDescriptionsUI.RefillButton.GetComponentInChildren<TMP_Text>();
-                if (buttonText != null)
-                {
-                    if (!needsHealing)
-                    {
-                        buttonText.text = "Full Health";
-                    }
-                    else if (availableCoins < healCost && canAffordSome)
-                    {
-                        int maxAffordableHP = availableCoins / shopManager.healCostPerHP;
-                        int partialCost = maxAffordableHP * shopManager.healCostPerHP;
-                        buttonText.text = $"Heal ({partialCost})";
-                    }
-                    else
-                    {
-                        buttonText.text = $"Heal ({healCost})";
-                    }
-                }
+                // Cập nhật lại UI sau khi dùng
+                UpdateStatDescription(statRef, statType);
+            });
 
-                // Update button interactability
-                equipDescriptionsUI.RefillButton.interactable = needsHealing && canAffordSome;
+            int cost = 0;
+            bool needsRefill = false;
+            int availableCoins = CoinManager.Instance.GetCoins();
+            bool canAffordSome = false;
+
+            if (statType == "Health" && statRef is PlayerHealth h2)
+            {
+                cost = shopManager.GetHealCost(h2);
+                needsRefill = shopManager.NeedsHeal(h2);
+                canAffordSome = availableCoins >= shopManager.healCostPerHP;
             }
+            else if (statType == "Shield" && statRef is PlayerShield s2)
+            {
+                cost = shopManager.GetShieldCost(s2);
+                needsRefill = shopManager.NeedsShield(s2);
+                canAffordSome = availableCoins >= shopManager.shieldCostPerPoint;
+            }
+
+            // Update button text
+            TMP_Text buttonText = equipDescriptionsUI.RefillButton.GetComponentInChildren<TMP_Text>();
+            if (buttonText != null)
+            {
+                if (!needsRefill)
+                {
+                    buttonText.text = $"Full {statType}";
+                }
+                else if (availableCoins < cost && canAffordSome)
+                {
+                    int maxAffordable = (statType == "Health") ? availableCoins / shopManager.healCostPerHP
+                                                                : availableCoins / shopManager.shieldCostPerPoint;
+                    int partialCost = maxAffordable * ((statType == "Health") ? shopManager.healCostPerHP : shopManager.shieldCostPerPoint);
+                    buttonText.text = $"{statType} ({partialCost})";
+                }
+                else
+                {
+                    buttonText.text = $"{statType} ({cost})";
+                }
+            }
+
+            // Update interactable
+            equipDescriptionsUI.RefillButton.interactable = needsRefill && canAffordSome;
         }
     }
 
@@ -289,18 +376,29 @@ public class EquipItemUI : MonoBehaviour, ISelectHandler, IPointerClickHandler
         }
     }
 
-    public void HealClicked()
+    public void RestoreClicked()
     {
-        if (playerHealthRef == null) return;
+        bool success = false;
 
-        bool success = shopManager.HealPlayer(playerHealthRef);
+        if (playerHealthRef != null)
+        {
+            success = shopManager.HealPlayer(playerHealthRef);
+            if (success)
+                UpdateStatSlotUI(playerHealthRef, "Health");
+        }
+        else if (playerShieldRef != null)
+        {
+            success = shopManager.ShieldPlayer(playerShieldRef);
+            if (success)
+            {
+                UpdateStatSlotUI(playerShieldRef, "Shield");
+                Debug.Log("here");
+            }
+        }
 
-        // Update UI after heal attempt
         if (success)
         {
-            UpdateHealthSlotUI(playerHealthRef);
-
-            // Refresh the selection to update button states
+            // Refresh selection để cập nhật button states
             ApplySelection();
         }
     }
@@ -316,7 +414,8 @@ public class EquipItemUI : MonoBehaviour, ISelectHandler, IPointerClickHandler
                 Debug.Log($"Upgrading {weaponRef.GetType().Name}");
                 break;
             case "Health":
-                Debug.Log("Upgrading Health/Medical item");
+            case "Shield":
+                Debug.Log("Upgrading Health/Shield item");
                 break;
         }
     }
@@ -364,7 +463,9 @@ public class EquipItemUI : MonoBehaviour, ISelectHandler, IPointerClickHandler
                 if (meleeData != null) UpdateMeleeDescription();
                 break;
             case "Health":
-                if (playerHealthRef != null) UpdateHealthDescription();
+            case "Shield":
+                if (playerHealthRef != null) UpdateStatDescription(playerHealthRef, "Health");
+                else if (playerShieldRef != null) UpdateStatDescription(playerShieldRef, "Shield");
                 break;
             default:
                 equipDescriptionsUI.HideDescription();
@@ -382,7 +483,8 @@ public class EquipItemUI : MonoBehaviour, ISelectHandler, IPointerClickHandler
                     RefillClicked();
                     break;
                 case "Health":
-                    HealClicked();
+                case "Shield":
+                    RestoreClicked();
                     break;
             }
         }

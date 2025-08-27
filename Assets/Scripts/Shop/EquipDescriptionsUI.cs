@@ -21,7 +21,10 @@ public class EquipDescriptionsUI : MonoBehaviour
     [Header("Action Buttons")]
     [SerializeField] private Button refillButton;
     [SerializeField] private Button upgradeButton;
-    [SerializeField] private Sprite healthIconSprite; // Assign health icon in inspector
+
+    [Header("Icons")]
+    [SerializeField] private Sprite healthIconSprite;
+    [SerializeField] private Sprite shieldIconSprite;
 
 
     public Button RefillButton => refillButton;
@@ -32,9 +35,10 @@ public class EquipDescriptionsUI : MonoBehaviour
         HideDescription();
     }
 
-    public void UpdateDescriptionUI(GunData gunData = null, MeleeData meleeData = null, int meleeLevel = 0, PlayerHealth playerHealth = null)
+    public void UpdateDescriptionUI(GunData gunData = null, MeleeData meleeData = null, int meleeLevel = 0,
+                                    PlayerHealth playerHealth = null, PlayerShield playerShield = null)
     {
-        if (gunData == null && meleeData == null && playerHealth == null)
+        if (gunData == null && meleeData == null && playerHealth == null && playerShield == null)
         {
             HideDescription();
             return;
@@ -49,7 +53,7 @@ public class EquipDescriptionsUI : MonoBehaviour
             typeText.text = gunData.gunType.ToString();
             avatarImage.sprite = gunData.gunSpriteFullColor;
 
-            SetGunProperties(gunData);
+            UpdateGunProperties(gunData);
 
             ShowButton(refillButton);
             ShowButton(upgradeButton);
@@ -61,25 +65,38 @@ public class EquipDescriptionsUI : MonoBehaviour
             typeText.text = "Melee";
             avatarImage.sprite = meleeData.weaponSpriteFullColor;
 
-            SetMeleeProperties(meleeData, meleeLevel);
+            UpdateMeleeProperties(meleeData, meleeLevel);
 
             HideButton(refillButton);
             ShowButton(upgradeButton);
         }
         else if (playerHealth != null)
         {
+            // --- Health ---
             nameText.text = "Medical Kit";
             typeText.text = "Health";
-            avatarImage.sprite = healthIconSprite; // Use health icon
+            avatarImage.sprite = healthIconSprite;
 
-            SetHealthProperties();
+            UpdateStatProperties();
 
             ShowButton(refillButton); // Will be used as "Heal" button
             HideButton(upgradeButton);
         }
+        else if (playerShield != null)
+        {
+            // --- Shield ---
+            nameText.text = "Shield Kit";
+            typeText.text = "Shield";
+            avatarImage.sprite = shieldIconSprite;
+
+            UpdateStatProperties();
+
+            ShowButton(refillButton); // Will be used as "Shield" button
+            HideButton(upgradeButton);
+        }
     }
 
-    private void SetGunProperties(GunData gunData)
+    private void UpdateGunProperties(GunData gunData)
     {
         damageUI.SetValue(gunData.damage, 100f);
         rangeUI.SetValue(gunData.range, 100f);
@@ -94,7 +111,7 @@ public class EquipDescriptionsUI : MonoBehaviour
         reserveUI.gameObject.SetActive(true);
     }
 
-    private void SetMeleeProperties(MeleeData meleeData, int level)
+    private void UpdateMeleeProperties(MeleeData meleeData, int level)
     {
         damageUI.SetValue(meleeData.GetDamage(level), 100f);
         rangeUI.SetValue(meleeData.GetRange(level), 10f);
@@ -106,7 +123,7 @@ public class EquipDescriptionsUI : MonoBehaviour
         reserveUI.gameObject.SetActive(false);
     }
 
-    private void SetHealthProperties()
+    private void UpdateStatProperties()
     {
         // Hide all UI elements
         avatarImage.gameObject.SetActive(true);

@@ -11,7 +11,7 @@ public class TimerUI : MonoBehaviour
     [SerializeField] private TextMeshProUGUI[] timeTexts;
     [SerializeField] private Animator waveUI;
 
-    private int timerForShop = 0;
+    private int timerForShop = 10; //Test
     private int lastSecondPlayed = -1;
 
     private void Awake()

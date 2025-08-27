@@ -23,6 +23,7 @@ public class ShopUI : MonoBehaviour
     private EquipDescriptionsUI equipDescriptionsUI;
     private IWeapon[] allWeapon;
     private PlayerHealth playerHealth;
+    private PlayerShield playerShield;
 
     private void Start()
     {
@@ -32,6 +33,7 @@ public class ShopUI : MonoBehaviour
 
         allWeapon = GameObject.FindWithTag("Player")?.GetComponentsInChildren<IWeapon>(true);
         playerHealth = GameObject.FindWithTag("Player")?.GetComponent<PlayerHealth>();
+        playerShield = GameObject.FindWithTag("Player")?.GetComponent<PlayerShield>();
     }
 
     public void Show()
@@ -46,8 +48,7 @@ public class ShopUI : MonoBehaviour
             UpdateWeaponUI(weapon);
         }
 
-        // Update health UI
-        UpdateHealthUI();
+        UpdateStatUI();
 
         if (currentRoutine != null) StopCoroutine(currentRoutine);
         currentRoutine = StartCoroutine(ShowCoroutine());
@@ -100,11 +101,16 @@ public class ShopUI : MonoBehaviour
             meleeUI.UpdateMeleeSlotUI(melee, melee.level);
     }
 
-    private void UpdateHealthUI()
+    private void UpdateStatUI()
     {
         if (medicUI != null && playerHealth != null)
         {
-            medicUI.UpdateHealthSlotUI(playerHealth);
+            medicUI.UpdateStatSlotUI(playerHealth, "Health");
+        }
+
+        if (shieldUI != null && playerShield != null)
+        {
+            shieldUI.UpdateStatSlotUI(playerShield, "Shield");
         }
     }
 

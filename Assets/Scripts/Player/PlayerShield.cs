@@ -7,7 +7,7 @@ public class PlayerShield : MonoBehaviour
 {
     [Header("Values")]
     public float maxShield = 100;
-    private float currentShield;
+    public float currentShield;
 
     [Header("Regeneration")]
     public bool useRegen;
@@ -64,6 +64,7 @@ public class PlayerShield : MonoBehaviour
 
     private void UpdateUI()
     {
+        barUI.SetMaxValue(maxShield);
         barUI.SetValue(currentShield);
     }
 

@@ -45,7 +45,7 @@ public class BarUI : MonoBehaviour
     public void UpdateUI()
     {
         barImage.fillAmount = currentValue / maxValue;
-        if(textObject != null) textObject.text = currentValue.ToString("F0");
+        if (textObject != null) textObject.text = currentValue.ToString("F0");
     }
 
     //* Thiết lập hướng di chuyển của thanh 
@@ -78,7 +78,7 @@ public class BarUI : MonoBehaviour
     //* Thiết lập giá trị của thanh
     public void SetValue(float newValue)
     {
-        if(delayedRoutine != null ) StopCoroutine(delayedRoutine);
+        if (delayedRoutine != null) StopCoroutine(delayedRoutine);
 
         oldValue = currentValue;
         currentValue = Mathf.Clamp(newValue, 0, maxValue);
@@ -108,5 +108,11 @@ public class BarUI : MonoBehaviour
 
         delayedBarImage.fillAmount = endFill;
         delayedRoutine = null;
+    }
+    
+    public void SetMaxValue(float newMax)
+    {
+        maxValue = newMax;
+        UpdateUI();
     }
 }

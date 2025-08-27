@@ -2,7 +2,6 @@ using UnityEngine;
 
 public class TestAll : MonoBehaviour
 {
-    public float damage = 10f;
     public float moveSpeed = 5f;
     public float rotationSpeed = 100f;
 
@@ -13,7 +12,7 @@ public class TestAll : MonoBehaviour
         {
             GameObject.FindGameObjectWithTag("Player")
                 .GetComponent<PlayerHealth>()
-                .TakeDamage(damage, 0f, transform.position);
+                .TakeDamage(Random.Range(10, 50), 0f, transform.position);
         }
 
         // Movement controls

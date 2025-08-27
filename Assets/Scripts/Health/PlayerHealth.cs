@@ -96,6 +96,7 @@ public class PlayerHealth : MonoBehaviour, IDamageable
     
     private void UpdateUI()
     {
+        barUI.SetMaxValue(maxHealth);
         barUI.SetValue(currentHealth);
     }
 }

@@ -4,8 +4,9 @@ public class ShopManager : MonoBehaviour
 {
     [Header("Settings")]
     public int healCostPerHP = 1;
+    public int shieldCostPerPoint = 1; // chi phí nạp shield
 
-    //AMMO
+    // AMMO
     public bool RefillAmmo(PlayerShoot gun)
     {
         if (gun == null) return false;
@@ -33,7 +34,6 @@ public class ShopManager : MonoBehaviour
     public int GetRefillCost(PlayerShoot gun)
     {
         if (gun == null) return 0;
-
         int bulletsNeeded = gun.gunData.magazineSize + gun.gunData.reserveAmmo - (gun.currentAmmo + gun.reserveAmmo);
         return bulletsNeeded * gun.gunData.bulletRefillCost;
     }
@@ -44,7 +44,7 @@ public class ShopManager : MonoBehaviour
         return (gun.currentAmmo + gun.reserveAmmo) < (gun.gunData.magazineSize + gun.gunData.reserveAmmo);
     }
 
-    //HEALTH
+    // HEALTH
     public bool HealPlayer(PlayerHealth player)
     {
         if (player == null) return false;
@@ -72,14 +72,51 @@ public class ShopManager : MonoBehaviour
     public int GetHealCost(PlayerHealth player)
     {
         if (player == null) return 0;
-
         int missingHP = (int)(player.maxHealth - player.currentHealth);
         return missingHP * healCostPerHP;
     }
 
-    public bool NeedsHealing(PlayerHealth player)
+    public bool NeedsHeal(PlayerHealth player)
     {
         if (player == null) return false;
         return player.currentHealth < player.maxHealth;
+    }
+
+    // SHIELD
+    public bool ShieldPlayer(PlayerShield shield)
+    {
+        if (shield == null) return false;
+
+        int availableCoins = CoinManager.Instance.GetCoins();
+        if (availableCoins <= 0) return false;
+
+        int missingShield = (int)(shield.maxShield - shield.currentShield);
+        if (missingShield <= 0) return false;
+
+        int maxAffordablePoints = availableCoins / shieldCostPerPoint;
+        int rechargeAmount = Mathf.Min(missingShield, maxAffordablePoints);
+        int cost = rechargeAmount * shieldCostPerPoint;
+
+        if (rechargeAmount > 0)
+        {
+            shield.UpdateShield(rechargeAmount);
+            CoinManager.Instance.RemoveCoins(cost);
+            return true;
+        }
+
+        return false;
+    }
+
+    public int GetShieldCost(PlayerShield shield)
+    {
+        if (shield == null) return 0;
+        int missingShield = (int)(shield.maxShield - shield.currentShield);
+        return missingShield * shieldCostPerPoint;
+    }
+
+    public bool NeedsShield(PlayerShield shield)
+    {
+        if (shield == null) return false;
+        return shield.currentShield < shield.maxShield;
     }
 }
