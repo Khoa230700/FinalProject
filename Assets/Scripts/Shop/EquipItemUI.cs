@@ -7,488 +7,356 @@ public class EquipItemUI : MonoBehaviour, ISelectHandler, IPointerClickHandler
 {
     private static EquipItemUI currentSelected;
 
-    [Header("UI Elements")]
+    [Header("UI")]
     public Transform upgradeBarParent;
     public Image avatar;
-    public TMP_Text ammo;
-    public TMP_Text priceText;
+    public TMP_Text ammo, priceText;
     public Image sliderBar;
 
-    //Cache
-    private GunData gunData = null;
-    private MeleeData meleeData = null;
-    private PlayerHealth playerHealthRef = null;
-    private PlayerShield playerShieldRef = null;
-    private IWeapon weaponRef = null;
-    private int meleeLevel = 0;
-    private string currentItemType = null;
-    private float lastClickTime = 0f;
+    // Cache
+    private object currentItem;
+    private string itemType;
+    private int meleeLevel;
+    private float lastClickTime;
 
-    //References
-    private EquipDescriptionsUI equipDescriptionsUI;
+    // References
+    private EquipDescriptionsUI descriptionUI;
     private ShopManager shopManager;
     private Animator animator;
 
     private void Awake()
     {
-        equipDescriptionsUI = FindAnyObjectByType<EquipDescriptionsUI>();
+        descriptionUI = FindAnyObjectByType<EquipDescriptionsUI>();
         shopManager = FindAnyObjectByType<ShopManager>();
         animator = GetComponent<Animator>();
     }
 
-    public void UpdateGunSlotUI(PlayerShoot gun, int currentAmmo, int reserveAmmo)
+    public void UpdateSlot(object item, string type, int level = 0, int currentAmmo = 0, int reserveAmmo = 0)
     {
-        if (gun == null)
-        {
-            ClearUI();
-            return;
-        }
-
-        currentItemType = "Gun";
-        gunData = gun.gunData;
-        weaponRef = gun;
-        playerHealthRef = null;
-
-        avatar.sprite = gunData.gunSprite;
-        ammo.text = $"{currentAmmo}/{reserveAmmo}";
-        ammo.gameObject.SetActive(true);
-
-        // Update refill price
-        UpdateRefillPrice(gun);
-    }
-
-    public void UpdateMeleeSlotUI(MeleeWeapon melee, int level)
-    {
-        if (melee == null)
-        {
-            ClearUI();
-            return;
-        }
-
-        currentItemType = "Melee";
-        meleeData = melee.data;
+        currentItem = item;
+        itemType = type;
         meleeLevel = level;
-        weaponRef = melee;
-        playerHealthRef = null;
 
-        avatar.sprite = meleeData.weaponSprite;
-        ammo.gameObject.SetActive(false);
-
-        // Hide refill price for melee weapons
-        if (priceText != null)
-            priceText.gameObject.SetActive(false);
-    }
-
-    public void UpdateStatSlotUI(object statObject, string type)
-    {
-        currentItemType = type;
-        weaponRef = null;
-        gunData = null;
-        meleeData = null;
-        playerHealthRef = null;
-        playerShieldRef = null;
-
-        float current = 0f;
-        float max = 1f;
+        if (item == null)
+        {
+            ClearUI();
+            return;
+        }
 
         switch (type)
         {
-            case "Health":
-                if (statObject is PlayerHealth ph)
-                {
-                    playerHealthRef = ph;
-                    current = ph.currentHealth;
-                    max = ph.maxHealth;
-
-                    UpdateHealPrice(ph);
-                }
+            case "Gun":
+                SetupGunSlot(item as PlayerShoot, currentAmmo, reserveAmmo);
                 break;
-
+            case "Melee":
+                SetupMeleeSlot(item as MeleeWeapon, level);
+                break;
+            case "Health":
+                SetupStatSlot(item as PlayerHealth, type);
+                break;
             case "Shield":
-                if (statObject is PlayerShield ps)
-                {
-                    playerShieldRef = ps;
-                    current = ps.currentShield;
-                    max = ps.maxShield;
+                SetupStatSlot(item as PlayerShield, type);
+                break;
+        }
+    }
 
-                    UpdateShieldPrice(ps);
-                }
+    private void SetupGunSlot(PlayerShoot gun, int currentAmmo, int reserveAmmo)
+    {
+        avatar.sprite = gun.gunData.gunSprite;
+        ammo.text = $"{currentAmmo}/{reserveAmmo}";
+        ammo.gameObject.SetActive(true);
+        UpdatePrice(gun);
+    }
+
+    private void SetupMeleeSlot(MeleeWeapon melee, int level)
+    {
+        avatar.sprite = melee.data.weaponSprite;
+        ammo.gameObject.SetActive(false);
+        priceText?.gameObject.SetActive(false);
+    }
+
+    private void SetupStatSlot<T>(T stat, string type) where T : class
+    {
+        float current = 0f, max = 1f;
+
+        switch (type)
+        {
+            case "Health" when stat is PlayerHealth health:
+                current = health.currentHealth;
+                max = health.maxHealth;
+                UpdateStatPrice(health, shopManager.GetHealCost(health), shopManager.NeedsHeal(health), shopManager.healCostPerHP);
+                break;
+            case "Shield" when stat is PlayerShield shield:
+                current = shield.currentShield;
+                max = shield.maxShield;
+                UpdateStatPrice(shield, shopManager.GetShieldCost(shield), shopManager.NeedsShield(shield), shopManager.shieldCostPerPoint);
                 break;
         }
 
         ammo.text = $"{(int)current}/{(int)max}";
-        sliderBar.fillAmount = current / max;
+        if (sliderBar) sliderBar.fillAmount = current / max;
         ammo.gameObject.SetActive(true);
     }
 
-    private void UpdateRefillPrice(PlayerShoot gun)
+    private void UpdatePrice(PlayerShoot gun)
     {
         if (priceText == null || shopManager == null) return;
 
-        if (shopManager.NeedsRefill(gun))
-        {
-            int refillCost = shopManager.GetRefillCost(gun);
-            int availableCoins = CoinManager.Instance.GetCoins();
-
-            // Show partial refill cost if can't afford full
-            if (availableCoins < refillCost && availableCoins > 0)
-            {
-                int maxAffordableBullets = availableCoins / gun.gunData.bulletRefillCost;
-                int partialCost = maxAffordableBullets * gun.gunData.bulletRefillCost;
-                priceText.text = $"$ {partialCost}";
-            }
-            else
-            {
-                priceText.text = $"$ {refillCost}";
-            }
-
-            priceText.gameObject.SetActive(true);
-
-            // Change color based on affordability
-            bool canAfford = CoinManager.Instance.HasEnoughCoins(gun.gunData.bulletRefillCost);
-            priceText.color = canAfford ? new Color(0.392f, 0.698f, 0.812f) : Color.red;
-        }
-        else
+        bool needsRefill = shopManager.NeedsRefill(gun);
+        if (!needsRefill)
         {
             priceText.text = "Full Ammo";
             priceText.color = new Color(0.392f, 0.698f, 0.812f);
-            priceText.gameObject.SetActive(true);
-        }
-    }
-
-    private void UpdateHealPrice(PlayerHealth playerHealth)
-    {
-        if (priceText == null || shopManager == null) return;
-
-        if (shopManager.NeedsHeal(playerHealth))
-        {
-            int healCost = shopManager.GetHealCost(playerHealth);
-            int availableCoins = CoinManager.Instance.GetCoins();
-
-            // Show partial heal cost if can't afford full
-            if (availableCoins < healCost && availableCoins >= shopManager.healCostPerHP)
-            {
-                int maxAffordableHP = availableCoins / shopManager.healCostPerHP;
-                int partialCost = maxAffordableHP * shopManager.healCostPerHP;
-                priceText.text = $"$ {partialCost}";
-            }
-            else
-            {
-                priceText.text = $"$ {healCost}";
-            }
-
-            priceText.gameObject.SetActive(true);
-
-            // Change color based on affordability
-            bool canAfford = CoinManager.Instance.HasEnoughCoins(shopManager.healCostPerHP);
-            priceText.color = canAfford ? new Color(0.392f, 0.698f, 0.812f) : Color.red;
         }
         else
         {
-            priceText.text = "Full Health";
-            priceText.color = new Color(0.392f, 0.698f, 0.812f);
-            priceText.gameObject.SetActive(true);
+            int cost = shopManager.GetRefillCost(gun);
+            int available = CoinManager.Instance.GetCoins();
+            
+            if (available < cost && available > 0)
+            {
+                int maxBullets = available / gun.gunData.bulletRefillCost;
+                cost = maxBullets * gun.gunData.bulletRefillCost;
+            }
+
+            priceText.text = $"$ {cost}";
+            priceText.color = CoinManager.Instance.HasEnoughCoins(gun.gunData.bulletRefillCost) 
+                ? new Color(0.392f, 0.698f, 0.812f) : Color.red;
         }
+        
+        priceText.gameObject.SetActive(true);
     }
-    private void UpdateShieldPrice(PlayerShield playerShield)
+
+    private void UpdateStatPrice<T>(T stat, int fullCost, bool needs, int costPerUnit)
     {
-        if (priceText == null || shopManager == null) return;
+        if (priceText == null) return;
 
-        if (shopManager.NeedsShield(playerShield))
+        if (!needs)
         {
-            int shieldCost = shopManager.GetShieldCost(playerShield);
-            int availableCoins = CoinManager.Instance.GetCoins();
-
-            // Show partial shield cost if can't afford full
-            if (availableCoins < shieldCost && availableCoins >= shopManager.shieldCostPerPoint)
-            {
-                int maxAffordableHP = availableCoins / shopManager.healCostPerHP;
-                int partialCost = maxAffordableHP * shopManager.healCostPerHP;
-                priceText.text = $"$ {partialCost}";
-            }
-            else
-            {
-                priceText.text = $"$ {shieldCost}";
-            }
-
-            priceText.gameObject.SetActive(true);
-
-            // Change color based on affordability
-            bool canAfford = CoinManager.Instance.HasEnoughCoins(shopManager.healCostPerHP);
-            priceText.color = canAfford ? new Color(0.392f, 0.698f, 0.812f) : Color.red;
+            priceText.text = itemType == "Health" ? "Full Health" : "Full Shield";
+            priceText.color = new Color(0.392f, 0.698f, 0.812f);
         }
         else
         {
-            priceText.text = "Full Shield";
-            priceText.color = new Color(0.392f, 0.698f, 0.812f);
-            priceText.gameObject.SetActive(true);
+            int available = CoinManager.Instance.GetCoins();
+            int cost = available < fullCost && available >= costPerUnit 
+                ? (available / costPerUnit) * costPerUnit 
+                : fullCost;
+
+            priceText.text = $"$ {cost}";
+            priceText.color = available >= costPerUnit 
+                ? new Color(0.392f, 0.698f, 0.812f) : Color.red;
+        }
+        
+        priceText.gameObject.SetActive(true);
+    }
+
+    public void OnSelect(BaseEventData eventData) => ApplySelection();
+
+    private void ApplySelection()
+    {
+        if (currentSelected != null && currentSelected != this)
+            currentSelected.animator.SetBool("IsSelected", false);
+
+        currentSelected = this;
+        animator.SetBool("IsSelected", true);
+
+        descriptionUI?.ClearButtonListeners();
+        UpdateDescription();
+    }
+
+    private void UpdateDescription()
+    {
+        switch (itemType)
+        {
+            case "Gun" when currentItem is PlayerShoot gun:
+                descriptionUI.UpdateDescriptionUI(gun: gun.gunData);
+                SetupGunButtons(gun);
+                break;
+            case "Melee" when currentItem is MeleeWeapon melee:
+                descriptionUI.UpdateDescriptionUI(melee: melee.data, meleeLevel: meleeLevel);
+                SetupMeleeButtons();
+                break;
+            case "Health" when currentItem is PlayerHealth health:
+                descriptionUI.UpdateDescriptionUI(health: health);
+                SetupStatButtons(health, "Health");
+                break;
+            case "Shield" when currentItem is PlayerShield shield:
+                descriptionUI.UpdateDescriptionUI(shield: shield);
+                SetupStatButtons(shield, "Shield");
+                break;
+            default:
+                descriptionUI?.HideDescription();
+                break;
         }
     }
 
-    private void UpdateGunDescription()
+    private void SetupGunButtons(PlayerShoot gun)
     {
-        equipDescriptionsUI.UpdateDescriptionUI(gunData: gunData);
+        descriptionUI.RefillButton?.onClick.AddListener(() => HandleRefill(gun));
+        descriptionUI.UpgradeButton?.onClick.AddListener(() => Debug.Log($"Upgrading {gun.GetType().Name}"));
+        
+        UpdateGunButtonState(gun);
+    }
 
-        // Setup refill button
-        if (equipDescriptionsUI.RefillButton != null)
+    private void SetupMeleeButtons()
+    {
+        descriptionUI.UpgradeButton?.onClick.AddListener(() => Debug.Log($"Upgrading Melee"));
+    }
+
+    private void SetupStatButtons<T>(T stat, string type)
+    {
+        descriptionUI.RefillButton?.onClick.AddListener(() => HandleStatRestore(stat, type));
+        UpdateStatButtonState(stat, type);
+    }
+
+    private void UpdateGunButtonState(PlayerShoot gun)
+    {
+        if (descriptionUI.RefillButton == null) return;
+
+        bool needsRefill = shopManager.NeedsRefill(gun);
+        bool canAfford = CoinManager.Instance.GetCoins() >= gun.gunData.bulletRefillCost;
+        int fullCost = shopManager.GetRefillCost(gun);
+        int availableCoins = CoinManager.Instance.GetCoins();
+
+        var buttonText = descriptionUI.RefillButton.GetComponentInChildren<TMP_Text>();
+        if (buttonText != null)
         {
-            equipDescriptionsUI.RefillButton.onClick.AddListener(RefillClicked);
-
-            // Update refill button text and interactability
-            var gun = weaponRef as PlayerShoot;
-            if (gun != null)
+            if (!needsRefill)
             {
-                bool needsRefill = shopManager.NeedsRefill(gun);
-                int refillCost = shopManager.GetRefillCost(gun);
-                int availableCoins = CoinManager.Instance.GetCoins();
-                bool canAffordSome = availableCoins >= gun.gunData.bulletRefillCost;
-
-                // Update button text
-                TMP_Text buttonText = equipDescriptionsUI.RefillButton.GetComponentInChildren<TMP_Text>();
-                if (buttonText != null)
-                {
-                    if (!needsRefill)
-                    {
-                        buttonText.text = "Full Ammo";
-                    }
-                    else if (availableCoins < refillCost && canAffordSome)
-                    {
-                        int maxAffordableBullets = availableCoins / gun.gunData.bulletRefillCost;
-                        int partialCost = maxAffordableBullets * gun.gunData.bulletRefillCost;
-                        buttonText.text = $"Refill ({partialCost})";
-                    }
-                    else
-                    {
-                        buttonText.text = $"Refill ({refillCost})";
-                    }
-                }
-
-                // Update button interactability
-                equipDescriptionsUI.RefillButton.interactable = needsRefill && canAffordSome;
+                buttonText.text = "Full Ammo";
+            }
+            else if (availableCoins < fullCost && canAfford)
+            {
+                int maxBullets = availableCoins / gun.gunData.bulletRefillCost;
+                int partialCost = maxBullets * gun.gunData.bulletRefillCost;
+                buttonText.text = $"Refill ({partialCost})";
+            }
+            else
+            {
+                buttonText.text = $"Refill ({fullCost})";
             }
         }
+        
+        descriptionUI.RefillButton.interactable = needsRefill && canAfford;
+    }
 
-        // Setup upgrade button
-        if (equipDescriptionsUI.UpgradeButton != null)
+    private void UpdateStatButtonState<T>(T stat, string type)
+    {
+        if (descriptionUI.RefillButton == null) return;
+
+        bool needs = type == "Health" ? shopManager.NeedsHeal(stat as PlayerHealth) 
+                                     : shopManager.NeedsShield(stat as PlayerShield);
+        int costPerUnit = type == "Health" ? shopManager.healCostPerHP : shopManager.shieldCostPerPoint;
+        int fullCost = type == "Health" ? shopManager.GetHealCost(stat as PlayerHealth) 
+                                       : shopManager.GetShieldCost(stat as PlayerShield);
+        int availableCoins = CoinManager.Instance.GetCoins();
+        bool canAfford = availableCoins >= costPerUnit;
+
+        var buttonText = descriptionUI.RefillButton.GetComponentInChildren<TMP_Text>();
+        if (buttonText != null)
         {
-            equipDescriptionsUI.UpgradeButton.onClick.AddListener(UpgradeClicked);
+            if (!needs)
+            {
+                buttonText.text = $"Full {type}";
+            }
+            else if (availableCoins < fullCost && canAfford)
+            {
+                int maxAffordable = availableCoins / costPerUnit;
+                int partialCost = maxAffordable * costPerUnit;
+                buttonText.text = $"{type} ({partialCost})";
+            }
+            else
+            {
+                buttonText.text = $"{type} ({fullCost})";
+            }
+        }
+        
+        descriptionUI.RefillButton.interactable = needs && canAfford;
+    }
+
+    private void HandleRefill(PlayerShoot gun)
+    {
+        if (shopManager.RefillAmmo(gun))
+        {
+            // Update slot UI immediately
+            UpdateSlot(gun, "Gun", 0, gun.currentAmmo, gun.reserveAmmo);
+            
+            // Update button state immediately
+            UpdateGunButtonState(gun);
+            
+            // Refresh price display
+            UpdatePrice(gun);
         }
     }
 
-    private void UpdateMeleeDescription()
+    private void HandleStatRestore<T>(T stat, string type)
     {
-        equipDescriptionsUI.UpdateDescriptionUI(meleeData: meleeData, meleeLevel: meleeLevel);
-
-        // Setup upgrade button
-        if (equipDescriptionsUI.UpgradeButton != null)
-        {
-            equipDescriptionsUI.UpgradeButton.onClick.AddListener(UpgradeClicked);
-        }
-    }
-
-    private void UpdateStatDescription<T>(T statRef, string statType)
-    {
-        if (statRef == null) return;
-
-        // Cập nhật UI description (sử dụng EquipDescriptionsUI chung)
-        if (statType == "Health" && statRef is PlayerHealth health)
-        {
-            equipDescriptionsUI.UpdateDescriptionUI(playerHealth: health);
-        }
-        else if (statType == "Shield" && statRef is PlayerShield shield)
-        {
-            equipDescriptionsUI.UpdateDescriptionUI(playerShield: shield);
-        }
-
-        // Setup Refill/Heal/Recharge button
-        if (equipDescriptionsUI.RefillButton != null)
-        {
-            equipDescriptionsUI.RefillButton.onClick.RemoveAllListeners(); // tránh trùng listener
-
-            equipDescriptionsUI.RefillButton.onClick.AddListener(() =>
-            {
-                if (statType == "Health" && statRef is PlayerHealth h)
-                    shopManager.HealPlayer(h);
-                else if (statType == "Shield" && statRef is PlayerShield s)
-                    shopManager.ShieldPlayer(s);
-
-                // Cập nhật lại UI sau khi dùng
-                UpdateStatDescription(statRef, statType);
-            });
-
-            int cost = 0;
-            bool needsRefill = false;
-            int availableCoins = CoinManager.Instance.GetCoins();
-            bool canAffordSome = false;
-
-            if (statType == "Health" && statRef is PlayerHealth h2)
-            {
-                cost = shopManager.GetHealCost(h2);
-                needsRefill = shopManager.NeedsHeal(h2);
-                canAffordSome = availableCoins >= shopManager.healCostPerHP;
-            }
-            else if (statType == "Shield" && statRef is PlayerShield s2)
-            {
-                cost = shopManager.GetShieldCost(s2);
-                needsRefill = shopManager.NeedsShield(s2);
-                canAffordSome = availableCoins >= shopManager.shieldCostPerPoint;
-            }
-
-            // Update button text
-            TMP_Text buttonText = equipDescriptionsUI.RefillButton.GetComponentInChildren<TMP_Text>();
-            if (buttonText != null)
-            {
-                if (!needsRefill)
-                {
-                    buttonText.text = $"Full {statType}";
-                }
-                else if (availableCoins < cost && canAffordSome)
-                {
-                    int maxAffordable = (statType == "Health") ? availableCoins / shopManager.healCostPerHP
-                                                                : availableCoins / shopManager.shieldCostPerPoint;
-                    int partialCost = maxAffordable * ((statType == "Health") ? shopManager.healCostPerHP : shopManager.shieldCostPerPoint);
-                    buttonText.text = $"{statType} ({partialCost})";
-                }
-                else
-                {
-                    buttonText.text = $"{statType} ({cost})";
-                }
-            }
-
-            // Update interactable
-            equipDescriptionsUI.RefillButton.interactable = needsRefill && canAffordSome;
-        }
-    }
-
-    public void RefillClicked()
-    {
-        if (weaponRef == null) return;
-
-        bool success = shopManager.RefillAmmo(weaponRef as PlayerShoot);
-
-        // Update UI after refill attempt
-        if (success && weaponRef is PlayerShoot gun)
-        {
-            UpdateGunSlotUI(gun, gun.currentAmmo, gun.reserveAmmo);
-
-            // Refresh the selection to update button states
-            ApplySelection();
-        }
-    }
-
-    public void RestoreClicked()
-    {
-        bool success = false;
-
-        if (playerHealthRef != null)
-        {
-            success = shopManager.HealPlayer(playerHealthRef);
-            if (success)
-                UpdateStatSlotUI(playerHealthRef, "Health");
-        }
-        else if (playerShieldRef != null)
-        {
-            success = shopManager.ShieldPlayer(playerShieldRef);
-            if (success)
-            {
-                UpdateStatSlotUI(playerShieldRef, "Shield");
-                Debug.Log("here");
-            }
-        }
-
+        bool success = type == "Health" ? shopManager.HealPlayer(stat as PlayerHealth)
+                                       : shopManager.ShieldPlayer(stat as PlayerShield);
         if (success)
         {
-            // Refresh selection để cập nhật button states
-            ApplySelection();
+            // Update slot UI immediately
+            UpdateSlot(stat, type);
+            
+            // Update button state immediately
+            UpdateStatButtonState(stat, type);
+            
+            // Refresh price display
+            if (type == "Health")
+                UpdateStatPrice(stat as PlayerHealth, shopManager.GetHealCost(stat as PlayerHealth), 
+                              shopManager.NeedsHeal(stat as PlayerHealth), shopManager.healCostPerHP);
+            else
+                UpdateStatPrice(stat as PlayerShield, shopManager.GetShieldCost(stat as PlayerShield), 
+                              shopManager.NeedsShield(stat as PlayerShield), shopManager.shieldCostPerPoint);
         }
     }
 
-    private void UpgradeClicked()
+    public void OnPointerClick(PointerEventData eventData)
     {
-        switch (currentItemType)
+        ApplySelection();
+        
+        if (Time.time - lastClickTime < 0.3f) // Double click
         {
-            case "Gun":
-                Debug.Log($"Upgrading {weaponRef.GetType().Name}");
+            switch (itemType)
+            {
+                case "Gun" when currentItem is PlayerShoot gun:
+                    HandleRefill(gun);
+                    break;
+                case "Health":
+                case "Shield":
+                    HandleStatRestore(currentItem, itemType);
+                    break;
+            }
+        }
+        lastClickTime = Time.time;
+    }
+
+    public void RefreshUI()
+    {
+        switch (itemType)
+        {
+            case "Gun" when currentItem is PlayerShoot gun:
+                UpdateSlot(gun, "Gun", 0, gun.currentAmmo, gun.reserveAmmo);
+                if (currentSelected == this) UpdateGunButtonState(gun);
                 break;
-            case "Melee":
-                Debug.Log($"Upgrading {weaponRef.GetType().Name}");
+            case "Health" when currentItem is PlayerHealth health:
+                UpdateSlot(health, "Health");
+                if (currentSelected == this) UpdateStatButtonState(health, "Health");
                 break;
-            case "Health":
-            case "Shield":
-                Debug.Log("Upgrading Health/Shield item");
+            case "Shield" when currentItem is PlayerShield shield:
+                UpdateSlot(shield, "Shield");
+                if (currentSelected == this) UpdateStatButtonState(shield, "Shield");
                 break;
         }
     }
 
     private void ClearUI()
     {
-        gunData = null;
-        meleeData = null;
-        weaponRef = null;
-        playerHealthRef = null;
-
-        if (avatar != null)
-            avatar.sprite = null;
-        if (ammo != null)
-            ammo.text = "";
-        if (priceText != null)
-            priceText.gameObject.SetActive(false);
-    }
-
-    public void OnSelect(BaseEventData eventData)
-    {
-        ApplySelection();
-    }
-
-    private void ApplySelection()
-    {
-        if (equipDescriptionsUI == null) return;
-
-        if (currentSelected != null && currentSelected != this)
-        {
-            currentSelected.animator.SetBool("IsSelected", false);
-        }
-
-        currentSelected = this;
-        animator.SetBool("IsSelected", true);
-
-        equipDescriptionsUI.ClearButtonListeners();
-
-        switch (currentItemType)
-        {
-            case "Gun":
-                if (gunData != null) UpdateGunDescription();
-                break;
-            case "Melee":
-                if (meleeData != null) UpdateMeleeDescription();
-                break;
-            case "Health":
-            case "Shield":
-                if (playerHealthRef != null) UpdateStatDescription(playerHealthRef, "Health");
-                else if (playerShieldRef != null) UpdateStatDescription(playerShieldRef, "Shield");
-                break;
-            default:
-                equipDescriptionsUI.HideDescription();
-                break;
-        }
-    }
-
-    public void OnPointerClick(PointerEventData eventData)
-    {
-        if (Time.time - lastClickTime < 0.3f)
-        {
-            switch (currentItemType)
-            {
-                case "Gun":
-                    RefillClicked();
-                    break;
-                case "Health":
-                case "Shield":
-                    RestoreClicked();
-                    break;
-            }
-        }
-
-        lastClickTime = Time.time;
+        currentItem = null;
+        itemType = null;
+        avatar.sprite = null;
+        ammo.text = "";
+        priceText?.gameObject.SetActive(false);
     }
 }
