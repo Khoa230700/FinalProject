@@ -1,4 +1,4 @@
-using System.Net.NetworkInformation;
+﻿using System.Net.NetworkInformation;
 using UnityEngine;
 
 public class DamegeMelee : MonoBehaviour
@@ -11,8 +11,21 @@ public class DamegeMelee : MonoBehaviour
     {
         if (other.CompareTag("Enemy"))
         {
-            other.GetComponent<EnemyM>().TakeDamage(10f);
+            Debug.Log("Hit Enemy");
 
+            // Tìm script EnemyM ở chính collider hoặc cha của nó
+            EnemyM enemy = other.GetComponent<EnemyM>() ?? other.GetComponentInParent<EnemyM>();
+            //if (enemy == null)
+            //    enemy = other.GetComponentInParent<EnemyM>();
+
+            if (enemy != null)
+            {
+                enemy.TakeDamage(10f);
+            }
+            else
+            {
+                Debug.LogWarning($"Không tìm thấy EnemyM trên {other.name}");
+            }
         }
     }
 }
