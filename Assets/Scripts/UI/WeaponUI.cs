@@ -54,6 +54,7 @@ public class WeaponUI : MonoBehaviour
             Destroy(child.gameObject);
 
         bulletImages.Clear();
+        fireMode.FireModeImage.gameObject.SetActive(true);
 
         for (int i = 0; i < gunData.magazineSize; i++)
         {
@@ -78,6 +79,21 @@ public class WeaponUI : MonoBehaviour
                 ? (isLowAmmo ? LowAmmoBulletColor : NormalBulletColor)
                 : BulletConsumedColor;
         }
+    }
+
+    public void ClearUI()
+    {
+        // Xóa tất cả viên đạn UI
+        foreach (Transform child in BulletsGroup.transform)
+            Destroy(child.gameObject);
+        bulletImages.Clear();
+
+        // Xóa text
+        storageTxt.text = string.Empty;
+
+        // Xóa chế độ bắn (fire mode)
+        if (fireMode.FireModeImage != null)
+            fireMode.FireModeImage.gameObject.SetActive(false);
     }
 
     public void SetFireMode(GunFireMode mode) => fireMode.SetFireModeSprite(mode);
