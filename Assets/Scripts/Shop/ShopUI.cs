@@ -19,6 +19,8 @@ public class ShopUI : MonoBehaviour
     private IWeapon[] weapons;
     private PlayerHealth playerHealth;
     private PlayerShield playerShield;
+    private PlayerMovement playerMovement;
+    private MeshMouseLook mouseLook;
 
     private void Start()
     {
@@ -46,6 +48,8 @@ public class ShopUI : MonoBehaviour
         weapons = player.GetComponentsInChildren<IWeapon>(true);
         playerHealth = player.GetComponent<PlayerHealth>();
         playerShield = player.GetComponent<PlayerShield>();
+        playerMovement = player.GetComponent<PlayerMovement>();
+        mouseLook = player.GetComponent<MeshMouseLook>();
     }
 
     public void Show()
@@ -62,6 +66,8 @@ public class ShopUI : MonoBehaviour
         {
             canvasSetting?.SetActive(false);
             if (pressKeyEvent) pressKeyEvent.enabled = false;
+            playerMovement.enabled = false;
+            mouseLook.Show();
         }));
     }
 
@@ -75,6 +81,8 @@ public class ShopUI : MonoBehaviour
             canvasSetting?.SetActive(true);
             if (pressKeyEvent) pressKeyEvent.enabled = true;
             descriptionsUI?.HideDescription();
+            playerMovement.enabled = true;
+            mouseLook.Hide();
         }));
     }
 
