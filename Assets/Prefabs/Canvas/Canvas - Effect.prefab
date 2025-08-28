@@ -316,3 +316,5 @@ MonoBehaviour:
     fadeOutSpeed: 1
     fadeOutPause: 0.5
   indicatorDistance: 128
+  fallbackMaxHealth: 100
+  fallbackMaxShield: 0
