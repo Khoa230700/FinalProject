@@ -6,20 +6,21 @@ public class EndUI : MonoBehaviour
 {
     [SerializeField] private GameObject gainPanel;
     [SerializeField] private TextMeshProUGUI coinGainText;
+    [SerializeField] private GameObject settingPanel;
 
     private Tween coinTween;
     private MeshMouseLook meshMouseLook;
 
-    private void Start()
+    private void Awake()
     {
         meshMouseLook = FindAnyObjectByType<MeshMouseLook>();
-
     }
 
     void OnEnable()
     {
         meshMouseLook.Show();
-        Time.timeScale = 0f;
+        //Time.timeScale = 0f;
+        //settingPanel.SetActive(false);
     }
 
     public void ShowGain()
