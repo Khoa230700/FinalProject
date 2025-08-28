@@ -12,7 +12,7 @@ public class WaveManager : MonoBehaviour
     [SerializeField] private TimerUI timerUI;
 
     private int  currentWaveIndex = 0;
-    private bool isBetweenWaves   = false;
+    public bool isBetweenWaves   = false;
 
     public void SetWaves(List<WaveData> newWaves) => waves = newWaves;
 
