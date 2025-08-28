@@ -945,6 +945,8 @@ GameObject:
   - component: {fileID: -7418132429981823657}
   - component: {fileID: -5324489661830361494}
   - component: {fileID: -1937878382126220471}
+  - component: {fileID: 8584781903988979503}
+  - component: {fileID: 8902583359123549289}
   m_Layer: 2
   m_Name: Tail
   m_TagString: Enemy
@@ -2315,6 +2317,71 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   trackingType: 0
   targetID: Tail
+--- !u!114 &8584781903988979503
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2340879936498945498}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 08c9ae4dc92959e40a9e30b1d736fd01, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  outlinable: {fileID: 8902583359123549289}
+--- !u!114 &8902583359123549289
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2340879936498945498}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fe91dc294731a9428c0941ea7579110, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  complexMaskingMode: 0
+  drawingMode: 1
+  outlineLayer: 0
+  outlineTargets:
+  - CutoutMask: 8
+    renderer: {fileID: 4912440298811347175}
+    SubmeshIndex: 0
+    BoundsMode: 0
+    Bounds:
+      m_Center: {x: 0, y: 0, z: 0}
+      m_Extent: {x: 0.5, y: 0.5, z: 0.5}
+    CutoutThreshold: 0.5
+    CullMode: 2
+    cutoutTextureName: 
+    cutoutTextureIndex: 0
+  renderStyle: 1
+  outlineParameters:
+    enabled: 1
+    color: {r: 1, g: 0.025357205, b: 0.015686274, a: 1}
+    dilateShift: 1
+    blurShift: 1
+    fillPass:
+      shader: {fileID: 0}
+      serializedProperties: []
+  backParameters:
+    enabled: 1
+    color: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+    dilateShift: 1
+    blurShift: 1
+    fillPass:
+      shader: {fileID: 0}
+      serializedProperties: []
+  frontParameters:
+    enabled: 1
+    color: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+    dilateShift: 1
+    blurShift: 1
+    fillPass:
+      shader: {fileID: 0}
+      serializedProperties: []
 --- !u!1 &2344813332677895130
 GameObject:
   m_ObjectHideFlags: 0
@@ -2799,6 +2866,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1637745149289787345}
   - component: {fileID: 4912440298811347175}
+  - component: {fileID: 4773800485118458584}
   m_Layer: 0
   m_Name: Body_mesh
   m_TagString: Untagged
@@ -2952,6 +3020,18 @@ SkinnedMeshRenderer:
     m_Center: {x: -0.34960836, y: -0.32774097, z: -0.00373286}
     m_Extent: {x: 0.45280212, y: 0.47381216, z: 0.57458216}
   m_DirtyAABB: 0
+--- !u!114 &4773800485118458584
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3235018865914435224}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 034bc47afcbf5e141a58d5c20b7808e4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &3298455766764248534
 GameObject:
   m_ObjectHideFlags: 0

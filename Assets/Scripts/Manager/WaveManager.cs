@@ -11,6 +11,7 @@ public class WaveManager : MonoBehaviour
 
     [Header("UI References")]
     [SerializeField] private TimerUI timerUI;
+    [SerializeField] private GameObject gameOverObject;
 
     private int  currentWaveIndex = 0;
     public bool isBetweenWaves   = false;
@@ -70,6 +71,11 @@ public class WaveManager : MonoBehaviour
             }
 
             currentWaveIndex++;
+        }
+
+        if (gameOverObject != null)
+        {
+            gameOverObject.SetActive(true);  // Kích hoạt gameObject bạn đã tham chiếu ở trên
         }
     }
 

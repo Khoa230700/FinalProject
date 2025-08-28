@@ -30,10 +30,13 @@ public class suicideEnemy : MonoBehaviour
     public float moveSpeed = 4f;
     public LayerMask targetLayer;
 
+    private QuestTracker questTracker;
+
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
         enemyAnimation = GetComponent<Animator>();
+        questTracker = GetComponent<QuestTracker>();
         //float distance = Vector3.Distance(transform.position, player.position);
         //if (distance <= attackRange)
         //{
@@ -102,6 +105,7 @@ public class suicideEnemy : MonoBehaviour
     }
     IEnumerator DestroyAfterDelay()
     {
+        questTracker.OnKilled();
         yield return new WaitForSeconds(1);
         Destroy(gameObject);
     }
