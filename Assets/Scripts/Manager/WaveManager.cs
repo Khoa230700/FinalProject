@@ -7,6 +7,7 @@ public class WaveManager : MonoBehaviour
     [SerializeField] private List<WaveData> waves;
     [SerializeField] private float timeBetweenWaves = 10f;
     [SerializeField] private SpawnManager spawnManager;
+    [SerializeField] private ShopSpawner shopSpawner;
 
     [Header("UI References")]
     [SerializeField] private TimerUI timerUI;
@@ -26,6 +27,8 @@ public class WaveManager : MonoBehaviour
             timerUI.HideUI();
             timerUI.SetVisible(false);
         }
+
+        if(shopSpawner != null) shopSpawner.HideShop();
 
         StartCoroutine(HandleWave());
     }
@@ -51,6 +54,8 @@ public class WaveManager : MonoBehaviour
                     timerUI.SetVisible(true); // bật UI để đếm
                 }
 
+                if (shopSpawner != null) shopSpawner.ShowShop();
+
                 yield return StartCoroutine(WaveCountdown(timeBetweenWaves));
 
                 isBetweenWaves = false;
@@ -60,6 +65,8 @@ public class WaveManager : MonoBehaviour
                     timerUI.HideUI();
                     timerUI.SetVisible(false); // tắt lại sau khi đếm xong
                 }
+
+                if (shopSpawner != null) shopSpawner.HideShop();
             }
 
             currentWaveIndex++;
