@@ -2,7 +2,7 @@ using System.Collections;
 using UnityEngine;
 using static UnityEngine.Rendering.DebugUI;
 
-public class BotHealth : HealthBase , IDamageInter
+public class BotHealth : HealthBase  //IDamageable
 {
     [Header("Regeneration")]
     public bool useRegen;
