@@ -11,7 +11,7 @@ public class BossAi : MonoBehaviour
     [Header("Ranges")]
     public float detectRange = 20f;
     public float meleeRange = 2f;
-    public float slamRange = 5f;
+    public float slamRange = 15f;
     public float triggerRange = 10f;
 
     [Header("Cooldowns")]
@@ -22,6 +22,7 @@ public class BossAi : MonoBehaviour
     private float lastRangeAttackTime = -10f;
     private float lastSlamAttackTime = -10f;
     private float nextFireTime = 0f;
+    public float Shoutcooldown = 10f;
 
     [Header("Fire Breath")]
     public float channelTime = 3f;
@@ -33,7 +34,7 @@ public class BossAi : MonoBehaviour
     [Header("Ranged Attack")]
     public GameObject rangedProjectile;
     public Transform firePoint;
-    public float bulletSpeed = 50f;
+    public float bulletSpeed = 40f;
     public float bulletTimelife = 7f;
     public Transform playerAimTarget;
 
@@ -41,9 +42,27 @@ public class BossAi : MonoBehaviour
     public string playerTag = "Player";
     public float rotationSpeed = 5f;
 
+    [Header("Shout")]
+    public float Shoutrange = 6f;
+    public float lastShoutTime = 5f;
+
+    //Health ref
+    private BossHealth bossHealth;
+    private bool isPhase2 = false;
+
+
+    //Skill Slam
+    public GameObject particlePrefab;
+    public GameObject colliderPrefab;
+    private float particlePrefabTimelife = 3f;
+    private float colliderPrefabTimelife = 2f;
+
     public Animator enemyAnimation;
 
     //fix
+    private bool isAttacking = false;
+
+
     private float destinationUpdateRate = 0.5f;
     private float nextDestinationUpdateTime = 0f;
 
@@ -53,14 +72,22 @@ public class BossAi : MonoBehaviour
         //enemyAnimation = GetComponent<Animator>();
         fireFX.Stop();
         fireDamageArea.enabled = false;
+
+        bossHealth = GetComponent<BossHealth>();
+        bossHealth.OnPhase2Enter += EnterPhase2;
     }
 
     private void Update()
     {
-        if (isChanneling)
+        if (Input.GetKeyDown(KeyCode.H))
         {
-            RotateTowardsTarget(); // Optional: look at player while channeling
-            return;
+            bossHealth.TakeDamage(30);
+        }
+
+        if (isChanneling || isAttacking)
+        {
+            RotateTowardsTarget();
+            return; // Block other logic while attacking
         }
 
         float distance = Vector3.Distance(transform.position, player.position);
@@ -73,10 +100,11 @@ public class BossAi : MonoBehaviour
 
         bool canSlam = distance <= slamRange && Time.time - lastSlamAttackTime >= slamAttackCooldown;
         bool canFire = distance <= triggerRange && HasLineOfSight() && Time.time >= nextFireTime;
+        bool canShout = isPhase2 && distance <= Shoutrange && Time.time - lastShoutTime >= Shoutcooldown;
         bool canMelee = distance <= meleeRange;
         bool canRange = Time.time - lastRangeAttackTime >= rangeAttackCooldown;
 
-        // Attack priority: Slam > FireBreath > Melee > Chase
+        // Phase-based priority
         if (canSlam)
         {
             SlamAttack();
@@ -88,20 +116,20 @@ public class BossAi : MonoBehaviour
             StartFireBreath();
             nextFireTime = Time.time + fireCooldown;
         }
+        else if (canShout)
+        {
+            Shout();
+            lastShoutTime = Time.time;
+        }
         else if (canMelee)
         {
             MeleeAttack();
         }
         else
         {
-            // Default: Chase
-            agent.isStopped = false;
-            //if (!agent.hasPath || agent.remainingDistance < 0.5f)
-            //{
-            //    agent.SetDestination(player.position);
-            //}
-            if (Time.time >= nextDestinationUpdateTime)
+            if (!agent.hasPath || agent.remainingDistance < 0.5f || Time.time >= nextDestinationUpdateTime)
             {
+                agent.isStopped = false;
                 agent.SetDestination(player.position);
                 nextDestinationUpdateTime = Time.time + destinationUpdateRate;
             }
@@ -113,22 +141,30 @@ public class BossAi : MonoBehaviour
     void MeleeAttack()
     {
         //agent.isStopped = true;
-        Debug.Log("Boss performs melee attack!");
+        //Debug.Log("Boss performs melee attack!");
         player.GetComponent<testPlayerHealth>()?.TakeDamage(10);
     }
 
-    void RangeAttack()
-    {
-        //agent.isStopped = true;
-        //Debug.Log("Boss performs range attack!");
-        GameObject bullet = Instantiate(rangedProjectile, firePoint.position, firePoint.rotation);
-        bullet.GetComponent<Rigidbody>().AddForce(firePoint.forward * bulletSpeed);
-        Destroy(bullet, bulletTimelife);
-    }
+    //void RangeAttack()
+    //{
+    //    //agent.isStopped = true;
+    //    //Debug.Log("Boss performs range attack!");
+    //    GameObject bullet = Instantiate(rangedProjectile, firePoint.position, firePoint.rotation);
+    //    bullet.GetComponent<Rigidbody>().AddForce(firePoint.forward * bulletSpeed);
+    //    Destroy(bullet, bulletTimelife);
+    //}
 
     void SlamAttack()
     {
-        //agent.isStopped = true;
+
+        isAttacking = true;
+        agent.isStopped = true;
+
+        GameObject partic = Instantiate(particlePrefab, firePoint.position, firePoint.rotation);
+        GameObject collid = Instantiate(colliderPrefab, firePoint.position, firePoint.rotation);
+        collid.GetComponent<Rigidbody>().AddForce(firePoint.forward * bulletSpeed);
+        Destroy(partic, particlePrefabTimelife);
+        Destroy(collid, colliderPrefabTimelife);
         //Debug.Log("Boss performs slam attack!");
         //Collider[] colliders = Physics.OverlapSphere(transform.position, 4f);
         //foreach (Collider col in colliders)
@@ -137,6 +173,7 @@ public class BossAi : MonoBehaviour
         //        col.GetComponent<PlayerHealth>().TakeDamage(20);
         //}
         enemyAnimation.SetTrigger("Slam");
+        Invoke(nameof(EndAttack), 2f);
     }
 
     // --- Fire Breath ---
@@ -167,9 +204,7 @@ public class BossAi : MonoBehaviour
         //Debug.Log("Stopped fire breath, resuming movement.");
         enemyAnimation.SetBool("FireBreath", false);
     }
-
     
-
     bool HasLineOfSight()
     {
         Ray ray = new Ray(transform.position + Vector3.up, (player.position - transform.position).normalized);
@@ -185,5 +220,52 @@ public class BossAi : MonoBehaviour
         Vector3 direction = (player.position - transform.position).normalized;
         Quaternion lookRotation = Quaternion.LookRotation(new Vector3(direction.x, 0, direction.z));
         transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * rotationSpeed);
+    }
+
+
+
+    void Shout()
+    {
+
+        isAttacking = true;
+        agent.isStopped = true;
+        //Debug.Log("Boss uses SHOUT!");
+        enemyAnimation.SetTrigger("Shout"); // Assuming you have an animation trigger
+
+        Collider[] hitPlayers = Physics.OverlapSphere(transform.position, Shoutrange);
+        foreach (var hit in hitPlayers)
+        {
+            if (hit.CompareTag("Player"))
+            {
+                hit.GetComponent<PlayerHealth>()?.TakeDamage(15);
+                // Or trigger a stun, knockback, etc.
+            }
+        }
+        Invoke(nameof(EndAttack), 1.5f);
+    }
+    void ResumeMovement()
+    {
+        agent.isStopped = false;
+    }
+
+
+    void EnterPhase2()
+    {
+        isPhase2 = true;
+        Debug.Log("Boss has entered Phase 2!");
+    }
+
+    void EndAttack()
+    {
+        isAttacking = false;
+
+        if (agent != null)
+        {
+            agent.ResetPath();              // Clear any existing path
+            agent.isStopped = false;       // Resume movement
+            agent.SetDestination(player.position); // Force chase to resume
+        }
+
+        nextDestinationUpdateTime = Time.time + destinationUpdateRate; // Restart chase timing
     }
 }
