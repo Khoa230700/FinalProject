@@ -14,6 +14,7 @@ public class ShopUI : MonoBehaviour
     private PressKeyEvent pressKeyEvent;
     private EquipDescriptionsUI descriptionsUI;
     private Coroutine currentRoutine;
+    private WaveManager waveManager;
 
     // Cached player components
     private IWeapon[] weapons;
@@ -27,6 +28,7 @@ public class ShopUI : MonoBehaviour
         animator = GetComponent<Animator>();
         pressKeyEvent = canvasSetting?.GetComponent<PressKeyEvent>();
         descriptionsUI = FindAnyObjectByType<EquipDescriptionsUI>();
+        waveManager = FindAnyObjectByType<WaveManager>();
 
         CachePlayerComponents();
     }
@@ -54,7 +56,7 @@ public class ShopUI : MonoBehaviour
 
     public void Show()
     {
-        if (isOpen || !canOpen) return;
+        if (isOpen || !canOpen || !waveManager.isBetweenWaves) return;
 
         isOpen = true;
 

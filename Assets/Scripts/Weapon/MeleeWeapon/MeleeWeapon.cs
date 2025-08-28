@@ -28,7 +28,8 @@ public class MeleeWeapon : MonoBehaviour, IWeapon
     public void OnSelected(WeaponUI ui)
     {
         weaponUI = ui;
-        // weaponUI?.ClearAmmoUI(); // ẩn UI đạn nếu muốn
+        weaponUI?.ClearUI(); // ẩn UI đạn nếu muốn
+        weaponUI?.SetWeaponSprite(data.weaponSprite);
     }
     public void OnDeselected() { }
 

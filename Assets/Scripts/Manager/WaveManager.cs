@@ -7,12 +7,13 @@ public class WaveManager : MonoBehaviour
     [SerializeField] private List<WaveData> waves;
     [SerializeField] private float timeBetweenWaves = 10f;
     [SerializeField] private SpawnManager spawnManager;
+    [SerializeField] private ShopSpawner shopSpawner;
 
     [Header("UI References")]
     [SerializeField] private TimerUI timerUI;
 
     private int  currentWaveIndex = 0;
-    private bool isBetweenWaves   = false;
+    public bool isBetweenWaves   = false;
 
     public void SetWaves(List<WaveData> newWaves) => waves = newWaves;
 
@@ -26,6 +27,8 @@ public class WaveManager : MonoBehaviour
             timerUI.HideUI();
             timerUI.SetVisible(false);
         }
+
+        if(shopSpawner != null) shopSpawner.HideShop();
 
         StartCoroutine(HandleWave());
     }
@@ -51,6 +54,8 @@ public class WaveManager : MonoBehaviour
                     timerUI.SetVisible(true); // bật UI để đếm
                 }
 
+                if (shopSpawner != null) shopSpawner.ShowShop();
+
                 yield return StartCoroutine(WaveCountdown(timeBetweenWaves));
 
                 isBetweenWaves = false;
@@ -60,6 +65,8 @@ public class WaveManager : MonoBehaviour
                     timerUI.HideUI();
                     timerUI.SetVisible(false); // tắt lại sau khi đếm xong
                 }
+
+                if (shopSpawner != null) shopSpawner.HideShop();
             }
 
             currentWaveIndex++;
@@ -70,13 +77,13 @@ public class WaveManager : MonoBehaviour
     {
         float timer = countdown;
 
-        while (timer > 0f && isBetweenWaves)
+        while (timer >= 0f && isBetweenWaves)
         {
-            int seconds = Mathf.CeilToInt(timer);
+            int seconds = Mathf.FloorToInt(timer);
 
             if (timerUI != null)
                 timerUI.UpdateUI($"NEXT WAVE IN {seconds}s", timer / countdown, seconds);
-
+            Debug.Log(seconds);
             yield return null;
             timer -= Time.deltaTime;
         }
