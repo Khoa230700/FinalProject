@@ -126,5 +126,5 @@ MonoBehaviour:
   shopUI: {fileID: 0}
   shopNotification: {fileID: 0}
   arrowPrefab: {fileID: 6990147152625376613, guid: 387aa4d3eb7f5d443a4e49d94b4b2b42, type: 3}
-  arrowSpeed: 10
-  pathInterval: 1
+  arrowSpeed: 50
+  pathInterval: 5

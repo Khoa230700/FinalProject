@@ -70,13 +70,13 @@ public class WaveManager : MonoBehaviour
     {
         float timer = countdown;
 
-        while (timer > 0f && isBetweenWaves)
+        while (timer >= 0f && isBetweenWaves)
         {
-            int seconds = Mathf.CeilToInt(timer);
+            int seconds = Mathf.FloorToInt(timer);
 
             if (timerUI != null)
                 timerUI.UpdateUI($"NEXT WAVE IN {seconds}s", timer / countdown, seconds);
-
+            Debug.Log(seconds);
             yield return null;
             timer -= Time.deltaTime;
         }
