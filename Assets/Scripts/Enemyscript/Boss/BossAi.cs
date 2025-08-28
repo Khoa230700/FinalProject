@@ -11,7 +11,7 @@ public class BossAi : MonoBehaviour
     [Header("Ranges")]
     public float detectRange = 20f;
     public float meleeRange = 2f;
-    public float slamRange = 5f;
+    public float slamRange = 15f;
     public float triggerRange = 10f;
 
     [Header("Cooldowns")]
@@ -34,7 +34,7 @@ public class BossAi : MonoBehaviour
     [Header("Ranged Attack")]
     public GameObject rangedProjectile;
     public Transform firePoint;
-    public float bulletSpeed = 50f;
+    public float bulletSpeed = 40f;
     public float bulletTimelife = 7f;
     public Transform playerAimTarget;
 
@@ -50,6 +50,12 @@ public class BossAi : MonoBehaviour
     private BossHealth bossHealth;
     private bool isPhase2 = false;
 
+
+    //Skill Slam
+    public GameObject particlePrefab;
+    public GameObject colliderPrefab;
+    private float particlePrefabTimelife = 3f;
+    private float colliderPrefabTimelife = 2f;
 
     public Animator enemyAnimation;
 
@@ -135,8 +141,8 @@ public class BossAi : MonoBehaviour
     void MeleeAttack()
     {
         //agent.isStopped = true;
-        Debug.Log("Boss performs melee attack!");
-        player.GetComponent<PlayerHealth>()?.TakeDamage(10);
+        //Debug.Log("Boss performs melee attack!");
+        player.GetComponent<testPlayerHealth>()?.TakeDamage(10);
     }
 
     //void RangeAttack()
@@ -153,6 +159,12 @@ public class BossAi : MonoBehaviour
 
         isAttacking = true;
         agent.isStopped = true;
+
+        GameObject partic = Instantiate(particlePrefab, firePoint.position, firePoint.rotation);
+        GameObject collid = Instantiate(colliderPrefab, firePoint.position, firePoint.rotation);
+        collid.GetComponent<Rigidbody>().AddForce(firePoint.forward * bulletSpeed);
+        Destroy(partic, particlePrefabTimelife);
+        Destroy(collid, colliderPrefabTimelife);
         //Debug.Log("Boss performs slam attack!");
         //Collider[] colliders = Physics.OverlapSphere(transform.position, 4f);
         //foreach (Collider col in colliders)
@@ -217,7 +229,7 @@ public class BossAi : MonoBehaviour
 
         isAttacking = true;
         agent.isStopped = true;
-        Debug.Log("Boss uses SHOUT!");
+        //Debug.Log("Boss uses SHOUT!");
         enemyAnimation.SetTrigger("Shout"); // Assuming you have an animation trigger
 
         Collider[] hitPlayers = Physics.OverlapSphere(transform.position, Shoutrange);
