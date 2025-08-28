@@ -12,13 +12,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 19c1a55a65e88f44280c5bd48b9fe731, type: 3}
   m_Name: Wave2
   m_EditorClassIdentifier: 
-  questID: 
-  questName: 
+  questID: Kill all enemies!c8f63b43-f3a0-4388-858e-4828b1d864b9
+  questName: Kill all enemies!
   description: 
-  objectives: []
-  prerequisiteQuests: []
+  objectives:
+  - objectiveID: 
+    description: Kill Normie
+    type: 0
+    targetID: Normie
+    currentAmount: 0
+    requiredAmount: 25
+    isCompleted: 0
+  - objectiveID: 
+    description: Kill Fatphuc
+    type: 0
+    targetID: Fatphuc
+    currentAmount: 0
+    requiredAmount: 5
+    isCompleted: 0
+  prerequisiteQuests:
+  - {fileID: 11400000, guid: 8bb333312c9e7114196dcb20a68f918c, type: 2}
   requiredLevel: 1
   expReward: 0
-  coinReward: 0
-  autoStart: 0
-  autoStartScene: 
+  coinReward: 700
+  autoStart: 1
+  autoStartScene: SceneMainGame

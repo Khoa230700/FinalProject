@@ -3,8 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-public class PlayerHealth : HealthBase
+public class PlayerHealth : MonoBehaviour, IDamageable
 {
+    [Header("Settings")]
+    public float maxHealth = 100;
+    public float currentHealth;
+    [HideInInspector] public UnityEvent<float, Vector3> OnTakeDamage;
+
     [Header("Regeneration")]
     public bool useRegen;
     public float regenRate;
@@ -17,14 +22,19 @@ public class PlayerHealth : HealthBase
     public bool IsDown { get; private set; } = false;
     private Coroutine regenRoutine;
 
-    protected override void Start()
+    private void Start()
     {
-        base.Start();
+        UpdateHealth(maxHealth);
         shield ??= GetComponent<PlayerShield>();
     }
 
+    public void TakeDamage(float amount)
+    {
+        TakeDamage(amount, 0f, Vector3.zero);
+    }
+
     //* Nhận sát thương qua lá chắn và tính toán sát thương còn lại, thêm khả năng xuyên lá chắn , thêm vào điểm va chạm
-    public override void TakeDamage(float damage, float penetrationPercent = 0f, Vector3 hitPoint = default)
+    public void TakeDamage(float damage, float penetrationPercent = 0f, Vector3 hitPoint = default)
     {
         //* Khởi động tái tạo khi nhận sát thương
         if (regenRoutine != null) StopCoroutine(regenRoutine);
@@ -64,7 +74,7 @@ public class PlayerHealth : HealthBase
     }
 
     //* Hồi máu (+ hồi, - trừ)
-    protected override void UpdateHealth(float amount)
+    public void UpdateHealth(float amount)
     {
         currentHealth = Mathf.Clamp(currentHealth + amount, 0, maxHealth);
         UpdateUI();
@@ -73,18 +83,20 @@ public class PlayerHealth : HealthBase
             Die();
     }
 
-    protected override void Die()
+    public void Die()
     {
         Debug.Log("Die!");
     }
 
-    private void UpdateUI()
-    {
-        barUI.SetValue(currentHealth);
-    }
     public void Revive()
     {
         IsDown = false;
-        Debug.Log("✅ Player revived! HP = " + currentHealth );
+        Debug.Log("✅ Player revived! HP = " + currentHealth);
+    }
+    
+    private void UpdateUI()
+    {
+        barUI.SetMaxValue(maxHealth);
+        barUI.SetValue(currentHealth);
     }
 }

@@ -7,6 +7,7 @@ public class CoinManager : MonoBehaviour
 
     [Header("Coin Settings")]
     [SerializeField] private int currentCoins = 0;
+    [SerializeField] private int sessionCoins = 0;
 
     public event Action<int, int> OnCoinChanged;
 
@@ -15,10 +16,16 @@ public class CoinManager : MonoBehaviour
         Instance = this;
 
         LoadCoins();
+        sessionCoins = 99999999;//Test
     }
 
     public void AddCoins(int amount)
     {
+        if (amount > 0)
+        {
+            sessionCoins += amount;
+        }
+
         int newAmount = Mathf.Max(0, currentCoins + amount);
 
         OnCoinChanged?.Invoke(currentCoins, newAmount);
@@ -36,6 +43,11 @@ public class CoinManager : MonoBehaviour
     public int GetCoins()
     {
         return currentCoins;
+    }
+
+    public int GetSessionCoins()
+    {
+        return sessionCoins;
     }
 
     public bool HasEnoughCoins(int amount)

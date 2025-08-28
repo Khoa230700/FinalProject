@@ -12,18 +12,18 @@ public class ShopPoint : MonoBehaviour
 
     private bool playerInRange = false;
     private Transform player;
+    private Coroutine pathCoroutine;
 
     void OnEnable()
     {
-        StartCoroutine(PathLoop());
+        player = GameObject.FindGameObjectWithTag("Player").transform;
+        pathCoroutine = StartCoroutine(PathLoop());
     }
 
     private void Start()
     {
         if (shopUI == null)
             shopUI = FindAnyObjectByType<ShopUI>();
-
-        player = GameObject.FindGameObjectWithTag("Player").transform;
     }
 
     private void Update()
@@ -40,6 +40,7 @@ public class ShopPoint : MonoBehaviour
         {
             playerInRange = true;
             shopNotification.SetActive(true);
+            if(pathCoroutine != null) StopCoroutine(pathCoroutine);
         }
     }
 
@@ -50,7 +51,8 @@ public class ShopPoint : MonoBehaviour
             playerInRange = false;
             shopNotification.SetActive(false);
 
-            if (shopUI.IsOpen) shopUI.Hide();
+            if (shopUI.isOpen) shopUI.Hide();
+            if(pathCoroutine != null) pathCoroutine = StartCoroutine(PathLoop());
         }
     }
 
@@ -79,7 +81,8 @@ public class ShopPoint : MonoBehaviour
 
     private IEnumerator MovePathArrow(Vector3[] waypoints)
     {
-        GameObject arrow = Instantiate(arrowPrefab, waypoints[0], Quaternion.identity);
+        Vector3 spawnPos = player.position + player.forward * 4f + Vector3.up * 1.5f;
+        GameObject arrow = Instantiate(arrowPrefab, spawnPos, Quaternion.identity);
 
         int index = 1;
         while (arrow != null && index < waypoints.Length)
@@ -98,6 +101,6 @@ public class ShopPoint : MonoBehaviour
         }
 
         if (arrow != null)
-            Destroy(arrow, 0.5f);
+            Destroy(arrow, 5f);
     }
 }
