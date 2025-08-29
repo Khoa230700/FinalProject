@@ -9,10 +9,15 @@ public class PropertyUI : MonoBehaviour
     [SerializeField] private Slider sliderValue;
     [SerializeField] private Slider sliderPreview;
 
+    private string originalText;
+
     public void SetValue(float value, float maxValue = 100f, string format = "0")
     {
         if (textValue != null)
+        {
             textValue.text = value.ToString(format);
+            originalText = textValue.text;
+        }
 
         if (sliderValue != null)
         {
@@ -20,22 +25,31 @@ public class PropertyUI : MonoBehaviour
             sliderValue.value = value;
         }
 
-        if (sliderPreview != null)
-            sliderPreview.value = 0;
+        HidePreview();
     }
 
-    public void SetPreview(float previewValue, float maxValue = 100f)
+    public void SetPreview(float previewValue, float maxValue = 100f, string format = "0")
     {
         if (sliderPreview == null) return;
 
+        originalText = textValue.text;
+
         sliderPreview.maxValue = maxValue;
         sliderPreview.value = previewValue;
+
+        if (textValue != null)
+        {
+            textValue.text = previewValue.ToString(format);
+            textValue.color = Color.yellow; // Highlight preview value
+        }
+
         sliderPreview.gameObject.SetActive(true);
     }
 
     public void HidePreview()
     {
-        if (sliderPreview != null)
-            sliderPreview.gameObject.SetActive(false);
+        sliderPreview.value = 0;
+        textValue.text = originalText;
+        textValue.color = Color.white;
     }
 }

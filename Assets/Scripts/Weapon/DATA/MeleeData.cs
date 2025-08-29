@@ -48,16 +48,4 @@ public class MeleeData : ScriptableObject
     {
         return c != null ? Mathf.Max(0.01f, c.Evaluate(lvl)) : 1f;
     }
-
-    public string GetUpgradeProgressText(int currentLevel)
-    {
-        if (currentLevel >= maxLevel)
-            return "MAX LEVEL";
-
-        float currentDmg = GetDamage(currentLevel);
-        float nextDmg = GetDamage(currentLevel + 1);
-        float dmgIncrease = nextDmg - currentDmg;
-
-        return $"+{dmgIncrease:F1} Damage";
-    }
 }

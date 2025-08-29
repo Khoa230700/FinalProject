@@ -50,12 +50,12 @@ public class ShopEquipDescriptionsUI : MonoBehaviour
         SetBasicInfo(gun.gunName, gun.gunType.ToString(), gun.gunSpriteFullColor);
 
         levelText.gameObject.SetActive(false);
-        properties[0].SetValue(gun.damage, 100f);           // damage
-        properties[1].SetValue(gun.range, 100f);            // range
-        properties[2].SetValue(gun.magazineSize, 100f);     // magSize
-        properties[3].SetValue(gun.roundsPerSecond, 20f, "0.0"); // speed
-        properties[4].SetValue(gun.reloadTime, 10f, "0.0"); // reload
-        properties[5].SetValue(gun.reserveAmmo);             // reserve
+        properties[0].SetValue(gun.damage, 100f);           // damage 0
+        properties[1].SetValue(gun.range, 100f);            // range 1
+        properties[2].SetValue(gun.magazineSize, 100f);     // magSize 2
+        properties[3].SetValue(gun.roundsPerSecond, 20f, "0.0"); // speed 3
+        properties[4].SetValue(gun.reloadTime, 10f, "0.0"); // reload 4
+        properties[5].SetValue(gun.reserveAmmo);             // reserve 5
 
         SetPropertiesActive(true, true, true, true, true, true);
         SetButtonsActive(true, true);

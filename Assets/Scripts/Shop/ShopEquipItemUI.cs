@@ -52,8 +52,8 @@ public class ShopEquipItemUI : MonoBehaviour, ISelectHandler, IPointerClickHandl
 
         switch (type)
         {
-            case "Gun":    SetupGunSlot(item as PlayerShoot, currentAmmo, reserveAmmo); break;
-            case "Melee":  SetupMeleeSlot(item as MeleeWeapon, level); break;
+            case "Gun": SetupGunSlot(item as PlayerShoot, currentAmmo, reserveAmmo); break;
+            case "Melee": SetupMeleeSlot(item as MeleeWeapon, level); break;
             case "Health": SetupStatSlot(item as PlayerHealthSystem, "Health"); break;
             case "Shield": SetupStatSlot(item as PlayerHealthSystem, "Shield"); break;
         }
@@ -84,7 +84,7 @@ public class ShopEquipItemUI : MonoBehaviour, ISelectHandler, IPointerClickHandl
     private void SetupStatSlot(PlayerHealthSystem stat, string type)
     {
         float current = type == "Health" ? stat.CurrentHealth : stat.CurrentShield;
-        float max     = type == "Health" ? stat.MaxHealth     : stat.MaxShield;
+        float max = type == "Health" ? stat.MaxHealth : stat.MaxShield;
 
         ammo.text = $"{(int)current}/{(int)max}";
         if (sliderBar) sliderBar.fillAmount = current / max;
@@ -282,7 +282,32 @@ public class ShopEquipItemUI : MonoBehaviour, ISelectHandler, IPointerClickHandl
 
             case "Melee" when currentItem is MeleeWeapon melee:
                 descriptionUI.UpdateDescriptionUI(melee: melee.data, meleeLevel: meleeLevel);
-                descriptionUI.UpgradeButton?.onClick.AddListener(() => HandleMeleeUpgrade(melee));
+
+                // Nút Upgrade
+                if (descriptionUI.UpgradeButton != null)
+                {
+                    descriptionUI.UpgradeButton.onClick.AddListener(() =>
+                    {
+                        HandleMeleeUpgrade(melee);
+                        ShowMeleePreview(melee);
+                    });
+
+                    // Hover preview
+                    EventTrigger trigger = descriptionUI.UpgradeButton.gameObject.GetComponent<EventTrigger>();
+                    if (trigger == null) trigger = descriptionUI.UpgradeButton.gameObject.AddComponent<EventTrigger>();
+                    trigger.triggers.Clear();
+
+                    // OnPointerEnter
+                    var enter = new EventTrigger.Entry { eventID = EventTriggerType.PointerEnter };
+                    enter.callback.AddListener((_) => ShowMeleePreview(melee));
+                    trigger.triggers.Add(enter);
+
+                    // OnPointerExit
+                    var exit = new EventTrigger.Entry { eventID = EventTriggerType.PointerExit };
+                    exit.callback.AddListener((_) => HideMeleePreview());
+                    trigger.triggers.Add(exit);
+                }
+
                 UpdateButtonState("Melee", melee);
                 break;
 
@@ -397,5 +422,33 @@ public class ShopEquipItemUI : MonoBehaviour, ISelectHandler, IPointerClickHandl
             }
         }
         lastClickTime = Time.time;
+    }
+
+    private void ShowMeleePreview(MeleeWeapon melee)
+    {
+        if (melee == null || meleeLevel >= melee.data.maxLevel) return;
+
+        int nextLevel = meleeLevel + 1;
+
+        // Ví dụ preview damage
+        float currentDamage = 1 / melee.data.GetCooldown(meleeLevel);
+        float nextDamage = 1 / melee.data.GetCooldown(nextLevel);
+
+        // Tìm PropertyUI (trong description panel) để hiển thị preview
+        foreach (var prop in descriptionUI.GetComponentsInChildren<PropertyUI>())
+        {
+            if (prop.name.Contains("Property Speed")) // bạn đặt tên object SpeedPropertyUI
+            {
+                prop.SetPreview(nextDamage, 10f, "0.0");
+            }
+        }
+    }
+
+    private void HideMeleePreview()
+    {
+        foreach (var prop in descriptionUI.GetComponentsInChildren<PropertyUI>())
+        {
+            prop.HidePreview();
+        }
     }
 }
