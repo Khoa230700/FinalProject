@@ -41,8 +41,5 @@ public class testPlayerHealth2 : MonoBehaviour, IDamageable
     // }
 
 
-    public interface IHealth
-    {
-        void TakeDamage(float amount);
-    }
+    
 }

@@ -30,10 +30,13 @@ public class suicideEnemy : MonoBehaviour
     public float moveSpeed = 4f;
     public LayerMask targetLayer;
 
+    private QuestTracker questTracker;
+
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
         enemyAnimation = GetComponent<Animator>();
+        questTracker = GetComponent<QuestTracker>();
         //float distance = Vector3.Distance(transform.position, player.position);
         //if (distance <= attackRange)
         //{
@@ -78,6 +81,13 @@ public class suicideEnemy : MonoBehaviour
 
     void Attack()
     {
+        IDamageable target = GetClosestDamageableInRange();
+
+        //if (target != null && Time.time >= lastAttackTime + attackCooldown)
+        //{
+        //    target.TakeDamage(damage);
+        //    lastAttackTime = Time.time;
+        //}
         if (Time.time - lastAttackTime >= attackCooldown)
         {
             lastAttackTime = Time.time;
@@ -88,10 +98,8 @@ public class suicideEnemy : MonoBehaviour
             Collider[] colliders = Physics.OverlapSphere(transform.position, 4f);
             foreach (Collider collider in colliders)
             {
-                if (collider.GetComponent<testPlayerHealth>())
-                {
-                    collider.GetComponent<testPlayerHealth>().TakeDamage(50);
-                }
+                target.TakeDamage(60);
+                lastAttackTime = Time.time;
             }
 
             GameObject explo = Instantiate(explosion, transform.position, transform.rotation);
@@ -102,6 +110,7 @@ public class suicideEnemy : MonoBehaviour
     }
     IEnumerator DestroyAfterDelay()
     {
+        questTracker.OnKilled();
         yield return new WaitForSeconds(1);
         Destroy(gameObject);
     }
@@ -133,5 +142,26 @@ public class suicideEnemy : MonoBehaviour
     {
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, detectionRadius);
+    }
+
+
+    IDamageable GetClosestDamageableInRange()
+    {
+        IDamageable[] targets = GameObject.FindObjectsOfType<MonoBehaviour>().OfType<IDamageable>().ToArray();
+
+        IDamageable closest = null;
+        float minDistance = Mathf.Infinity;
+
+        foreach (IDamageable target in targets)
+        {
+            float distance = Vector3.Distance(transform.position, ((MonoBehaviour)target).transform.position);
+            if (distance <= attackRange && distance < minDistance)
+            {
+                closest = target;
+                minDistance = distance;
+            }
+        }
+
+        return closest;
     }
 }

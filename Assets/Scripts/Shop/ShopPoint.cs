@@ -20,6 +20,11 @@ public class ShopPoint : MonoBehaviour
         pathCoroutine = StartCoroutine(PathLoop());
     }
 
+    private void OnDisable()
+    {
+        shopNotification.SetActive(false);
+    }
+
     private void Start()
     {
         if (shopUI == null)

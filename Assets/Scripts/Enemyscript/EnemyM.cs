@@ -26,6 +26,15 @@ public class EnemyM : MonoBehaviour
         tracker = GetComponent<EnemyTracker>();
     }
 
+    private void Update()
+    {
+        //test
+        if(Input.GetKeyDown(KeyCode.K))
+        {
+            TakeDamage(1000);
+        }
+    }
+
     public void TakeDamage(float amount)
     {
         if (isDead) return;

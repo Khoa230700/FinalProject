@@ -11,7 +11,7 @@ public class EndUI : MonoBehaviour
     private Tween coinTween;
     private MeshMouseLook meshMouseLook;
 
-    private void Start()
+    private void Awake()
     {
         meshMouseLook = FindAnyObjectByType<MeshMouseLook>();
     }
