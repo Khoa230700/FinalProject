@@ -5,14 +5,14 @@ using UnityEngine.EventSystems;
 public class ShopUI : MonoBehaviour
 {
     [SerializeField] private GameObject canvasSetting;
-    [SerializeField] private EquipItemUI[] itemSlots = new EquipItemUI[5]; // [primary, secondary, melee, health, shield]
+    [SerializeField] private ShopEquipItemUI[] itemSlots = new ShopEquipItemUI[5]; // [primary, secondary, melee, health, shield]
 
     public bool isOpen { get; private set; }
     public bool canOpen { get; set; } = true;
 
     private Animator animator;
     private PressKeyEvent pressKeyEvent;
-    private EquipDescriptionsUI descriptionsUI;
+    private ShopEquipDescriptionsUI descriptionsUI;
     private Coroutine currentRoutine;
 
     // Cached player components
@@ -25,7 +25,7 @@ public class ShopUI : MonoBehaviour
     {
         animator = GetComponent<Animator>();
         pressKeyEvent = canvasSetting?.GetComponent<PressKeyEvent>();
-        descriptionsUI = FindAnyObjectByType<EquipDescriptionsUI>();
+        descriptionsUI = FindAnyObjectByType<ShopEquipDescriptionsUI>();
 
         CachePlayerComponents();
     }

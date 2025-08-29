@@ -2,10 +2,9 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class EquipDescriptionsUI : MonoBehaviour
+public class ShopEquipDescriptionsUI : MonoBehaviour
 {
-    [Header("General")]
-    [SerializeField] private TMP_Text nameText, typeText, priceText;
+    [SerializeField] private TMP_Text nameText, typeText, levelText;
     [SerializeField] private Image avatarImage;
 
     [Header("Properties")]
@@ -50,6 +49,7 @@ public class EquipDescriptionsUI : MonoBehaviour
     {
         SetBasicInfo(gun.gunName, gun.gunType.ToString(), gun.gunSpriteFullColor);
 
+        levelText.gameObject.SetActive(false);
         properties[0].SetValue(gun.damage, 100f);           // damage
         properties[1].SetValue(gun.range, 100f);            // range
         properties[2].SetValue(gun.magazineSize, 100f);     // magSize
@@ -65,6 +65,9 @@ public class EquipDescriptionsUI : MonoBehaviour
     {
         SetBasicInfo(melee.weaponName, "Melee", melee.weaponSpriteFullColor);
 
+        levelText.text = $"Level: {level}";
+        levelText.gameObject.SetActive(true);
+
         properties[0].SetValue(melee.GetDamage(level), 100f);
         properties[1].SetValue(melee.GetRange(level), 10f);
         properties[3].SetValue(1f / melee.GetCooldown(level), 10f, "0.0");
@@ -75,6 +78,8 @@ public class EquipDescriptionsUI : MonoBehaviour
 
     private void SetupHealth()
     {
+        levelText.gameObject.SetActive(false);
+
         SetBasicInfo("Medical Kit", "Health", healthIcon);
         SetPropertiesActive(false, false, false, false, false, false);
         SetButtonsActive(true, false);
@@ -82,6 +87,8 @@ public class EquipDescriptionsUI : MonoBehaviour
 
     private void SetupShield()
     {
+        levelText.gameObject.SetActive(false);
+
         SetBasicInfo("Shield Kit", "Shield", shieldIcon);
         SetPropertiesActive(false, false, false, false, false, false);
         SetButtonsActive(true, false);
@@ -126,7 +133,7 @@ public class EquipDescriptionsUI : MonoBehaviour
     {
         nameText.text = "Name";
         typeText.text = "Type";
-        priceText.text = "";
+        levelText.text = "";
 
         avatarImage.gameObject.SetActive(false);
         foreach (var prop in properties)

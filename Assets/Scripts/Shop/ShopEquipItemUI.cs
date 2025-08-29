@@ -3,9 +3,9 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class EquipItemUI : MonoBehaviour, ISelectHandler, IPointerClickHandler
+public class ShopEquipItemUI : MonoBehaviour, ISelectHandler, IPointerClickHandler
 {
-    private static EquipItemUI currentSelected;
+    private static ShopEquipItemUI currentSelected;
 
     [Header("UI")]
     public Transform upgradeBarParent;
@@ -21,13 +21,13 @@ public class EquipItemUI : MonoBehaviour, ISelectHandler, IPointerClickHandler
     private float lastClickTime;
 
     // References
-    private EquipDescriptionsUI descriptionUI;
+    private ShopEquipDescriptionsUI descriptionUI;
     private ShopManager shopManager;
     private Animator animator;
 
     private void Awake()
     {
-        descriptionUI = FindAnyObjectByType<EquipDescriptionsUI>();
+        descriptionUI = FindAnyObjectByType<ShopEquipDescriptionsUI>();
         shopManager = FindAnyObjectByType<ShopManager>();
         animator = GetComponent<Animator>();
     }
@@ -298,7 +298,6 @@ public class EquipItemUI : MonoBehaviour, ISelectHandler, IPointerClickHandler
         bool success = type == "Health" ? shopManager.HealPlayer(stat as PlayerHealthSystem)
                                        : shopManager.ShieldPlayer(stat as PlayerHealthSystem);
 
-                                       Debug.Log(success);
         if (success)
         {
             // Update slot UI immediately
