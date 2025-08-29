@@ -25,20 +25,36 @@ public class PlayerShoot : MonoBehaviour, IWeapon, IReloadable
 
     // guard to avoid double-shot in same frame
     private int _lastShotFrame = -1;
-
     private bool initialized = false;
+
+    // NEW: optional upgrade state
+    private GunUpgradeState upgrade;
+
+    // --------- Helpers (đọc stat đã nâng cấp nếu có) ---------
+    int MagazineSize => upgrade ? upgrade.MagazineSize : gunData.magazineSize;
+    float Damage => upgrade ? upgrade.Damage : gunData.damage;
+    float Range => upgrade ? upgrade.Range : gunData.range;
+    float ReloadTime => upgrade ? upgrade.ReloadTime : gunData.reloadTime;
+    float SpreadAngle => upgrade ? upgrade.SpreadAngle : gunData.spreadAngle;
+    float SemiAutoIv => upgrade ? upgrade.SemiAutoMinInterval : gunData.semiAutoMinInterval;
+
+    void Awake()
+    {
+        upgrade = GetComponent<GunUpgradeState>();
+    }
 
     public void Initialize()
     {
         if (initialized) return;
-        currentAmmo = gunData.magazineSize;
-        reserveAmmo = gunData.reserveAmmo;
+        currentAmmo = MagazineSize;           // dùng magazine size đã nâng cấp
+        reserveAmmo = gunData.reserveAmmo;    // reserve giữ theo data gốc (tuỳ design)
         initialized = true;
     }
 
     void Start()
     {
-        currentAmmo = gunData.magazineSize;
+        // Khởi tạo đạn với magazine size đã nâng cấp
+        currentAmmo = MagazineSize;
         reserveAmmo = gunData.reserveAmmo;
         weaponUI?.UpdateAmmoUI(currentAmmo, reserveAmmo);
     }
@@ -124,20 +140,20 @@ public class PlayerShoot : MonoBehaviour, IWeapon, IReloadable
         if (gunData.shootSound != null)
             AudioSource.PlayClipAtPoint(gunData.shootSound, shootPoint.position);
 
-        int count = (gunData.gunType == GunType.Shotgun) ? gunData.pelletCount : 1;
-        for (int i = 0; i < count; i++)
+        int pellets = (gunData.gunType == GunType.Shotgun) ? gunData.pelletCount : 1;
+        for (int i = 0; i < pellets; i++)
         {
-            Vector3 dir = (count == 1)
+            Vector3 dir = (pellets == 1)
                 ? shootPoint.forward
-                : GetSpreadDirection(shootPoint.forward, gunData.spreadAngle);
+                : GetSpreadDirection(shootPoint.forward, SpreadAngle);
 
             Ray ray = new Ray(shootPoint.position, dir);
-            if (Physics.Raycast(ray, out RaycastHit hit, gunData.range))
+            if (Physics.Raycast(ray, out RaycastHit hit, Range))
             {
                 var hb = hit.collider.GetComponent<Hitbox>();
                 if (hb != null && hb.ownerHealthSystem != null)
                 {
-                    float dmg = gunData.damage;
+                    float dmg = Damage;
                     if (hb.hitboxType == Hitbox.HitboxType.Head) dmg *= 2f;
                     hb.ownerHealthSystem.TakeDamage(dmg);
                     hb.OnHit(dmg, hit.point);
@@ -150,11 +166,11 @@ public class PlayerShoot : MonoBehaviour, IWeapon, IReloadable
         if (shotResetCoroutine != null) StopCoroutine(shotResetCoroutine);
         shotResetCoroutine = StartCoroutine(ResetShotAnimation());
 
-        // cooldown for semi-auto (sniper ~1s)
+        // cooldown cho SemiAuto (sniper ~1s nếu chưa set)
         float cooldown = 0f;
         if (gunData.fireMode == GunFireMode.SemiAuto)
         {
-            cooldown = gunData.semiAutoMinInterval;
+            cooldown = SemiAutoIv;
             if (gunData.gunType == GunType.SniperRifle && cooldown <= 0f)
                 cooldown = 1f;
         }
@@ -192,7 +208,7 @@ public class PlayerShoot : MonoBehaviour, IWeapon, IReloadable
 
     public void Reload()
     {
-        if (isReloading || currentAmmo >= gunData.magazineSize || reserveAmmo <= 0)
+        if (isReloading || currentAmmo >= MagazineSize || reserveAmmo <= 0)
             return;
 
         isReloading = true;
@@ -202,11 +218,13 @@ public class PlayerShoot : MonoBehaviour, IWeapon, IReloadable
 
     private IEnumerator ReloadRoutine()
     {
-        yield return new WaitForSeconds(gunData.reloadTime);
-        int need = gunData.magazineSize - currentAmmo;
+        yield return new WaitForSeconds(ReloadTime);
+
+        int need = MagazineSize - currentAmmo;
         int used = Mathf.Min(need, reserveAmmo);
         currentAmmo += used;
         reserveAmmo -= used;
+
         isReloading = false;
         weaponUI?.UpdateAmmoUI(currentAmmo, reserveAmmo);
     }
@@ -219,21 +237,21 @@ public class PlayerShoot : MonoBehaviour, IWeapon, IReloadable
         armsAnimator.SetTrigger("Idle");
     }
 
-    //SHOP
+    //================ SHOP ==================
     public int AddAmmo(int amount)
     {
         if (amount <= 0) return 0;
 
         int bulletsAdded = 0;
 
-        // Add to currentAmmo
-        int magazineSpace = gunData.magazineSize - currentAmmo;
+        // Add to current magazine (dựa theo MagazineSize đã upgrade)
+        int magazineSpace = MagazineSize - currentAmmo;
         int toMagazine = Mathf.Min(amount, magazineSpace);
         currentAmmo += toMagazine;
         bulletsAdded += toMagazine;
         amount -= toMagazine;
 
-        // Add to reserveAmmo
+        // Add to reserve (giữ capacity theo gunData.reserveAmmo)
         if (amount > 0)
         {
             int reserveSpace = gunData.reserveAmmo - reserveAmmo;
@@ -243,22 +261,18 @@ public class PlayerShoot : MonoBehaviour, IWeapon, IReloadable
         }
 
         weaponUI?.UpdateAmmoUI(currentAmmo, reserveAmmo);
-
-        // Debug.Log($"Added {bulletsAdded} bullets to {gunData.name}. Current: {currentAmmo}/{gunData.magazineSize}, Reserve: {reserveAmmo}/{gunData.reserveAmmo}");
-
         return bulletsAdded;
     }
 
     public bool NeedsRefill()
     {
-        return currentAmmo < gunData.magazineSize || reserveAmmo < gunData.reserveAmmo;
+        return currentAmmo < MagazineSize || reserveAmmo < gunData.reserveAmmo;
     }
 
     public int GetAmmoNeeded()
     {
-        int currentAmmoNeeded = gunData.magazineSize - currentAmmo;
+        int currentAmmoNeeded = MagazineSize - currentAmmo;
         int reserveAmmoNeeded = gunData.reserveAmmo - reserveAmmo;
-        return currentAmmoNeeded + reserveAmmoNeeded;
-
+        return Mathf.Max(0, currentAmmoNeeded) + Mathf.Max(0, reserveAmmoNeeded);
     }
 }
