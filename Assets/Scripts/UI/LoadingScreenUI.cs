@@ -47,6 +47,8 @@ public class LoadingScreenUI : MonoBehaviour
 
     void OnEnable()
     {
+        Time.timeScale = 0f;
+
         StopAllCoroutines();
 
         if (enableRandomHints && hintList.Count > 0) StartCoroutine(RandomHint());
@@ -69,7 +71,8 @@ public class LoadingScreenUI : MonoBehaviour
 
     public IEnumerator LoadSceneRoutine(string targetScene)
     {
-        yield return new WaitForSeconds(0.1f);
+        // Time.timeScale = 1f;
+        yield return new WaitForSecondsRealtime(0.1f);
 
         processLoading = true;
         loadingProcess = SceneManager.LoadSceneAsync(targetScene);
@@ -91,13 +94,15 @@ public class LoadingScreenUI : MonoBehaviour
         if (!loadingProcess.allowSceneActivation)
             loadingProcess.allowSceneActivation = true;
 
-        progressBar.value = Mathf.Lerp(progressBar.value, loadingProcess.progress, 0.1f);
+        progressBar.value = Mathf.Lerp(progressBar.value, loadingProcess.progress, 0.1f * Time.unscaledDeltaTime * 60);
         statusText.text = Mathf.Round(progressBar.value * 100) + "%";
 
         if (canvasGroup.alpha == 0) animator.Play("In");
 
         if (loadingProcess.progress >= 0.9f)
         {
+            Time.timeScale = 1f;
+
             animator.Play("Out");
             var length = animator.GetCurrentAnimatorStateInfo(0).length;
             Destroy(gameObject, length);
@@ -118,6 +123,8 @@ public class LoadingScreenUI : MonoBehaviour
 
             if (loadingProcess.progress >= 0.9f)
             {
+                Time.timeScale = 1f;
+
                 animator.Play("Out");
                 var length = animator.GetCurrentAnimatorStateInfo(0).length;
                 Destroy(gameObject, length);

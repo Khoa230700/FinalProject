@@ -7,6 +7,6 @@ public class LoadSceneManager : MonoBehaviour
     public void LoadScene(string sceneName)
     {
         LoadingScreenUI.LoadScene(sceneName);
-        Debug.Log("LoadScene");
+        Debug.Log($"Loading scene: {sceneName}");
     }
 }

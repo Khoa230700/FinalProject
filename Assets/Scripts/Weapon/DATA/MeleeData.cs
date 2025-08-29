@@ -29,6 +29,11 @@ public class MeleeData : ScriptableObject
     public AudioClip swingSfx;
     public AudioClip hitSfx;
 
+    [Header("Upgrade System")]
+    [Tooltip("Maximum upgrade level for this weapon")]
+    [Range(1, 20)]
+    public int maxLevel = 5;
+
     [Header("Upgrade Curves (tuỳ chọn)")]
     [Tooltip("Hệ số nhân theo level (0 = level1). Nếu rỗng = 1.0f")]
     public AnimationCurve damageByLevel = AnimationCurve.Linear(0, 1f, 5, 1.8f);

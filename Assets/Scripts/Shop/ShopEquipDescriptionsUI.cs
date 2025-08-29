@@ -2,10 +2,9 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class EquipDescriptionsUI : MonoBehaviour
+public class ShopEquipDescriptionsUI : MonoBehaviour
 {
-    [Header("General")]
-    [SerializeField] private TMP_Text nameText, typeText, priceText;
+    [SerializeField] private TMP_Text nameText, typeText, levelText;
     [SerializeField] private Image avatarImage;
 
     [Header("Properties")]
@@ -23,7 +22,7 @@ public class EquipDescriptionsUI : MonoBehaviour
     private void Start() => HideDescription();
 
     public void UpdateDescriptionUI(GunData gun = null, MeleeData melee = null, int meleeLevel = 0,
-                                    PlayerHealth health = null, PlayerShield shield = null)
+                                    PlayerHealthSystem health = null, PlayerHealthSystem shield = null)
     {
         if (IsAllNull(gun, melee, health, shield))
         {
@@ -50,12 +49,13 @@ public class EquipDescriptionsUI : MonoBehaviour
     {
         SetBasicInfo(gun.gunName, gun.gunType.ToString(), gun.gunSpriteFullColor);
 
-        properties[0].SetValue(gun.damage, 100f);           // damage
-        properties[1].SetValue(gun.range, 100f);            // range
-        properties[2].SetValue(gun.magazineSize, 100f);     // magSize
-        properties[3].SetValue(gun.roundsPerSecond, 20f, "0.0"); // speed
-        properties[4].SetValue(gun.reloadTime, 10f, "0.0"); // reload
-        properties[5].SetValue(gun.reserveAmmo);             // reserve
+        levelText.gameObject.SetActive(false);
+        properties[0].SetValue(gun.damage, 100f);           // damage 0
+        properties[1].SetValue(gun.range, 100f);            // range 1
+        properties[2].SetValue(gun.magazineSize, 100f);     // magSize 2
+        properties[3].SetValue(gun.roundsPerSecond, 20f, "0.0"); // speed 3
+        properties[4].SetValue(gun.reloadTime, 10f, "0.0"); // reload 4
+        properties[5].SetValue(gun.reserveAmmo);             // reserve 5
 
         SetPropertiesActive(true, true, true, true, true, true);
         SetButtonsActive(true, true);
@@ -64,6 +64,9 @@ public class EquipDescriptionsUI : MonoBehaviour
     private void SetupMelee(MeleeData melee, int level)
     {
         SetBasicInfo(melee.weaponName, "Melee", melee.weaponSpriteFullColor);
+
+        levelText.text = $"Level: {level}";
+        levelText.gameObject.SetActive(true);
 
         properties[0].SetValue(melee.GetDamage(level), 100f);
         properties[1].SetValue(melee.GetRange(level), 10f);
@@ -75,6 +78,8 @@ public class EquipDescriptionsUI : MonoBehaviour
 
     private void SetupHealth()
     {
+        levelText.gameObject.SetActive(false);
+
         SetBasicInfo("Medical Kit", "Health", healthIcon);
         SetPropertiesActive(false, false, false, false, false, false);
         SetButtonsActive(true, false);
@@ -82,6 +87,8 @@ public class EquipDescriptionsUI : MonoBehaviour
 
     private void SetupShield()
     {
+        levelText.gameObject.SetActive(false);
+
         SetBasicInfo("Shield Kit", "Shield", shieldIcon);
         SetPropertiesActive(false, false, false, false, false, false);
         SetButtonsActive(true, false);
@@ -126,7 +133,7 @@ public class EquipDescriptionsUI : MonoBehaviour
     {
         nameText.text = "Name";
         typeText.text = "Type";
-        priceText.text = "";
+        levelText.text = "";
 
         avatarImage.gameObject.SetActive(false);
         foreach (var prop in properties)
