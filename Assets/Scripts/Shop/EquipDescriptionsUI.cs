@@ -23,7 +23,7 @@ public class EquipDescriptionsUI : MonoBehaviour
     private void Start() => HideDescription();
 
     public void UpdateDescriptionUI(GunData gun = null, MeleeData melee = null, int meleeLevel = 0,
-                                    PlayerHealth health = null, PlayerShield shield = null)
+                                    PlayerHealthSystem health = null, PlayerHealthSystem shield = null)
     {
         if (IsAllNull(gun, melee, health, shield))
         {

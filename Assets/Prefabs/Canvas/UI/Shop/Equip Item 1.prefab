@@ -281,10 +281,10 @@ RectTransform:
   - {fileID: 4587822991575480644}
   - {fileID: 1599922672191839316}
   - {fileID: 132550141682628800}
-  - {fileID: 4120803809581100934}
   - {fileID: 2826085041127555180}
-  - {fileID: 7174652128260766744}
   - {fileID: 2142980679590512389}
+  - {fileID: 4120803809581100934}
+  - {fileID: 7174652128260766744}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -396,6 +396,8 @@ MonoBehaviour:
   avatar: {fileID: 6419145667589581756}
   ammo: {fileID: 287745817523229569}
   priceText: {fileID: 233497309598081397}
+  sliderBar: {fileID: 0}
+  emptyPanel: {fileID: 9169039135392773578}
 --- !u!1 &792114703223743725
 GameObject:
   m_ObjectHideFlags: 0
@@ -1393,9 +1395,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 0.20784314, g: 0.20784314, b: 0.20784314, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
+  m_Maskable: 0
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []

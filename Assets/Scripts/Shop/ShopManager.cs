@@ -50,36 +50,36 @@ public class ShopManager : MonoBehaviour
     }
 
     // HEALTH
-    public bool HealPlayer(PlayerHealth player)
+    public bool HealPlayer(PlayerHealthSystem health)
     {
-        return PurchaseResource(player, GetHealCost, NeedsHeal,
-            (p, amount) => { p.UpdateHealth(amount); return true; }, healCostPerHP);
+        return PurchaseResource(health, GetHealCost, NeedsHeal,
+            (p, amount) => { p.Heal(amount); return true; }, healCostPerHP);
     }
 
-    public int GetHealCost(PlayerHealth player)
+    public int GetHealCost(PlayerHealthSystem health)
     {
-        return player == null ? 0 : (int)(player.maxHealth - player.currentHealth) * healCostPerHP;
+        return health == null ? 0 : (int)(health.MaxHealth - health.CurrentHealth) * healCostPerHP;
     }
 
-    public bool NeedsHeal(PlayerHealth player)
+    public bool NeedsHeal(PlayerHealthSystem health)
     {
-        return player != null && player.currentHealth < player.maxHealth;
+        return health != null && health.CurrentHealth < health.MaxHealth;
     }
 
     // SHIELD
-    public bool ShieldPlayer(PlayerShield shield)
+    public bool ShieldPlayer(PlayerHealthSystem shield)
     {
         return PurchaseResource(shield, GetShieldCost, NeedsShield,
-            (s, amount) => { s.UpdateShield(amount); return true; }, shieldCostPerPoint);
+            (s, amount) => { s.AddShield(amount); return true; }, shieldCostPerPoint);
     }
 
-    public int GetShieldCost(PlayerShield shield)
+    public int GetShieldCost(PlayerHealthSystem shield)
     {
-        return shield == null ? 0 : (int)(shield.maxShield - shield.currentShield) * shieldCostPerPoint;
+        return shield == null ? 0 : (int)(shield.MaxShield - shield.CurrentShield) * shieldCostPerPoint;
     }
 
-    public bool NeedsShield(PlayerShield shield)
+    public bool NeedsShield(PlayerHealthSystem shield)
     {
-        return shield != null && shield.currentShield < shield.maxShield;
+        return shield != null && shield.CurrentShield < shield.MaxShield;
     }
 }

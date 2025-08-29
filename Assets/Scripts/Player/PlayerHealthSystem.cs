@@ -18,6 +18,8 @@ public class PlayerHealthSystem : BaseHealthSystem, IDamageable
     [Header("Shield Settings (runtime)")]
     [SerializeField] private float maxShield = 0f;
     [SerializeField] private float currentShield = 0f;
+    public float MaxShield => maxShield;
+    public float CurrentShield => currentShield;
 
     // Hồi giáp (có thể lấy từ stats)
     [SerializeField] private float shieldRegenPerSecond = 0f; // 0 = tắt

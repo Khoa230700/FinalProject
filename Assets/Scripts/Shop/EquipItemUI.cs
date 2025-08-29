@@ -12,6 +12,7 @@ public class EquipItemUI : MonoBehaviour, ISelectHandler, IPointerClickHandler
     public Image avatar;
     public TMP_Text ammo, priceText;
     public Image sliderBar;
+    public GameObject emptyPanel;
 
     // Cache
     private object currentItem;
@@ -39,9 +40,11 @@ public class EquipItemUI : MonoBehaviour, ISelectHandler, IPointerClickHandler
 
         if (item == null)
         {
-            ClearUI();
+            HideUI();
             return;
         }
+
+        ShowUI();
 
         switch (type)
         {
@@ -52,10 +55,10 @@ public class EquipItemUI : MonoBehaviour, ISelectHandler, IPointerClickHandler
                 SetupMeleeSlot(item as MeleeWeapon, level);
                 break;
             case "Health":
-                SetupStatSlot(item as PlayerHealth, type);
+                SetupStatSlot(item as PlayerHealthSystem, type);
                 break;
             case "Shield":
-                SetupStatSlot(item as PlayerShield, type);
+                SetupStatSlot(item as PlayerHealthSystem, type);
                 break;
         }
     }
@@ -81,15 +84,15 @@ public class EquipItemUI : MonoBehaviour, ISelectHandler, IPointerClickHandler
 
         switch (type)
         {
-            case "Health" when stat is PlayerHealth health:
-                current = health.currentHealth;
-                max = health.maxHealth;
-                UpdateStatPrice(health, shopManager.GetHealCost(health), shopManager.NeedsHeal(health), shopManager.healCostPerHP);
+            case "Health" when stat is PlayerHealthSystem health:
+                current = health.CurrentHealth;
+                max = health.MaxHealth;
+                UpdateStatPrice(shopManager.GetHealCost(health), shopManager.NeedsHeal(health), shopManager.healCostPerHP);
                 break;
-            case "Shield" when stat is PlayerShield shield:
-                current = shield.currentShield;
-                max = shield.maxShield;
-                UpdateStatPrice(shield, shopManager.GetShieldCost(shield), shopManager.NeedsShield(shield), shopManager.shieldCostPerPoint);
+            case "Shield" when stat is PlayerHealthSystem shield:
+                current = shield.CurrentShield;
+                max = shield.MaxShield;
+                UpdateStatPrice(shopManager.GetShieldCost(shield), shopManager.NeedsShield(shield), shopManager.shieldCostPerPoint);
                 break;
         }
 
@@ -112,7 +115,7 @@ public class EquipItemUI : MonoBehaviour, ISelectHandler, IPointerClickHandler
         {
             int cost = shopManager.GetRefillCost(gun);
             int available = CoinManager.Instance.GetCoins();
-            
+
             if (available < cost && available > 0)
             {
                 int maxBullets = available / gun.gunData.bulletRefillCost;
@@ -120,14 +123,14 @@ public class EquipItemUI : MonoBehaviour, ISelectHandler, IPointerClickHandler
             }
 
             priceText.text = $"$ {cost}";
-            priceText.color = CoinManager.Instance.HasEnoughCoins(gun.gunData.bulletRefillCost) 
+            priceText.color = CoinManager.Instance.HasEnoughCoins(gun.gunData.bulletRefillCost)
                 ? new Color(0.392f, 0.698f, 0.812f) : Color.red;
         }
-        
+
         priceText.gameObject.SetActive(true);
     }
 
-    private void UpdateStatPrice<T>(T stat, int fullCost, bool needs, int costPerUnit)
+    private void UpdateStatPrice(int fullCost, bool needs, int costPerUnit)
     {
         if (priceText == null) return;
 
@@ -139,15 +142,15 @@ public class EquipItemUI : MonoBehaviour, ISelectHandler, IPointerClickHandler
         else
         {
             int available = CoinManager.Instance.GetCoins();
-            int cost = available < fullCost && available >= costPerUnit 
-                ? (available / costPerUnit) * costPerUnit 
+            int cost = available < fullCost && available >= costPerUnit
+                ? (available / costPerUnit) * costPerUnit
                 : fullCost;
 
             priceText.text = $"$ {cost}";
-            priceText.color = available >= costPerUnit 
+            priceText.color = available >= costPerUnit
                 ? new Color(0.392f, 0.698f, 0.812f) : Color.red;
         }
-        
+
         priceText.gameObject.SetActive(true);
     }
 
@@ -177,11 +180,11 @@ public class EquipItemUI : MonoBehaviour, ISelectHandler, IPointerClickHandler
                 descriptionUI.UpdateDescriptionUI(melee: melee.data, meleeLevel: meleeLevel);
                 SetupMeleeButtons();
                 break;
-            case "Health" when currentItem is PlayerHealth health:
+            case "Health" when currentItem is PlayerHealthSystem health:
                 descriptionUI.UpdateDescriptionUI(health: health);
                 SetupStatButtons(health, "Health");
                 break;
-            case "Shield" when currentItem is PlayerShield shield:
+            case "Shield" when currentItem is PlayerHealthSystem shield:
                 descriptionUI.UpdateDescriptionUI(shield: shield);
                 SetupStatButtons(shield, "Shield");
                 break;
@@ -195,7 +198,7 @@ public class EquipItemUI : MonoBehaviour, ISelectHandler, IPointerClickHandler
     {
         descriptionUI.RefillButton?.onClick.AddListener(() => HandleRefill(gun));
         descriptionUI.UpgradeButton?.onClick.AddListener(() => Debug.Log($"Upgrading {gun.GetType().Name}"));
-        
+
         UpdateGunButtonState(gun);
     }
 
@@ -237,7 +240,7 @@ public class EquipItemUI : MonoBehaviour, ISelectHandler, IPointerClickHandler
                 buttonText.text = $"Refill ({fullCost})";
             }
         }
-        
+
         descriptionUI.RefillButton.interactable = needsRefill && canAfford;
     }
 
@@ -245,11 +248,11 @@ public class EquipItemUI : MonoBehaviour, ISelectHandler, IPointerClickHandler
     {
         if (descriptionUI.RefillButton == null) return;
 
-        bool needs = type == "Health" ? shopManager.NeedsHeal(stat as PlayerHealth) 
-                                     : shopManager.NeedsShield(stat as PlayerShield);
+        bool needs = type == "Health" ? shopManager.NeedsHeal(stat as PlayerHealthSystem)
+                                     : shopManager.NeedsShield(stat as PlayerHealthSystem);
         int costPerUnit = type == "Health" ? shopManager.healCostPerHP : shopManager.shieldCostPerPoint;
-        int fullCost = type == "Health" ? shopManager.GetHealCost(stat as PlayerHealth) 
-                                       : shopManager.GetShieldCost(stat as PlayerShield);
+        int fullCost = type == "Health" ? shopManager.GetHealCost(stat as PlayerHealthSystem)
+                                       : shopManager.GetShieldCost(stat as PlayerHealthSystem);
         int availableCoins = CoinManager.Instance.GetCoins();
         bool canAfford = availableCoins >= costPerUnit;
 
@@ -271,7 +274,7 @@ public class EquipItemUI : MonoBehaviour, ISelectHandler, IPointerClickHandler
                 buttonText.text = $"{type} ({fullCost})";
             }
         }
-        
+
         descriptionUI.RefillButton.interactable = needs && canAfford;
     }
 
@@ -281,10 +284,10 @@ public class EquipItemUI : MonoBehaviour, ISelectHandler, IPointerClickHandler
         {
             // Update slot UI immediately
             UpdateSlot(gun, "Gun", 0, gun.currentAmmo, gun.reserveAmmo);
-            
+
             // Update button state immediately
             UpdateGunButtonState(gun);
-            
+
             // Refresh price display
             UpdatePrice(gun);
         }
@@ -292,30 +295,32 @@ public class EquipItemUI : MonoBehaviour, ISelectHandler, IPointerClickHandler
 
     private void HandleStatRestore<T>(T stat, string type)
     {
-        bool success = type == "Health" ? shopManager.HealPlayer(stat as PlayerHealth)
-                                       : shopManager.ShieldPlayer(stat as PlayerShield);
+        bool success = type == "Health" ? shopManager.HealPlayer(stat as PlayerHealthSystem)
+                                       : shopManager.ShieldPlayer(stat as PlayerHealthSystem);
+
+                                       Debug.Log(success);
         if (success)
         {
             // Update slot UI immediately
             UpdateSlot(stat, type);
-            
+
             // Update button state immediately
             UpdateStatButtonState(stat, type);
-            
+
             // Refresh price display
             if (type == "Health")
-                UpdateStatPrice(stat as PlayerHealth, shopManager.GetHealCost(stat as PlayerHealth), 
-                              shopManager.NeedsHeal(stat as PlayerHealth), shopManager.healCostPerHP);
+                UpdateStatPrice(shopManager.GetHealCost(stat as PlayerHealthSystem),
+                              shopManager.NeedsHeal(stat as PlayerHealthSystem), shopManager.healCostPerHP);
             else
-                UpdateStatPrice(stat as PlayerShield, shopManager.GetShieldCost(stat as PlayerShield), 
-                              shopManager.NeedsShield(stat as PlayerShield), shopManager.shieldCostPerPoint);
+                UpdateStatPrice(shopManager.GetShieldCost(stat as PlayerHealthSystem),
+                              shopManager.NeedsShield(stat as PlayerHealthSystem), shopManager.shieldCostPerPoint);
         }
     }
 
     public void OnPointerClick(PointerEventData eventData)
     {
         ApplySelection();
-        
+
         if (Time.time - lastClickTime < 0.3f) // Double click
         {
             switch (itemType)
@@ -340,23 +345,29 @@ public class EquipItemUI : MonoBehaviour, ISelectHandler, IPointerClickHandler
                 UpdateSlot(gun, "Gun", 0, gun.currentAmmo, gun.reserveAmmo);
                 if (currentSelected == this) UpdateGunButtonState(gun);
                 break;
-            case "Health" when currentItem is PlayerHealth health:
+            case "Health" when currentItem is PlayerHealthSystem health:
                 UpdateSlot(health, "Health");
                 if (currentSelected == this) UpdateStatButtonState(health, "Health");
                 break;
-            case "Shield" when currentItem is PlayerShield shield:
+            case "Shield" when currentItem is PlayerHealthSystem shield:
                 UpdateSlot(shield, "Shield");
                 if (currentSelected == this) UpdateStatButtonState(shield, "Shield");
                 break;
         }
     }
 
-    private void ClearUI()
+    private void HideUI()
     {
         currentItem = null;
         itemType = null;
-        avatar.sprite = null;
-        ammo.text = "";
-        priceText?.gameObject.SetActive(false);
+        // avatar.sprite = null;
+        // ammo.text = "";
+        // priceText?.gameObject.SetActive(false);
+        emptyPanel.SetActive(true);
+    }
+    
+    private void ShowUI()
+    {
+        emptyPanel.SetActive(false);
     }
 }
