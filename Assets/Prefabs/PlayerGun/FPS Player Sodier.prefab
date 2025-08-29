@@ -23183,15 +23183,14 @@ GameObject:
   - component: {fileID: 6057439744301582472}
   - component: {fileID: 5554607344508544721}
   - component: {fileID: 1313218774189592259}
-  - component: {fileID: 1290790624756719737}
-  - component: {fileID: 2705527719469363844}
+  - component: {fileID: 8764838343534785366}
   m_Layer: 8
   m_Name: FPS Player Sodier
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &6365296034206012781
 Transform:
   m_ObjectHideFlags: 0
@@ -23281,51 +23280,36 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   weaponUI: {fileID: 0}
-  crosshairManager: {fileID: 0}
   weaponList:
   - {fileID: 4162912145842503920}
   - {fileID: 2510821748447414399}
   - {fileID: 4844007117431489719}
---- !u!114 &1290790624756719737
+--- !u!114 &8764838343534785366
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5790137767768560497}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ea983425b7ed1df41b6144159dd331fb, type: 3}
+  m_Script: {fileID: 11500000, guid: ef61007090d36964b9cc0e99f0702fd5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   maxHealth: 100
+  armor: 0
   OnTakeDamage:
     m_PersistentCalls:
       m_Calls: []
-  useRegen: 0
-  regenRate: 1
-  regenDelay: 0
-  secPerRegen: 0
-  barUI: {fileID: 0}
-  shield: {fileID: 2705527719469363844}
---- !u!114 &2705527719469363844
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5790137767768560497}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 006da952c04e82a4e8caf19e99cae503, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  maxShield: 100
-  useRegen: 0
-  regenRate: 0
-  regenDelay: 0
-  secPerRegen: 0
-  barUI: {fileID: 0}
+  stats: {fileID: 11400000, guid: a22cdaa590623984eac74827e556c660, type: 2}
+  playerClass: 1
+  maxShield: 0
+  currentShield: 0
+  shieldRegenPerSecond: 0
+  shieldRegenDelay: 3
+  baseMoveSpeed: 5
+  healthBar: {fileID: 0}
+  shieldBar: {fileID: 0}
 --- !u!1 &5858557603524245266
 GameObject:
   m_ObjectHideFlags: 0

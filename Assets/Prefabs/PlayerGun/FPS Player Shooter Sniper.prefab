@@ -1712,6 +1712,7 @@ GameObject:
   - component: {fileID: 8544334847368187436}
   - component: {fileID: 7414361622151578782}
   - component: {fileID: 2746969822871216562}
+  - component: {fileID: 7891282764500313473}
   m_Layer: 8
   m_Name: FPS Player Shooter Sniper
   m_TagString: Player
@@ -1838,6 +1839,23 @@ MonoBehaviour:
   baseMoveSpeed: 5
   healthBar: {fileID: 0}
   shieldBar: {fileID: 0}
+--- !u!114 &7891282764500313473
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2393662489545346051}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 33e34d18da5fd2e4d9fdeb7703af43bc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gunData: {fileID: 0}
+  level: 0
+  OnLevelChanged:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &2537921353113568113
 GameObject:
   m_ObjectHideFlags: 0
