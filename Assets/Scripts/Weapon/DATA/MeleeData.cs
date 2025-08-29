@@ -29,6 +29,11 @@ public class MeleeData : ScriptableObject
     public AudioClip swingSfx;
     public AudioClip hitSfx;
 
+    [Header("Upgrade System")]
+    [Tooltip("Maximum upgrade level for this weapon")]
+    [Range(1, 20)]
+    public int maxLevel = 5;
+
     [Header("Upgrade Curves (tuỳ chọn)")]
     [Tooltip("Hệ số nhân theo level (0 = level1). Nếu rỗng = 1.0f")]
     public AnimationCurve damageByLevel = AnimationCurve.Linear(0, 1f, 5, 1.8f);
@@ -42,5 +47,17 @@ public class MeleeData : ScriptableObject
     float EvalOrOne(AnimationCurve c, int lvl)
     {
         return c != null ? Mathf.Max(0.01f, c.Evaluate(lvl)) : 1f;
+    }
+
+    public string GetUpgradeProgressText(int currentLevel)
+    {
+        if (currentLevel >= maxLevel)
+            return "MAX LEVEL";
+
+        float currentDmg = GetDamage(currentLevel);
+        float nextDmg = GetDamage(currentLevel + 1);
+        float dmgIncrease = nextDmg - currentDmg;
+
+        return $"+{dmgIncrease:F1} Damage";
     }
 }
