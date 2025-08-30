@@ -64,7 +64,7 @@ public class ShopEquipDescriptionsUI : MonoBehaviour
     {
         SetBasicInfo(melee.weaponName, "Melee", melee.weaponSpriteFullColor);
 
-        levelText.text = $"Level: {level + 1}";
+        levelText.text = $"Level: {level}";
         levelText.gameObject.SetActive(true);
 
         properties[0].SetValue(melee.GetDamage(level), 100f);

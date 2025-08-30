@@ -55,7 +55,7 @@ public class ShopUI : MonoBehaviour
 
     public void Show()
     {
-        // if (isOpen || !canOpen || !waveManager.isBetweenWaves) return;
+        if (isOpen || !canOpen || !waveManager.isBetweenWaves) return;
 
         isOpen = true;
 
