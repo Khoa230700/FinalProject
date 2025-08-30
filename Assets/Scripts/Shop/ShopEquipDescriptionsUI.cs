@@ -21,7 +21,7 @@ public class ShopEquipDescriptionsUI : MonoBehaviour
 
     private void Start() => HideDescription();
 
-    public void UpdateDescriptionUI(GunData gun = null, MeleeData melee = null, int meleeLevel = 0,
+    public void UpdateDescriptionUI(GunData gun = null, int gunLevel = 0, MeleeData melee = null, int meleeLevel = 0,
                                     PlayerHealthSystem health = null, PlayerHealthSystem shield = null)
     {
         if (IsAllNull(gun, melee, health, shield))
@@ -32,7 +32,7 @@ public class ShopEquipDescriptionsUI : MonoBehaviour
 
         ShowDescription();
 
-        if (gun != null) SetupGun(gun);
+        if (gun != null) SetupGun(gun, gunLevel);
         else if (melee != null) SetupMelee(melee, meleeLevel);
         else if (health != null) SetupHealth();
         else if (shield != null) SetupShield();
@@ -45,27 +45,31 @@ public class ShopEquipDescriptionsUI : MonoBehaviour
         return true;
     }
 
-    private void SetupGun(GunData gun)
+    private void SetupGun(GunData gun, int level)
     {
         SetBasicInfo(gun.gunName, gun.gunType.ToString(), gun.gunSpriteFullColor);
 
-        levelText.gameObject.SetActive(false);
-        properties[0].SetValue(gun.damage, 100f);           // damage 0
-        properties[1].SetValue(gun.range, 100f);            // range 1
-        properties[2].SetValue(gun.magazineSize, 100f);     // magSize 2
-        properties[3].SetValue(gun.roundsPerSecond, 20f, "0.0"); // speed 3
-        properties[4].SetValue(gun.reloadTime, 10f, "0.0"); // reload 4
-        properties[5].SetValue(gun.reserveAmmo);             // reserve 5
+        // Show level for guns
+        levelText.text = $"Level: {level + 1}"; // Display level as 1-based
+        levelText.gameObject.SetActive(true);
+
+        // Use level-adjusted stats
+        properties[0].SetValue(gun.GetDamage(level), 100f);                    // damage
+        properties[1].SetValue(gun.GetRange(level), 100f);                     // range
+        properties[2].SetValue(gun.GetMagazineSize(level), 100f);              // magSize
+        properties[3].SetValue(gun.GetRoundsPerSecond(level), 20f, "0.0");     // speed
+        properties[4].SetValue(gun.GetReloadTime(level), 10f, "0.0");          // reload
+        properties[5].SetValue(gun.reserveAmmo);                               // reserve (unchanged)
 
         SetPropertiesActive(true, true, true, true, true, true);
-        SetButtonsActive(true, true);
+        SetButtonsActive(true, true); // Both refill and upgrade available for guns
     }
 
     private void SetupMelee(MeleeData melee, int level)
     {
         SetBasicInfo(melee.weaponName, "Melee", melee.weaponSpriteFullColor);
 
-        levelText.text = $"Level: {level}";
+        levelText.text = $"Level: {level + 1}"; // Display level as 1-based
         levelText.gameObject.SetActive(true);
 
         properties[0].SetValue(melee.GetDamage(level), 100f);
@@ -73,7 +77,7 @@ public class ShopEquipDescriptionsUI : MonoBehaviour
         properties[3].SetValue(1f / melee.GetCooldown(level), 10f, "0.0");
 
         SetPropertiesActive(true, true, false, true, false, false);
-        SetButtonsActive(false, true);
+        SetButtonsActive(false, true); // Only upgrade available for melee
     }
 
     private void SetupHealth()
@@ -82,7 +86,7 @@ public class ShopEquipDescriptionsUI : MonoBehaviour
 
         SetBasicInfo("Medical Kit", "Health", healthIcon);
         SetPropertiesActive(false, false, false, false, false, false);
-        SetButtonsActive(true, false);
+        SetButtonsActive(true, false); // Only refill available for health
     }
 
     private void SetupShield()
@@ -91,7 +95,7 @@ public class ShopEquipDescriptionsUI : MonoBehaviour
 
         SetBasicInfo("Shield Kit", "Shield", shieldIcon);
         SetPropertiesActive(false, false, false, false, false, false);
-        SetButtonsActive(true, false);
+        SetButtonsActive(true, false); // Only refill available for shield
     }
 
     private void SetBasicInfo(string name, string type, Sprite avatar)
@@ -125,8 +129,7 @@ public class ShopEquipDescriptionsUI : MonoBehaviour
     private void ShowDescription()
     {
         avatarImage.gameObject.SetActive(true);
-        for (int i = 0; i < 5; i++) // Show first 5 properties by default
-            properties[i].gameObject.SetActive(true);
+        // Properties will be shown/hidden individually based on item type
     }
 
     public void HideDescription()
@@ -136,6 +139,8 @@ public class ShopEquipDescriptionsUI : MonoBehaviour
         levelText.text = "";
 
         avatarImage.gameObject.SetActive(false);
+        levelText.gameObject.SetActive(false);
+        
         foreach (var prop in properties)
             prop.gameObject.SetActive(false);
 

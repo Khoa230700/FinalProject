@@ -6,8 +6,15 @@ public class ShopManager : MonoBehaviour
     [Header("Resource Settings")]
     public int healCostPerHP = 1;
     public int shieldCostPerPoint = 1;
+
+    [Header("Upgrade Settings")]
     public float upgradeCostMultiplier = 1.5f;
-    public int upgradeCost = 50;
+    public int meleeUpgradeCost = 50;
+
+    [Header("Gun Upgrade Settings")]
+    public int gunUpgradeBaseCost = 100;
+    public float gunUpgradeCostMultiplier = 1.8f;
+    public int maxGunLevel = 5; // Default max level for guns without specific limits
 
     // ===========================
     // Generic Purchase Method
@@ -46,13 +53,22 @@ public class ShopManager : MonoBehaviour
     public int GetRefillCost(PlayerShoot gun)
     {
         if (gun == null) return 0;
-        int bulletsNeeded = gun.gunData.magazineSize + gun.gunData.reserveAmmo - (gun.currentAmmo + gun.reserveAmmo);
+
+        var upgradeState = gun.GetComponent<GunUpgradeState>();
+        int magazineSize = upgradeState != null ? upgradeState.MagazineSize : gun.gunData.magazineSize;
+
+        int bulletsNeeded = magazineSize + gun.gunData.reserveAmmo - (gun.currentAmmo + gun.reserveAmmo);
         return bulletsNeeded * gun.gunData.bulletRefillCost;
     }
 
     public bool NeedsRefill(PlayerShoot gun)
     {
-        return gun != null && (gun.currentAmmo + gun.reserveAmmo) < (gun.gunData.magazineSize + gun.gunData.reserveAmmo);
+        if (gun == null) return false;
+
+        var upgradeState = gun.GetComponent<GunUpgradeState>();
+        int magazineSize = upgradeState != null ? upgradeState.MagazineSize : gun.gunData.magazineSize;
+
+        return (gun.currentAmmo + gun.reserveAmmo) < (magazineSize + gun.gunData.reserveAmmo);
     }
 
     // ===========================
@@ -94,7 +110,81 @@ public class ShopManager : MonoBehaviour
     }
 
     // ===========================
-    // MELEE UPGRADE
+    // GUN UPGRADE
+    // ===========================
+    public bool UpgradeGun(GunUpgradeState gunUpgradeState)
+    {
+        if (gunUpgradeState == null) return false;
+
+        int currentLevel = gunUpgradeState.level;
+        int maxLevel = GetMaxGunLevel(gunUpgradeState);
+        int upgradeCost = GetGunUpgradeCost(gunUpgradeState);
+
+        if (!CanUpgradeGun(gunUpgradeState) || !CoinManager.Instance.HasEnoughCoins(upgradeCost))
+            return false;
+
+        CoinManager.Instance.RemoveCoins(upgradeCost);
+        gunUpgradeState.LevelUp();
+
+        return true;
+    }
+
+    public bool UpgradeGun(PlayerShoot gun)
+    {
+        if (gun == null) return false;
+
+        var upgradeState = gun.GetComponent<GunUpgradeState>();
+        return upgradeState != null && UpgradeGun(upgradeState);
+    }
+
+    public int GetGunUpgradeCost(GunUpgradeState gunUpgradeState)
+    {
+        if (gunUpgradeState == null) return 0;
+
+        int currentLevel = gunUpgradeState.level;
+        int maxLevel = GetMaxGunLevel(gunUpgradeState);
+
+        if (currentLevel >= maxLevel) return 0;
+
+        return Mathf.RoundToInt(gunUpgradeBaseCost * Mathf.Pow(gunUpgradeCostMultiplier, currentLevel));
+    }
+
+    public int GetGunUpgradeCost(PlayerShoot gun)
+    {
+        if (gun == null) return 0;
+        var upgradeState = gun.GetComponent<GunUpgradeState>();
+        return GetGunUpgradeCost(upgradeState);
+    }
+
+    public bool CanUpgradeGun(GunUpgradeState gunUpgradeState)
+    {
+        if (gunUpgradeState == null) return false;
+        return gunUpgradeState.level < GetMaxGunLevel(gunUpgradeState);
+    }
+
+    public bool CanUpgradeGun(PlayerShoot gun)
+    {
+        if (gun == null) return false;
+        var upgradeState = gun.GetComponent<GunUpgradeState>();
+        return CanUpgradeGun(upgradeState);
+    }
+
+    public int GetMaxGunLevel(GunUpgradeState gunUpgradeState)
+    {
+        // You can add a maxLevel field to GunUpgradeState or GunData if needed
+        // For now, use the global maxGunLevel setting
+        return maxGunLevel;
+    }
+
+    public int GetMaxGunLevel(PlayerShoot gun)
+    {
+        if (gun == null) return 0;
+        var upgradeState = gun.GetComponent<GunUpgradeState>();
+        return GetMaxGunLevel(upgradeState);
+    }
+
+    // ===========================
+    // MELEE UPGRADE (existing)
     // ===========================
     public bool UpgradeMelee(MeleeWeapon melee)
     {
@@ -115,7 +205,7 @@ public class ShopManager : MonoBehaviour
     public int GetUpgradeCost(int currentLevel, int maxLevel)
     {
         if (currentLevel >= maxLevel) return 0;
-        return Mathf.RoundToInt(upgradeCost * Mathf.Pow(upgradeCostMultiplier, currentLevel));
+        return Mathf.RoundToInt(meleeUpgradeCost * Mathf.Pow(upgradeCostMultiplier, currentLevel));
     }
 
     public bool CanUpgrade(int currentLevel, int maxLevel)

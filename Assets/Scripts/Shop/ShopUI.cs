@@ -87,6 +87,7 @@ public class ShopUI : MonoBehaviour
 
     private void UpdateAllSlots()
     {
+        // Clear all slots first
         foreach (var slot in itemSlots)
         {
             if (slot != null)
@@ -100,8 +101,12 @@ public class ShopUI : MonoBehaviour
             {
                 if (gun.currentAmmo == 0 && gun.reserveAmmo == 0) gun.Initialize();
 
+                // Get the gun's current upgrade level
+                var upgradeState = gun.GetComponent<GunUpgradeState>();
+                int gunLevel = upgradeState?.level ?? 0;
+
                 int slotIndex = gun.gunData.gunSlot == GunSlot.Primary ? 0 : 1;
-                itemSlots[slotIndex]?.UpdateSlot(gun, "Gun", 0, gun.currentAmmo, gun.reserveAmmo);
+                itemSlots[slotIndex]?.UpdateSlot(gun, "Gun", gunLevel, gun.currentAmmo, gun.reserveAmmo);
             }
             else if (weapon is MeleeWeapon melee)
             {
@@ -109,7 +114,7 @@ public class ShopUI : MonoBehaviour
             }
         }
 
-        // Update stat slots - luôn hiện Health và Shield
+        // Update stat slots - always show Health and Shield
         itemSlots[3]?.UpdateSlot(playetStats, "Health");
         itemSlots[4]?.UpdateSlot(playetStats, "Shield");
 
