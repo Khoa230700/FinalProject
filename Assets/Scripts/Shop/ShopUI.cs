@@ -13,6 +13,7 @@ public class ShopUI : MonoBehaviour
     private Animator animator;
     private PressKeyEvent pressKeyEvent;
     private ShopEquipDescriptionsUI descriptionsUI;
+    private WaveManager waveManager;
     private Coroutine currentRoutine;
 
     // Cached player components
@@ -26,6 +27,7 @@ public class ShopUI : MonoBehaviour
         animator = GetComponent<Animator>();
         pressKeyEvent = canvasSetting?.GetComponent<PressKeyEvent>();
         descriptionsUI = FindAnyObjectByType<ShopEquipDescriptionsUI>();
+        waveManager = FindAnyObjectByType<WaveManager>();
 
         CachePlayerComponents();
     }
@@ -53,11 +55,11 @@ public class ShopUI : MonoBehaviour
 
     public void Show()
     {
-        // if (isOpen || !canOpen || !waveManager.isBetweenWaves) return; //Test
+        if (isOpen || !canOpen || !waveManager.isBetweenWaves) return;
 
         isOpen = true;
 
-        EventSystem.current?.SetSelectedGameObject(itemSlots[0]?.gameObject);
+        // EventSystem.current?.SetSelectedGameObject(itemSlots[0]?.gameObject);
         UpdateAllSlots();
 
         if (currentRoutine != null) StopCoroutine(currentRoutine);
@@ -87,6 +89,7 @@ public class ShopUI : MonoBehaviour
 
     private void UpdateAllSlots()
     {
+        // Clear all slots for (EMPTY slot)
         foreach (var slot in itemSlots)
         {
             if (slot != null)
@@ -100,8 +103,10 @@ public class ShopUI : MonoBehaviour
             {
                 if (gun.currentAmmo == 0 && gun.reserveAmmo == 0) gun.Initialize();
 
+                var upgradeState = gun.GetComponent<GunUpgradeState>();
                 int slotIndex = gun.gunData.gunSlot == GunSlot.Primary ? 0 : 1;
-                itemSlots[slotIndex]?.UpdateSlot(gun, "Gun", 0, gun.currentAmmo, gun.reserveAmmo);
+                
+                itemSlots[slotIndex]?.UpdateSlot(gun, "Gun", upgradeState.level, gun.currentAmmo, gun.reserveAmmo);
             }
             else if (weapon is MeleeWeapon melee)
             {
@@ -109,7 +114,7 @@ public class ShopUI : MonoBehaviour
             }
         }
 
-        // Update stat slots - luôn hiện Health và Shield
+        // Update stat slots
         itemSlots[3]?.UpdateSlot(playetStats, "Health");
         itemSlots[4]?.UpdateSlot(playetStats, "Shield");
 

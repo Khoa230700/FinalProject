@@ -101,4 +101,15 @@ public class GunData : ScriptableObject
     public float GetSpreadAngle(int level) => spreadAngle * EvalOrOne(spreadByLevel, level);
     public float GetSemiAutoMinInterval(int level) => semiAutoMinInterval * EvalOrOne(semiAutoIntervalByLevel, level);
     public float GetScopeZoom(int level) => scopeZoom * EvalOrOne(scopeZoomByLevel, level);
+
+    // ====== Getters theo max level ======
+    public float GetMaxDamage(int maxLevel) => GetDamage(maxLevel);
+    public float GetMaxRange(int maxLevel) => GetRange(maxLevel);
+    public float GetMaxRoundsPerSecond(int maxLevel) => GetRoundsPerSecond(maxLevel);
+    public float GetMaxReloadTime(int maxLevel) => GetReloadTime(maxLevel);
+    public int GetMaxMagazineSize(int maxLevel) => GetMagazineSize(maxLevel);
+    public float GetMaxSpreadAngle(int maxLevel) => GetSpreadAngle(maxLevel);
+    public float GetMaxSemiAutoMinInterval(int maxLevel) => GetSemiAutoMinInterval(maxLevel);
+    public float GetMaxScopeZoom(int maxLevel) => GetScopeZoom(maxLevel);
+
 }

@@ -17,7 +17,7 @@ public class ShopTimerUI : MonoBehaviour
         {
             timerText.text = $"00:00";
             shopUI.canOpen = false;
-            // if (shopUI.isOpen) shopUI.Hide(); //Test
+            if (shopUI.isOpen) shopUI.Hide();
             return;
         }
 

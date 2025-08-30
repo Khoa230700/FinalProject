@@ -1,3 +1,4 @@
+using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -5,7 +6,7 @@ using UnityEngine.UI;
 
 public class ShopEquipItemUI : MonoBehaviour, ISelectHandler, IPointerClickHandler
 {
-    private static ShopEquipItemUI currentSelected;
+    public static ShopEquipItemUI currentSelected;
 
     [Header("UI")]
     public Transform upgradeBarParent;
@@ -14,17 +15,15 @@ public class ShopEquipItemUI : MonoBehaviour, ISelectHandler, IPointerClickHandl
     public Image sliderBar;
     public GameObject emptyPanel;
 
-    // Cache
-    private object currentItem;
-    private string itemType;
-    private int meleeLevel;
-    private float lastClickTime;
+    [HideInInspector] public ShopEquipDescriptionsUI descriptionUI;
+    [HideInInspector] public ShopManager shopManager;
+    [HideInInspector] public Animator animator;
+    [HideInInspector] public ShopUpgradeBarUI shopUpgradeBarUI;
 
-    // References
-    private ShopEquipDescriptionsUI descriptionUI;
-    private ShopManager shopManager;
-    private Animator animator;
-    private ShopUpgradeBarUI shopUpgradeBarUI;
+    private object currentItem;
+    private IShopItemStrategy currentStrategy;
+    private int itemLevel;
+    private float lastClickTime;
 
     private void Awake()
     {
@@ -34,228 +33,26 @@ public class ShopEquipItemUI : MonoBehaviour, ISelectHandler, IPointerClickHandl
         if (upgradeBarParent != null) shopUpgradeBarUI = upgradeBarParent.GetComponent<ShopUpgradeBarUI>();
     }
 
-    // ==============================
-    // SETUP SLOT
-    // ==============================
     public void UpdateSlot(object item, string type, int level = 0, int currentAmmo = 0, int reserveAmmo = 0)
     {
         currentItem = item;
-        itemType = type;
-        meleeLevel = level;
+        itemLevel = level;
+        currentStrategy = CreateStrategy(type);
 
         if (item == null)
         {
             HideUI();
             return;
         }
+
         ShowUI();
-
-        switch (type)
-        {
-            case "Gun": SetupGunSlot(item as PlayerShoot, currentAmmo, reserveAmmo); break;
-            case "Melee": SetupMeleeSlot(item as MeleeWeapon, level); break;
-            case "Health": SetupStatSlot(item as PlayerHealthSystem, "Health"); break;
-            case "Shield": SetupStatSlot(item as PlayerHealthSystem, "Shield"); break;
-        }
+        currentStrategy.UpdateSlot(this, item, level, currentAmmo, reserveAmmo);
     }
 
-    private void SetupGunSlot(PlayerShoot gun, int currentAmmo, int reserveAmmo)
-    {
-        avatar.sprite = gun.gunData.gunSprite;
-        ammo.text = $"{currentAmmo}/{reserveAmmo}";
-        ammo.gameObject.SetActive(true);
-        UpdatePriceUI("Gun", gun);
-    }
+    private void UpdateDescription() => currentStrategy?.UpdateDescription(this, currentItem, itemLevel);
+    public void RefreshUI() => currentStrategy?.RefreshUI(this, currentItem, itemLevel);
 
-    private void SetupMeleeSlot(MeleeWeapon melee, int level)
-    {
-        avatar.sprite = melee.data.weaponSprite;
-        ammo.gameObject.SetActive(false);
-
-        if (shopUpgradeBarUI != null && shopManager != null)
-        {
-            upgradeBarParent.gameObject.SetActive(true);
-            shopUpgradeBarUI.SetupUpgradeBar(level, melee.data.maxLevel);
-        }
-
-        UpdatePriceUI("Melee", melee);
-    }
-
-    private void SetupStatSlot(PlayerHealthSystem stat, string type)
-    {
-        float current = type == "Health" ? stat.CurrentHealth : stat.CurrentShield;
-        float max = type == "Health" ? stat.MaxHealth : stat.MaxShield;
-
-        ammo.text = $"{(int)current}/{(int)max}";
-        if (sliderBar) sliderBar.fillAmount = current / max;
-        ammo.gameObject.SetActive(true);
-
-        UpdatePriceUI(type, stat);
-    }
-
-    // ==============================
-    // GENERIC PRICE UPDATE
-    // ==============================
-    private void UpdatePriceUI(string type, object target)
-    {
-        if (priceText == null || shopManager == null) return;
-
-        int cost = 0;
-        bool canDo = true;
-        string label = "";
-
-        switch (type)
-        {
-            case "Gun":
-                var gun = target as PlayerShoot;
-                bool needsAmmo = shopManager.NeedsRefill(gun);
-                if (!needsAmmo)
-                {
-                    label = "Full Ammo";
-                    canDo = false;
-                }
-                else
-                {
-                    cost = shopManager.GetRefillCost(gun);
-                    label = $"$ {cost}";
-                }
-                break;
-
-            case "Melee":
-                var melee = target as MeleeWeapon;
-                if (!shopManager.CanUpgrade(melee.level, melee.data.maxLevel))
-                {
-                    label = "Max Level";
-                    canDo = false;
-                }
-                else
-                {
-                    cost = shopManager.GetUpgradeCost(melee.level, melee.data.maxLevel);
-                    label = $"$ {cost}";
-                }
-                break;
-
-            case "Health":
-                var health = target as PlayerHealthSystem;
-                bool needsHP = shopManager.NeedsHeal(health);
-                if (!needsHP)
-                {
-                    label = "Full Health";
-                    canDo = false;
-                }
-                else
-                {
-                    cost = shopManager.GetHealCost(health);
-                    label = $"$ {cost}";
-                }
-                break;
-
-            case "Shield":
-                var shield = target as PlayerHealthSystem;
-                bool needsShield = shopManager.NeedsShield(shield);
-                if (!needsShield)
-                {
-                    label = "Full Shield";
-                    canDo = false;
-                }
-                else
-                {
-                    cost = shopManager.GetShieldCost(shield);
-                    label = $"$ {cost}";
-                }
-                break;
-        }
-
-        priceText.text = label;
-        priceText.color = (canDo && !CoinManager.Instance.HasEnoughCoins(cost))
-            ? Color.red
-            : new Color(0.392f, 0.698f, 0.812f);
-
-        priceText.gameObject.SetActive(true);
-    }
-
-    // ==============================
-    // GENERIC BUTTON STATE
-    // ==============================
-    private void UpdateButtonState(string type, object target)
-    {
-        if (descriptionUI == null) return;
-
-        Button button = (type == "Melee") ? descriptionUI.UpgradeButton : descriptionUI.RefillButton;
-        if (button == null) return;
-
-        TMP_Text buttonText = button.GetComponentInChildren<TMP_Text>();
-        int cost = 0;
-        bool canDo = true;
-        string label = "";
-
-        switch (type)
-        {
-            case "Gun":
-                var gun = target as PlayerShoot;
-                bool needsAmmo = shopManager.NeedsRefill(gun);
-                if (!needsAmmo)
-                {
-                    label = "Full Ammo";
-                    canDo = false;
-                }
-                else
-                {
-                    cost = shopManager.GetRefillCost(gun);
-                    label = $"Refill (${cost})";
-                }
-                break;
-
-            case "Melee":
-                var melee = target as MeleeWeapon;
-                if (!shopManager.CanUpgrade(melee.level, melee.data.maxLevel))
-                {
-                    label = "Max Level";
-                    canDo = false;
-                }
-                else
-                {
-                    cost = shopManager.GetUpgradeCost(melee.level, melee.data.maxLevel);
-                    label = $"Upgrade (${cost})";
-                }
-                break;
-
-            case "Health":
-                var health = target as PlayerHealthSystem;
-                if (!shopManager.NeedsHeal(health))
-                {
-                    label = "Full Health";
-                    canDo = false;
-                }
-                else
-                {
-                    cost = shopManager.GetHealCost(health);
-                    label = $"Heal (${cost})";
-                }
-                break;
-
-            case "Shield":
-                var shield = target as PlayerHealthSystem;
-                if (!shopManager.NeedsShield(shield))
-                {
-                    label = "Full Shield";
-                    canDo = false;
-                }
-                else
-                {
-                    cost = shopManager.GetShieldCost(shield);
-                    label = $"Shield (${cost})";
-                }
-                break;
-        }
-
-        if (buttonText) buttonText.text = label;
-        button.interactable = canDo && CoinManager.Instance.HasEnoughCoins(cost);
-    }
-
-    // ==============================
-    // EVENT HANDLERS
-    // ==============================
+    // UI EVENTS
     public void OnSelect(BaseEventData eventData) => ApplySelection();
 
     private void ApplySelection()
@@ -267,77 +64,50 @@ public class ShopEquipItemUI : MonoBehaviour, ISelectHandler, IPointerClickHandl
         animator.SetBool("IsSelected", true);
 
         descriptionUI?.ClearButtonListeners();
+        descriptionUI?.HidePreview();
         UpdateDescription();
+        RefreshUI();
     }
 
-    private void UpdateDescription()
+    public void OnPointerClick(PointerEventData eventData)
     {
-        switch (itemType)
+        ApplySelection();
+        if (Time.time - lastClickTime < 0.3f)
         {
-            case "Gun" when currentItem is PlayerShoot gun:
-                descriptionUI.UpdateDescriptionUI(gun: gun.gunData);
-                descriptionUI.RefillButton?.onClick.AddListener(() => HandleRefill(gun));
-                UpdateButtonState("Gun", gun);
-                break;
+            currentStrategy?.DoubleClick(this, currentItem);
+        }
+        lastClickTime = Time.time;
+    }
 
-            case "Melee" when currentItem is MeleeWeapon melee:
-                descriptionUI.UpdateDescriptionUI(melee: melee.data, meleeLevel: meleeLevel);
+    // ACTIONS
+    public void UpgradeGun(PlayerShoot gun, GunUpgradeState upgradeState)
+    {
+        if (upgradeState != null && shopManager.UpgradeGun(upgradeState))
+        {
+            itemLevel = upgradeState.level;
+            UpdateSlot(gun, "Gun", upgradeState.level, gun.currentAmmo, gun.reserveAmmo);
+            descriptionUI.UpdateDescriptionUI(gun: gun.gunData, gunLevel: upgradeState.level, upgradeState: upgradeState);
 
-                // Nút Upgrade
-                if (descriptionUI.UpgradeButton != null)
-                {
-                    descriptionUI.UpgradeButton.onClick.AddListener(() =>
-                    {
-                        HandleMeleeUpgrade(melee);
-                        ShowMeleePreview(melee);
-                    });
+            descriptionUI.ShowPreview(gun, "Gun");
 
-                    // Hover preview
-                    EventTrigger trigger = descriptionUI.UpgradeButton.gameObject.GetComponent<EventTrigger>();
-                    if (trigger == null) trigger = descriptionUI.UpgradeButton.gameObject.AddComponent<EventTrigger>();
-                    trigger.triggers.Clear();
+            currentStrategy.UpdateDescriptionButton(this, gun);
 
-                    // OnPointerEnter
-                    var enter = new EventTrigger.Entry { eventID = EventTriggerType.PointerEnter };
-                    enter.callback.AddListener((_) => ShowMeleePreview(melee));
-                    trigger.triggers.Add(enter);
-
-                    // OnPointerExit
-                    var exit = new EventTrigger.Entry { eventID = EventTriggerType.PointerExit };
-                    exit.callback.AddListener((_) => HideMeleePreview());
-                    trigger.triggers.Add(exit);
-                }
-
-                UpdateButtonState("Melee", melee);
-                break;
-
-            case "Health" when currentItem is PlayerHealthSystem health:
-                descriptionUI.UpdateDescriptionUI(health: health);
-                descriptionUI.RefillButton?.onClick.AddListener(() => HandleStatRestore(health, "Health"));
-                UpdateButtonState("Health", health);
-                break;
-
-            case "Shield" when currentItem is PlayerHealthSystem shield:
-                descriptionUI.UpdateDescriptionUI(shield: shield);
-                descriptionUI.RefillButton?.onClick.AddListener(() => HandleStatRestore(shield, "Shield"));
-                UpdateButtonState("Shield", shield);
-                break;
-
-            default: descriptionUI?.HideDescription(); break;
+            if (shopUpgradeBarUI != null)
+            {
+                shopUpgradeBarUI.UpdateLevel(upgradeState.level);
+                shopUpgradeBarUI.PlayAnimation(upgradeState.level - 1);
+            }
         }
     }
 
-    // ==============================
-    // ACTIONS
-    // ==============================
-    private void HandleMeleeUpgrade(MeleeWeapon melee)
+    public void UpgradeMelee(MeleeWeapon melee)
     {
         if (shopManager.UpgradeMelee(melee))
         {
-            meleeLevel = melee.level;
+            itemLevel = melee.level;
             UpdateSlot(melee, "Melee", melee.level);
             descriptionUI.UpdateDescriptionUI(melee: melee.data, meleeLevel: melee.level);
-            UpdateButtonState("Melee", melee);
+            currentStrategy.UpdateDescriptionButton(this, melee);
 
             if (shopUpgradeBarUI != null)
             {
@@ -347,108 +117,97 @@ public class ShopEquipItemUI : MonoBehaviour, ISelectHandler, IPointerClickHandl
         }
     }
 
-    private void HandleRefill(PlayerShoot gun)
+    public void RefillAmmo(PlayerShoot gun)
     {
         if (shopManager.RefillAmmo(gun))
         {
-            UpdateSlot(gun, "Gun", 0, gun.currentAmmo, gun.reserveAmmo);
-            UpdateButtonState("Gun", gun);
+            UpdateSlot(gun, "Gun", itemLevel, gun.currentAmmo, gun.reserveAmmo);
+            currentStrategy.UpdateDescriptionButton(this, gun);
         }
     }
 
-    private void HandleStatRestore(PlayerHealthSystem stat, string type)
+    public void RestoreStat(PlayerHealthSystem stat, string type)
     {
-        bool success = type == "Health" ? shopManager.HealPlayer(stat) : shopManager.ShieldPlayer(stat);
-        if (success)
+        if (type == "Health" ? shopManager.HealPlayer(stat) : shopManager.ShieldPlayer(stat))
         {
             UpdateSlot(stat, type);
-            UpdateButtonState(type, stat);
+            currentStrategy.UpdateDescriptionButton(this, stat);
         }
     }
 
-    // ==============================
-    // REFRESH
-    // ==============================
-    public void RefreshUI()
+    // BUTTON
+    public void UpdateGunRefillButton(PlayerShoot gun)
     {
-        switch (itemType)
-        {
-            case "Gun" when currentItem is PlayerShoot gun:
-                UpdateSlot(gun, "Gun", 0, gun.currentAmmo, gun.reserveAmmo);
-                if (currentSelected == this) UpdateButtonState("Gun", gun);
-                break;
-
-            case "Melee" when currentItem is MeleeWeapon melee:
-                UpdateSlot(melee, "Melee", melee.level);
-                if (currentSelected == this) UpdateButtonState("Melee", melee);
-                break;
-
-            case "Health" when currentItem is PlayerHealthSystem health:
-                UpdateSlot(health, "Health");
-                if (currentSelected == this) UpdateButtonState("Health", health);
-                break;
-
-            case "Shield" when currentItem is PlayerHealthSystem shield:
-                UpdateSlot(shield, "Shield");
-                if (currentSelected == this) UpdateButtonState("Shield", shield);
-                break;
-        }
+        bool needsAmmo = shopManager.NeedsRefill(gun);
+        int cost = needsAmmo ? shopManager.GetRefillCost(gun) : 0;
+        UpdateDescriptionButton(descriptionUI.RefillButton, "Full Ammo", "Refill", cost, needsAmmo);
     }
 
-    // ==============================
-    // HELPERS
-    // ==============================
+    public void UpdateGunUpgradeButton(PlayerShoot gun, GunUpgradeState upgradeState)
+    {
+        bool canUpgrade = upgradeState != null && shopManager.CanUpgradeGun(upgradeState);
+        int cost = canUpgrade ? shopManager.GetGunUpgradeCost(upgradeState) : 0;
+        UpdateDescriptionButton(descriptionUI.UpgradeButton, "Max Level", "Upgrade", cost, canUpgrade);
+    }
+
+    public void UpdateMeleeUpgradeButton(MeleeWeapon melee)
+    {
+        bool canUpgrade = shopManager.CanUpgradeMelee(melee);
+        int cost = canUpgrade ? shopManager.GetMeleeUpgradeCost(melee) : 0;
+        UpdateDescriptionButton(descriptionUI.UpgradeButton, "Max Level", "Upgrade", cost, canUpgrade);
+    }
+
+    public void UpdateHealthButton(PlayerHealthSystem health)
+    {
+        bool needsHeal = shopManager.NeedsHeal(health);
+        int cost = needsHeal ? shopManager.GetHealCost(health) : 0;
+        UpdateDescriptionButton(descriptionUI.RefillButton, "Full Health", "Heal", cost, needsHeal);
+    }
+
+    public void UpdateShieldButton(PlayerHealthSystem shield)
+    {
+        bool needsShield = shopManager.NeedsShield(shield);
+        int cost = needsShield ? shopManager.GetShieldCost(shield) : 0;
+        UpdateDescriptionButton(descriptionUI.RefillButton, "Full Shield", "Shield", cost, needsShield);
+    }
+
+    // HELPER
+    private IShopItemStrategy CreateStrategy(string type)
+    {
+        return type switch
+        {
+            "Gun" => new GunShopItemStrategy(),
+            "Melee" => new MeleeShopItemStrategy(),
+            "Health" => new HealthShopItemStrategy(),
+            "Shield" => new ShieldShopItemStrategy(),
+            _ => null
+        };
+    }
+
     private void HideUI()
     {
         currentItem = null;
-        itemType = null;
         emptyPanel.SetActive(true);
         if (upgradeBarParent != null) upgradeBarParent.gameObject.SetActive(false);
     }
 
     private void ShowUI() => emptyPanel.SetActive(false);
 
-    public void OnPointerClick(PointerEventData eventData)
+    private void UpdateDescriptionButton(Button button, string labelWhenFull, string actionName, int cost, bool canDoAction)
     {
-        ApplySelection();
-        if (Time.time - lastClickTime < 0.3f) // Double click
+        if (button == null) return;
+
+        TMP_Text buttonText = button.GetComponentInChildren<TMP_Text>();
+
+        if (!canDoAction)
         {
-            switch (itemType)
-            {
-                case "Gun" when currentItem is PlayerShoot gun: HandleRefill(gun); break;
-                case "Melee" when currentItem is MeleeWeapon melee: HandleMeleeUpgrade(melee); break;
-                case "Health": HandleStatRestore(currentItem as PlayerHealthSystem, "Health"); break;
-                case "Shield": HandleStatRestore(currentItem as PlayerHealthSystem, "Shield"); break;
-            }
+            if (buttonText) buttonText.text = labelWhenFull;
+            button.interactable = false;
         }
-        lastClickTime = Time.time;
-    }
-
-    private void ShowMeleePreview(MeleeWeapon melee)
-    {
-        if (melee == null || meleeLevel >= melee.data.maxLevel) return;
-
-        int nextLevel = meleeLevel + 1;
-
-        // Ví dụ preview damage
-        float currentDamage = 1 / melee.data.GetCooldown(meleeLevel);
-        float nextDamage = 1 / melee.data.GetCooldown(nextLevel);
-
-        // Tìm PropertyUI (trong description panel) để hiển thị preview
-        foreach (var prop in descriptionUI.GetComponentsInChildren<PropertyUI>())
+        else
         {
-            if (prop.name.Contains("Property Speed")) // bạn đặt tên object SpeedPropertyUI
-            {
-                prop.SetPreview(nextDamage, 10f, "0.0");
-            }
-        }
-    }
-
-    private void HideMeleePreview()
-    {
-        foreach (var prop in descriptionUI.GetComponentsInChildren<PropertyUI>())
-        {
-            prop.HidePreview();
+            if (buttonText) buttonText.text = $"{actionName} (${cost})";
+            button.interactable = CoinManager.Instance.HasEnoughCoins(cost);
         }
     }
 }

@@ -6,12 +6,16 @@ public class ShopManager : MonoBehaviour
     [Header("Resource Settings")]
     public int healCostPerHP = 1;
     public int shieldCostPerPoint = 1;
-    public float upgradeCostMultiplier = 1.5f;
-    public int upgradeCost = 50;
 
-    // ===========================
-    // Generic Purchase Method
-    // ===========================
+    [Header("Upgrade Settings")]
+    public float upgradeCostMultiplier = 1.5f;
+    public int meleeUpgradeCost = 50;
+
+    [Header("Gun Upgrade Settings")]
+    public int gunUpgradeBaseCost = 100;
+    public float gunUpgradeCostMultiplier = 1.8f;
+
+    // Purchase
     private bool PurchaseResource<T>(T target, Func<T, int> getCost, Func<T, bool> needsResource,
                                     Func<T, int, bool> applyResource, int costPerUnit)
     {
@@ -33,9 +37,7 @@ public class ShopManager : MonoBehaviour
         return false;
     }
 
-    // ===========================
     // AMMO
-    // ===========================
     public bool RefillAmmo(PlayerShoot gun)
     {
         return PurchaseResource(gun, GetRefillCost, NeedsRefill,
@@ -46,18 +48,25 @@ public class ShopManager : MonoBehaviour
     public int GetRefillCost(PlayerShoot gun)
     {
         if (gun == null) return 0;
-        int bulletsNeeded = gun.gunData.magazineSize + gun.gunData.reserveAmmo - (gun.currentAmmo + gun.reserveAmmo);
+
+        var upgradeState = gun.GetComponent<GunUpgradeState>();
+        int magazineSize = upgradeState != null ? upgradeState.MagazineSize : gun.gunData.magazineSize;
+
+        int bulletsNeeded = magazineSize + gun.gunData.reserveAmmo - (gun.currentAmmo + gun.reserveAmmo);
         return bulletsNeeded * gun.gunData.bulletRefillCost;
     }
 
     public bool NeedsRefill(PlayerShoot gun)
     {
-        return gun != null && (gun.currentAmmo + gun.reserveAmmo) < (gun.gunData.magazineSize + gun.gunData.reserveAmmo);
+        if (gun == null) return false;
+
+        var upgradeState = gun.GetComponent<GunUpgradeState>();
+        int magazineSize = upgradeState != null ? upgradeState.MagazineSize : gun.gunData.magazineSize;
+
+        return (gun.currentAmmo + gun.reserveAmmo) < (magazineSize + gun.gunData.reserveAmmo);
     }
 
-    // ===========================
     // HEALTH
-    // ===========================
     public bool HealPlayer(PlayerHealthSystem health)
     {
         return PurchaseResource(health, GetHealCost, NeedsHeal,
@@ -74,9 +83,7 @@ public class ShopManager : MonoBehaviour
         return health != null && health.CurrentHealth < health.MaxHealth;
     }
 
-    // ===========================
     // SHIELD
-    // ===========================
     public bool ShieldPlayer(PlayerHealthSystem shield)
     {
         return PurchaseResource(shield, GetShieldCost, NeedsShield,
@@ -93,18 +100,48 @@ public class ShopManager : MonoBehaviour
         return shield != null && shield.CurrentShield < shield.MaxShield;
     }
 
-    // ===========================
-    // MELEE UPGRADE
-    // ===========================
+    // GUN
+    public bool UpgradeGun(GunUpgradeState gunUpgradeState)
+    {
+        if (gunUpgradeState == null) return false;
+
+        int upgradeCost = GetGunUpgradeCost(gunUpgradeState);
+
+        if (!CanUpgradeGun(gunUpgradeState) || !CoinManager.Instance.HasEnoughCoins(upgradeCost))
+            return false;
+
+        CoinManager.Instance.RemoveCoins(upgradeCost);
+        gunUpgradeState.LevelUp();
+
+        return true;
+    }
+
+    public int GetGunUpgradeCost(GunUpgradeState gunUpgradeState)
+    {
+        if (gunUpgradeState == null) return 0;
+
+        int currentLevel = gunUpgradeState.level;
+        int maxLevel = gunUpgradeState.maxLevel;
+
+        if (currentLevel >= maxLevel) return 0;
+
+        return Mathf.RoundToInt(gunUpgradeBaseCost * Mathf.Pow(gunUpgradeCostMultiplier, currentLevel));
+    }
+
+    public bool CanUpgradeGun(GunUpgradeState gunUpgradeState)
+    {
+        if (gunUpgradeState == null) return false;
+        return gunUpgradeState.level < gunUpgradeState.maxLevel;
+    }
+
+    // MELEE
     public bool UpgradeMelee(MeleeWeapon melee)
     {
         if (melee == null) return false;
 
-        int currentLevel = melee.level;
-        int maxLevel = melee.data.maxLevel;
-        int upgradeCost = GetUpgradeCost(currentLevel, maxLevel);
+        int upgradeCost = GetMeleeUpgradeCost(melee);
 
-        if (!CanUpgrade(currentLevel, maxLevel) || !CoinManager.Instance.HasEnoughCoins(upgradeCost)) return false;
+        if (!CanUpgradeMelee(melee) || !CoinManager.Instance.HasEnoughCoins(upgradeCost)) return false;
 
         CoinManager.Instance.RemoveCoins(upgradeCost);
         melee.level++;
@@ -112,14 +149,14 @@ public class ShopManager : MonoBehaviour
         return true;
     }
 
-    public int GetUpgradeCost(int currentLevel, int maxLevel)
+    public int GetMeleeUpgradeCost(MeleeWeapon melee)
     {
-        if (currentLevel >= maxLevel) return 0;
-        return Mathf.RoundToInt(upgradeCost * Mathf.Pow(upgradeCostMultiplier, currentLevel));
+        if (melee.level >= melee.maxLevel) return 0;
+        return Mathf.RoundToInt(meleeUpgradeCost * Mathf.Pow(upgradeCostMultiplier, melee.level));
     }
 
-    public bool CanUpgrade(int currentLevel, int maxLevel)
+    public bool CanUpgradeMelee(MeleeWeapon melee)
     {
-        return currentLevel < maxLevel;
+        return melee.level < melee.maxLevel;
     }
 }

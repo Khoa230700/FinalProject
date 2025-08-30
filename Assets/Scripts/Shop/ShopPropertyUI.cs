@@ -2,7 +2,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class PropertyUI : MonoBehaviour
+public class ShopPropertyUI : MonoBehaviour
 {
     [Header("UI Elements")]
     [SerializeField] private TMP_Text textValue;
@@ -40,7 +40,7 @@ public class PropertyUI : MonoBehaviour
         if (textValue != null)
         {
             textValue.text = previewValue.ToString(format);
-            textValue.color = Color.yellow; // Highlight preview value
+            textValue.color = new Color(0.392f, 0.698f, 0.812f);
         }
 
         sliderPreview.gameObject.SetActive(true);
