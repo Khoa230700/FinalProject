@@ -22,6 +22,7 @@ public class ShopPoint : MonoBehaviour
 
     private void OnDisable()
     {
+        if (shopNotification != null)
         shopNotification.SetActive(false);
     }
 

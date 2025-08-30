@@ -7,6 +7,7 @@ public class MeleeWeapon : MonoBehaviour, IWeapon
     [Header("Data")]
     public MeleeData data;
     [Range(0, 20)] public int level = 0;   // 0 = base
+    public int maxLevel => data ? data.GetMaxLevel() : 0; 
 
     [Header("Refs")]
     public Animator armsAnimator;
