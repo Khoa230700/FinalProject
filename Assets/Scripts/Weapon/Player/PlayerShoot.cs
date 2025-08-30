@@ -14,6 +14,17 @@ public class PlayerShoot : MonoBehaviour, IWeapon, IReloadable
 
     [SerializeField] private ParticleSystem muzzleFlashParticle;
 
+    [Header("Audio")]
+    public AudioSource audioSource;          // đặt trên weapon (hoặc Player)
+    public AudioClip shotClip;               // nếu trống → dùng gunData.shootSound
+    public AudioClip emptyClip;              // click khi hết đạn
+    public AudioClip reloadStartClip;        // bắt đầu nạp
+    public AudioClip reloadEndClip;          // kết thúc nạp
+    public AudioClip drawClip;               // rút súng
+    public AudioClip holsterClip;            // cất súng
+    [Range(0f, 1f)] public float shotVolume = 1f;
+    [Range(0.8f, 1.2f)] public float shotPitch = 1f;
+
     [HideInInspector] public int currentAmmo;
     [HideInInspector] public int reserveAmmo;
     public bool isReloading { get; private set; }
@@ -21,39 +32,39 @@ public class PlayerShoot : MonoBehaviour, IWeapon, IReloadable
     public bool IsSwitchingWeapon { get; private set; }
 
     private Coroutine shotResetCoroutine;
+    private Coroutine fireLoopCoroutine;     // loop cho FullAuto
     public bool IsReadyToShoot { get; private set; } = true;
 
-    // guard to avoid double-shot in same frame
     private int _lastShotFrame = -1;
     private bool initialized = false;
 
-    // NEW: optional upgrade state
     private GunUpgradeState upgrade;
 
-    // --------- Helpers (đọc stat đã nâng cấp nếu có) ---------
+    public System.Action OnShotFired;                // crosshair bloom
+    public System.Action<Vector3, bool> OnBulletHit; // hit marker
+
+    // stat đã upgrade (nếu có)
     int MagazineSize => upgrade ? upgrade.MagazineSize : gunData.magazineSize;
     float Damage => upgrade ? upgrade.Damage : gunData.damage;
     float Range => upgrade ? upgrade.Range : gunData.range;
     float ReloadTime => upgrade ? upgrade.ReloadTime : gunData.reloadTime;
     float SpreadAngle => upgrade ? upgrade.SpreadAngle : gunData.spreadAngle;
     float SemiAutoIv => upgrade ? upgrade.SemiAutoMinInterval : gunData.semiAutoMinInterval;
+    float RoundsPerSec => upgrade ? upgrade.RoundsPerSecond : gunData.roundsPerSecond;
 
-    void Awake()
-    {
-        upgrade = GetComponent<GunUpgradeState>();
-    }
+    void Awake() { upgrade = GetComponent<GunUpgradeState>(); }
 
     public void Initialize()
     {
         if (initialized) return;
-        currentAmmo = MagazineSize;           // dùng magazine size đã nâng cấp
-        reserveAmmo = gunData.reserveAmmo;    // reserve giữ theo data gốc (tuỳ design)
+        currentAmmo = MagazineSize;
+        reserveAmmo = gunData.reserveAmmo;
         initialized = true;
     }
 
     void Start()
     {
-        // Khởi tạo đạn với magazine size đã nâng cấp
+        if (!audioSource) audioSource = GetComponent<AudioSource>();
         currentAmmo = MagazineSize;
         reserveAmmo = gunData.reserveAmmo;
         weaponUI?.UpdateAmmoUI(currentAmmo, reserveAmmo);
@@ -71,62 +82,97 @@ public class PlayerShoot : MonoBehaviour, IWeapon, IReloadable
             weaponUI.CreateBulletUI();
             weaponUI.UpdateAmmoUI(currentAmmo, reserveAmmo);
         }
+        // rút súng
+        PlayOneShot(drawClip, 1f);
     }
 
     public void OnDeselected() { }
 
-    public void StartFiring() => StartShooting();
-    public void StopFiring() => StopShooting();
+    public void StartFiring()
+    {
+        if (IsShooting) return;
+        IsShooting = true;
+
+        if (gunData != null && gunData.fireMode == GunFireMode.FullAuto)
+        {
+            if (fireLoopCoroutine != null) StopCoroutine(fireLoopCoroutine);
+            fireLoopCoroutine = StartCoroutine(FullAutoLoop());
+        }
+    }
+
+    public void StopFiring()
+    {
+        if (!IsShooting) return;
+
+        IsShooting = false;
+
+        if (fireLoopCoroutine != null)
+        {
+            StopCoroutine(fireLoopCoroutine);
+            fireLoopCoroutine = null;
+        }
+
+        if (csgoScope != null && csgoScope.IsScoped)
+            armsAnimator.CrossFade("AimingIdle", 0.08f);
+        else
+            armsAnimator.CrossFade("Idle", 0.08f);
+    }
+
     public void FireOnce() => ShootOneBullet();
 
-    public Coroutine SwitchOut(MonoBehaviour runner)
-        => runner.StartCoroutine(SwitchOutRoutine());
-    public Coroutine SwitchIn(MonoBehaviour runner)
-        => runner.StartCoroutine(SwitchInRoutine());
+    public Coroutine SwitchOut(MonoBehaviour runner) => runner.StartCoroutine(SwitchOutRoutine());
+    public Coroutine SwitchIn(MonoBehaviour runner) => runner.StartCoroutine(SwitchInRoutine());
 
     private IEnumerator SwitchOutRoutine()
     {
         IsSwitchingWeapon = true;
+        StopFiring();
         armsAnimator.SetTrigger("Hide");
+        PlayOneShot(holsterClip, 1f);
         yield return new WaitForSeconds(0.3f);
     }
 
     private IEnumerator SwitchInRoutine()
     {
         armsAnimator.SetTrigger("Get");
+        // draw clip đã phát ở OnSelected để chắc chắn vang khi bật active
         yield return new WaitForSeconds(0.3f);
         IsSwitchingWeapon = false;
     }
     // --------- /IWeapon adapters ---------
 
-    public void StartShooting()
+    private IEnumerator FullAutoLoop()
     {
-        if (!IsShooting)
-            IsShooting = true;
-    }
+        float rps = Mathf.Max(0.01f, RoundsPerSec);
+        float interval = 1f / rps;
 
-    public void StopShooting()
-    {
-        if (IsShooting)
+        while (IsShooting && !isReloading && currentAmmo > 0 && gunData.fireMode == GunFireMode.FullAuto)
         {
-            IsShooting = false;
-            if (csgoScope != null && csgoScope.IsScoped)
-                armsAnimator.CrossFade("AimingIdle", 0.08f);
-            else
-                armsAnimator.CrossFade("Idle", 0.08f);
+            if (IsReadyToShoot && !PauseGameUI.isPause)
+                ShootOneBullet();
+
+            yield return new WaitForSeconds(interval);
         }
+
+        fireLoopCoroutine = null;
     }
 
     public void ShootOneBullet()
     {
-        if (PauseGameUI.isPause || isReloading || currentAmmo <= 0) return;
+        if (PauseGameUI.isPause || isReloading) return;
 
-        // prevent multiple calls in the same frame
+        if (currentAmmo <= 0)
+        {
+            // click empty
+            PlayOneShot(emptyClip, 1f);
+            return;
+        }
+
         if (Time.frameCount == _lastShotFrame) return;
         _lastShotFrame = Time.frameCount;
 
         if (!IsReadyToShoot) return;
-        IsReadyToShoot = false; // lock immediately
+        IsReadyToShoot = false;
 
         currentAmmo--;
 
@@ -137,8 +183,23 @@ public class PlayerShoot : MonoBehaviour, IWeapon, IReloadable
         armsAnimator.Play(anim, 0, 0f);
 
         muzzleFlashParticle?.Play();
-        if (gunData.shootSound != null)
-            AudioSource.PlayClipAtPoint(gunData.shootSound, shootPoint.position);
+
+        // shot SFX (ưu tiên field; nếu trống dùng trong GunData)
+        var clip = shotClip ? shotClip : gunData.shootSound;
+        if (clip)
+        {
+            if (audioSource)
+            {
+                audioSource.pitch = shotPitch;
+                audioSource.PlayOneShot(clip, shotVolume);
+            }
+            else
+            {
+                AudioSource.PlayClipAtPoint(clip, shootPoint.position, shotVolume);
+            }
+        }
+
+        OnShotFired?.Invoke();
 
         int pellets = (gunData.gunType == GunType.Shotgun) ? gunData.pelletCount : 1;
         for (int i = 0; i < pellets; i++)
@@ -154,9 +215,13 @@ public class PlayerShoot : MonoBehaviour, IWeapon, IReloadable
                 if (hb != null && hb.ownerHealthSystem != null)
                 {
                     float dmg = Damage;
-                    if (hb.hitboxType == Hitbox.HitboxType.Head) dmg *= 2f;
+                    bool isHead = (hb.hitboxType == Hitbox.HitboxType.Head);
+                    if (isHead) dmg *= 2f;
+
                     hb.ownerHealthSystem.TakeDamage(dmg);
                     hb.OnHit(dmg, hit.point);
+
+                    OnBulletHit?.Invoke(hit.point, isHead);
                 }
             }
         }
@@ -166,13 +231,11 @@ public class PlayerShoot : MonoBehaviour, IWeapon, IReloadable
         if (shotResetCoroutine != null) StopCoroutine(shotResetCoroutine);
         shotResetCoroutine = StartCoroutine(ResetShotAnimation());
 
-        // cooldown cho SemiAuto (sniper ~1s nếu chưa set)
         float cooldown = 0f;
         if (gunData.fireMode == GunFireMode.SemiAuto)
         {
             cooldown = SemiAutoIv;
-            if (gunData.gunType == GunType.SniperRifle && cooldown <= 0f)
-                cooldown = 1f;
+            if (gunData.gunType == GunType.SniperRifle && cooldown <= 0f) cooldown = 1f;
         }
         StartCoroutine(ShotCooldown(cooldown));
     }
@@ -203,7 +266,7 @@ public class PlayerShoot : MonoBehaviour, IWeapon, IReloadable
         if (csgoScope != null && csgoScope.IsScoped)
             armsAnimator.CrossFade("AimingIdle", 0.08f);
         else if (!Input.GetMouseButton(0) || gunData.fireMode != GunFireMode.FullAuto)
-            StopShooting();
+            StopFiring();
     }
 
     public void Reload()
@@ -212,7 +275,11 @@ public class PlayerShoot : MonoBehaviour, IWeapon, IReloadable
             return;
 
         isReloading = true;
+
+        if (IsShooting) StopFiring();
+
         armsAnimator.SetTrigger("Recharge");
+        PlayOneShot(reloadStartClip, 1f);
         StartCoroutine(ReloadRoutine());
     }
 
@@ -226,6 +293,7 @@ public class PlayerShoot : MonoBehaviour, IWeapon, IReloadable
         reserveAmmo -= used;
 
         isReloading = false;
+        PlayOneShot(reloadEndClip, 1f);
         weaponUI?.UpdateAmmoUI(currentAmmo, reserveAmmo);
     }
 
@@ -241,17 +309,14 @@ public class PlayerShoot : MonoBehaviour, IWeapon, IReloadable
     public int AddAmmo(int amount)
     {
         if (amount <= 0) return 0;
-
         int bulletsAdded = 0;
 
-        // Add to current magazine (dựa theo MagazineSize đã upgrade)
         int magazineSpace = MagazineSize - currentAmmo;
         int toMagazine = Mathf.Min(amount, magazineSpace);
         currentAmmo += toMagazine;
         bulletsAdded += toMagazine;
         amount -= toMagazine;
 
-        // Add to reserve (giữ capacity theo gunData.reserveAmmo)
         if (amount > 0)
         {
             int reserveSpace = gunData.reserveAmmo - reserveAmmo;
@@ -274,5 +339,12 @@ public class PlayerShoot : MonoBehaviour, IWeapon, IReloadable
         int currentAmmoNeeded = MagazineSize - currentAmmo;
         int reserveAmmoNeeded = gunData.reserveAmmo - reserveAmmo;
         return Mathf.Max(0, currentAmmoNeeded) + Mathf.Max(0, reserveAmmoNeeded);
+    }
+
+    private void PlayOneShot(AudioClip clip, float vol)
+    {
+        if (!clip) return;
+        if (audioSource) audioSource.PlayOneShot(clip, vol);
+        else AudioSource.PlayClipAtPoint(clip, shootPoint ? shootPoint.position : transform.position, vol);
     }
 }
