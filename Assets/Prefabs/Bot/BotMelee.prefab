@@ -401,20 +401,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHealth: 100
+  armor: 0
   OnTakeDamage:
     m_PersistentCalls:
       m_Calls: []
-  useRegen: 0
-  regenRate: 1
-  regenDelay: 0
-  secPerRegen: 0
-  animator: {fileID: 5229804335748444862}
-  agent: {fileID: 5924586812206501642}
-  mainCollider: {fileID: 7471356476971691667}
-  aiScripts:
-  - {fileID: 1432243501291199269}
-  - {fileID: 7284171553910722365}
-  shield: {fileID: 1884421177641275335}
+  maxShield: 0
+  currentShield: 0
+  shieldRegenPerSecond: 0
+  shieldRegenDelay: 3
+  baseMoveSpeed: 4
+  healthBar: {fileID: 0}
+  shieldBar: {fileID: 0}
 --- !u!114 &1884421177641275335
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1018,6 +1015,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3533fe83422f2544895abc1c82971a77, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  damage: 10
+  attackRange: 0.19
+  attackRadius: 0.86
+  cooldown: 1
+  enemyMask:
+    serializedVersion: 2
+    m_Bits: 64
+  swingOrigin: {fileID: 2801550588296635517}
+  drawGizmos: 1
 --- !u!65 &6590447101737242600
 BoxCollider:
   m_ObjectHideFlags: 0

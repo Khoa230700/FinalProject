@@ -20,6 +20,8 @@ public class BotHealth : BaseHealthSystem, IDamageable
     [SerializeField] private BarUI healthBar;
     [SerializeField] private BarUI shieldBar;
 
+    private bool isDead = false;
+    public Animator anim;
     public event System.Action<float, float> OnShieldChanged;
 
     protected override void Start()
@@ -111,8 +113,38 @@ public class BotHealth : BaseHealthSystem, IDamageable
 
     protected override void Die()
     {
+        if (isDead) return; // tránh gọi nhiều lần
+        isDead = true;
+
         Debug.Log($"{gameObject.name} (Bot) Dead!");
-        // có thể gọi BotManager.Instance.OnBotDead(this) nếu cần
-        //Destroy(gameObject, 1.5f); // bot chết thì destroy
+
+        // 1. Ngắt AI (NavMeshAgent, script bắn, di chuyển…)
+        var agent = GetComponent<UnityEngine.AI.NavMeshAgent>();
+        if (agent != null)
+        {
+            agent.isStopped = true;
+            agent.enabled = false;
+        }
+
+        foreach (var comp in GetComponents<MonoBehaviour>())
+        {
+            if (comp != this) comp.enabled = false; // disable mọi script khác
+        }
+        gameObject.layer = LayerMask.NameToLayer("Default");
+        foreach (Transform child in transform)
+        {
+            child.gameObject.layer = LayerMask.NameToLayer("Default");
+        }
+
+        // 2. Ngắt collider (tránh nhận damage/tấn công)
+        //var col = GetComponent<Collider>();
+        //if (col != null) col.isTrigger = true;
+
+        // 3. Play animation chết
+
+        if (anim != null)
+        {
+            anim.SetTrigger(name: "Die");   // cần set trigger "Die" trong Animator
+        }
     }
 }
