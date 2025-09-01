@@ -4,81 +4,77 @@ using UnityEngine.UI;
 public class DynamicScopeUI : MonoBehaviour
 {
     [Header("References")]
-    public Camera mainCamera;
-    public Transform scopeLens;
-    public RawImage scopeOverlayUI;
-    public CSGOScope csgoScope;
+    public Camera mainCamera;            // camera người chơi
+    public Transform scopeLens;          // marker trên model
+    public RawImage scopeOverlayUI;      // RawImage chứa RenderTexture
+    public CSGOScope csgoScope;          // để biết đang scoped hay không
 
     [Header("UI Tweaks On Scope")]
-    [Range(0f, 1f)] public float centerPull = 0.2f;
-    public float uiScaleOnScope = 1.15f;
+    [Range(0f, 1f)] public float centerPull = 0.2f; // kéo về tâm
+    public float uiScaleOnScope = 1.15f;            // phóng to nhẹ
     public float uiLerpSpeed = 12f;
 
-    [Header("Control")]
-    [Tooltip("Nếu bật, script NÀY sẽ bật/tắt RawImage. Nếu tắt, để CSGOScope tự bật/tắt.")]
-    public bool controlActiveHere = false;   // <<< mặc định tắt để tránh giẫm chân
-
-    RectTransform uiRect;
-    RectTransform canvasRoot;
-    Vector2 currentAnchoredPos;
-    Vector3 currentScale;
-
-    public bool dontScale = true;
+    private RectTransform uiRect;
+    private RectTransform canvasRoot;
+    private Vector2 currentAnchoredPos;
+    private Vector3 currentScale;
 
     void Start()
     {
         if (mainCamera == null) mainCamera = Camera.main;
+
         if (scopeOverlayUI == null)
         {
             Debug.LogWarning("[DynamicScopeUI] scopeOverlayUI chưa được gán!");
             enabled = false; return;
         }
+
         uiRect = scopeOverlayUI.rectTransform;
-        TryCacheCanvasRoot();
+        TryCacheCanvasRoot(); // cố lấy canvasRoot nếu có
 
-        // Chỉ tắt ở Start nếu chính script này quản lý bật/tắt
-        if (controlActiveHere) scopeOverlayUI.gameObject.SetActive(false);
-
+        scopeOverlayUI.gameObject.SetActive(false);
         currentAnchoredPos = uiRect.anchoredPosition;
         currentScale = uiRect.localScale;
     }
 
     void LateUpdate()
     {
-        bool scoped = (csgoScope != null && csgoScope.IsScoped);
-
-        if (!scoped)
+        // chỉ hiển thị khi đang scope
+        if (csgoScope == null || !csgoScope.IsScoped)
         {
-            if (controlActiveHere && scopeOverlayUI.gameObject.activeSelf)
-                scopeOverlayUI.gameObject.SetActive(false);
+            if (scopeOverlayUI.gameObject.activeSelf) scopeOverlayUI.gameObject.SetActive(false);
             return;
         }
 
         if (scopeLens == null || mainCamera == null) return;
 
+        // world → screen
         Vector3 screenPos = mainCamera.WorldToScreenPoint(scopeLens.position);
         if (screenPos.z <= 0f)
         {
-            if (controlActiveHere && scopeOverlayUI.gameObject.activeSelf)
-                scopeOverlayUI.gameObject.SetActive(false);
+            if (scopeOverlayUI.gameObject.activeSelf) scopeOverlayUI.gameObject.SetActive(false);
             return;
         }
 
-        if (controlActiveHere && !scopeOverlayUI.gameObject.activeSelf)
-            scopeOverlayUI.gameObject.SetActive(true);
+        if (!scopeOverlayUI.gameObject.activeSelf) scopeOverlayUI.gameObject.SetActive(true);
 
+        // bảo đảm có canvasRoot; nếu chưa có thì thử lấy lại (trường hợp UI được bật runtime)
         if (canvasRoot == null) TryCacheCanvasRoot();
 
+        // Nếu vẫn chưa có canvasRoot → fallback đặt theo screenPos (ít chuẩn hơn nhưng không crash)
         if (canvasRoot == null)
         {
-            uiRect.position = screenPos; // fallback
+            uiRect.position = screenPos;
         }
         else
         {
+            // Chọn camera phù hợp theo render mode
             var canvas = scopeOverlayUI.canvas;
-            Camera camForCanvas = (canvas != null && canvas.renderMode != RenderMode.ScreenSpaceOverlay)
-                                  ? canvas.worldCamera : null;
+            Camera camForCanvas = null;
+            if (canvas != null && canvas.renderMode != RenderMode.ScreenSpaceOverlay)
+                camForCanvas = canvas.worldCamera; // bắt buộc có khi dùng Screen Space - Camera / World Space
 
+            // screen → anchored
             if (RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRoot, screenPos, camForCanvas, out var localPoint))
             {
                 Vector2 targetAnchoredPos = Vector2.Lerp(localPoint, Vector2.zero, centerPull);
@@ -87,20 +83,23 @@ public class DynamicScopeUI : MonoBehaviour
             }
             else
             {
-                uiRect.position = screenPos; // fallback
+                // nếu convert thất bại (camera null sai mode, v.v.) thì fallback
+                uiRect.position = screenPos;
             }
         }
 
-
-        Vector3 targetScale = dontScale ? Vector3.one : (Vector3.one * uiScaleOnScope);
+        // scale mượt khi scope
+        Vector3 targetScale = Vector3.one * uiScaleOnScope;
         currentScale = Vector3.Lerp(currentScale, targetScale, Time.deltaTime * uiLerpSpeed);
         uiRect.localScale = currentScale;
     }
 
-    void TryCacheCanvasRoot()
+    private void TryCacheCanvasRoot()
     {
         var canvas = scopeOverlayUI.canvas;
-        if (canvas && canvas.rootCanvas) canvasRoot = canvas.rootCanvas.GetComponent<RectTransform>();
-        else canvasRoot = null;
+        if (canvas != null && canvas.rootCanvas != null)
+            canvasRoot = canvas.rootCanvas.GetComponent<RectTransform>();
+        else
+            canvasRoot = null;
     }
 }

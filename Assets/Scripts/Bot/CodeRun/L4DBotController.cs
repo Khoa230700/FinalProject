@@ -6,20 +6,19 @@ public class L4DBotController : MonoBehaviour
     [Header("References")]
     [SerializeField] Transform player;
     [SerializeField] Transform firePoint;
+    [SerializeField] GameObject bulletPrefab;
     [SerializeField] ParticleSystem bulletParticleSystem;
     [SerializeField] WFX_LightFlicker wFX_LightFlicker;
     [SerializeField] TargetableEnemy hitdame;
 
     [Header("AI Settings")]
-    [SerializeField] float detectionRange = 20f;
-    [SerializeField] float fireRate = 0.5f;
-    [SerializeField] float bulletSpeed = 50f;
-    [SerializeField] float followPlayerDistance = 8f;   // khoảng cách để theo player khi không có zombie
-    [SerializeField] float combatStoppingDistance = 0f; // khoảng cách khi bắn zombie
+    [SerializeField] float detectionRange ;
+    [SerializeField] float fireRate ;
+    [SerializeField] float bulletSpeed;
 
     private NavMeshAgent agent;
     private Animator animator;
-    private float fireCooldown;
+    public float fireCooldown = 0f;
     private GameObject currentTarget;
 
     private void Start()
@@ -30,77 +29,70 @@ public class L4DBotController : MonoBehaviour
 
     private void Update()
     {
+       
         fireCooldown -= Time.deltaTime;
-
-        // --- Ưu tiên tìm zombie ---
-        currentTarget = FindNearestVisibleZombie();
-        if (currentTarget != null)
-        {
-            HandleCombat();
-            return;
-        }
-
-        // --- Không có zombie → theo player ---
-        HandleFollowPlayer();
-    }
-
-    private void HandleCombat()
-    {
-        float distToTarget = Vector3.Distance(transform.position, currentTarget.transform.position);
-        if (distToTarget > detectionRange)
-        {
-            currentTarget = null;
-            return;
-        }
-
-        // Dừng bắn tại chỗ
-        agent.stoppingDistance = combatStoppingDistance;
-        agent.isStopped = true;
-        agent.SetDestination(transform.position);
-        AudioBotManager.Instance.StopBotSound();
-
-        // Xoay mặt về phía zombie
-        Vector3 lookPos = new Vector3(currentTarget.transform.position.x, transform.position.y, currentTarget.transform.position.z);
-        transform.LookAt(lookPos);
-
-        animator.SetFloat("Horizontal", 0f);
-        animator.SetFloat("Vertical", 0f);
-        animator.SetBool("isMoving", false);
-
-        if (fireCooldown <= 0f)
-        {
-            animator.SetTrigger("shoot");
-            Shoot(currentTarget.transform);
-            AudioBotManager.Instance.ShootSound();
-            fireCooldown = fireRate;
-        }
-    }
-
-    private void HandleFollowPlayer()
-    {
         float distToPlayer = Vector3.Distance(transform.position, player.position);
-
-        agent.stoppingDistance = followPlayerDistance;
-
-        if (distToPlayer > agent.stoppingDistance)
+        // Debug.Log("Distance to Player: " + distToPlayer);
+        // Nếu player quá xa thì chạy theo player, không bắn
+        if (distToPlayer > agent.stoppingDistance )
         {
+
+            currentTarget = null; // Bỏ target vì phải theo player
             agent.isStopped = false;
             agent.SetDestination(player.position);
             AudioBotManager.Instance.PlayBotSound();
-
             Vector3 localVelocity = transform.InverseTransformDirection(agent.velocity);
             animator.SetFloat("Horizontal", localVelocity.x);
             animator.SetFloat("Vertical", localVelocity.z);
             animator.SetBool("isMoving", true);
+
+            return; 
         }
-        else
+
+        
+        currentTarget = FindNearestVisibleZombie();
+        if (currentTarget != null)
         {
-            agent.isStopped = true;
-            animator.SetFloat("Horizontal", 0f);
-            animator.SetFloat("Vertical", 0f);
-            animator.SetBool("isMoving", false);
-            AudioBotManager.Instance.StopBotSound();
+            float distToTarget = Vector3.Distance(transform.position, currentTarget.transform.position);
+            if (distToTarget <= detectionRange)
+            {
+                Debug.Log("Shooting at target: ");
+                agent.isStopped = true;
+              
+                agent.SetDestination(transform.position);
+                AudioBotManager.Instance.StopBotSound();
+
+                Vector3 lookPos = new Vector3(currentTarget.transform.position.x, transform.position.y, currentTarget.transform.position.z);
+                transform.LookAt(lookPos);
+
+                animator.SetFloat("Horizontal", 0f);
+                animator.SetFloat("Vertical", 0f);
+                animator.SetBool("isMoving", false);
+
+                if (fireCooldown <= 0f)
+                {
+                   
+                    animator.SetTrigger("shoot");
+                    Shoot(currentTarget.transform);
+                    AudioBotManager.Instance.ShootSound();
+                    fireCooldown = fireRate;
+                }
+              
+                return; // ưu tiên bắn zombie
+            }
+            else
+            {
+                // Zombie ra khỏi tầm → bỏ target, đứng yên chờ player (hoặc di chuyển nếu cần)
+                currentTarget = null;
+            }
         }
+        agent.isStopped = false;
+        animator.SetFloat("Horizontal", 0f);
+        animator.SetFloat("Vertical", 0f);
+        animator.SetBool("isMoving", false);
+
+
+
     }
 
     private GameObject FindNearestVisibleZombie()
@@ -133,22 +125,28 @@ public class L4DBotController : MonoBehaviour
         Vector3 direction = (targetPoint - firePoint.position).normalized;
         float distance = Vector3.Distance(firePoint.position, targetPoint);
 
-        if (Physics.Raycast(firePoint.position, direction, out RaycastHit hit, distance))
+    
+        if (Physics.Raycast(firePoint.position, direction, out RaycastHit hit,distance))
         {
             return hit.collider.CompareTag("Enemy");
         }
+
         return false;
     }
 
     private void Shoot(Transform target)
     {
+        Debug.Log("Shooting at target: " + target.name);
         if (firePoint == null || target == null) return;
 
         Vector3 aimPoint = GetAimPoint(target);
         Vector3 dir = (aimPoint - firePoint.position).normalized;
 
+        AudioBotManager.Instance?.ShootSound();
+
         if (Physics.Raycast(firePoint.position, dir, out RaycastHit hit, detectionRange))
         {
+            // Hiệu ứng khi bắn trúng
             if (bulletParticleSystem != null)
             {
                 bulletParticleSystem.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
@@ -159,10 +157,10 @@ public class L4DBotController : MonoBehaviour
             {
                 wFX_LightFlicker.FlickerOnce();
             }
-
             var hb = hit.collider.GetComponentInChildren<Hitbox>();
-            if (hb != null)
+            if (hb != null )
             {
+               
                 hb.ownerHealthSystem.TakeDamage(20);
                 hb.OnHit(20, hit.point);
             }
@@ -170,11 +168,13 @@ public class L4DBotController : MonoBehaviour
             var health = hit.collider.GetComponent<EnemyM>();
             if (health != null)
             {
-                health.TakeDamage(20);
+                health.TakeDamage(20); 
             }
+
+          
         }
     }
-
+   
     private Vector3 GetAimPoint(Transform target)
     {
         hitdame = target.gameObject.GetComponentInChildren<TargetableEnemy>();
@@ -182,8 +182,14 @@ public class L4DBotController : MonoBehaviour
             return hitdame.aimTarget.position;
 
         Collider col = target.GetComponent<Collider>();
-        if (col != null) return col.bounds.center;
+        if (col != null)
+            return col.transform.position;
 
+        EnemiAI ai = target.GetComponentInChildren<EnemiAI>();
+        if (ai != null && target.gameObject.CompareTag("Enemy"))
+            return target.position + Vector3.up * 1.5f;
         return target.position + Vector3.up * 1.2f;
+
+      
     }
 }

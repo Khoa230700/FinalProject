@@ -1712,6 +1712,7 @@ GameObject:
   - component: {fileID: 8544334847368187436}
   - component: {fileID: 7414361622151578782}
   - component: {fileID: 2746969822871216562}
+  - component: {fileID: 7891282764500313473}
   m_Layer: 8
   m_Name: FPS Player Shooter Sniper
   m_TagString: Player
@@ -1793,12 +1794,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sensitivityX: 2
   sensitivityY: 2
-  invertY: 0
-  useDeltaTime: 0
   minPitch: -60
   maxPitch: 60
-  yawTransform: {fileID: 0}
-  pitchTransform: {fileID: 0}
 --- !u!114 &7414361622151578782
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1816,10 +1813,6 @@ MonoBehaviour:
   - {fileID: 1559585607835018549}
   - {fileID: 4538897647001835457}
   - {fileID: 1812598803216876599}
-  playGenericSwitchSfx: 0
-  audioSource: {fileID: 0}
-  switchClip: {fileID: 0}
-  switchVolume: 1
 --- !u!114 &2746969822871216562
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1846,6 +1839,23 @@ MonoBehaviour:
   baseMoveSpeed: 5
   healthBar: {fileID: 0}
   shieldBar: {fileID: 0}
+--- !u!114 &7891282764500313473
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2393662489545346051}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 33e34d18da5fd2e4d9fdeb7703af43bc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gunData: {fileID: 0}
+  level: 0
+  OnLevelChanged:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &2537921353113568113
 GameObject:
   m_ObjectHideFlags: 0
@@ -2353,15 +2363,6 @@ MonoBehaviour:
   weaponUI: {fileID: 0}
   csgoScope: {fileID: 0}
   muzzleFlashParticle: {fileID: 198481540338831756, guid: 49aa1d4c5624e66418cbfbe9784d6f23, type: 3}
-  audioSource: {fileID: 0}
-  shotClip: {fileID: 0}
-  emptyClip: {fileID: 0}
-  reloadStartClip: {fileID: 0}
-  reloadEndClip: {fileID: 0}
-  drawClip: {fileID: 0}
-  holsterClip: {fileID: 0}
-  shotVolume: 1
-  shotPitch: 1
   currentAmmo: 0
   reserveAmmo: 0
 --- !u!95 &6418266595371665982
@@ -2942,15 +2943,6 @@ MonoBehaviour:
   weaponUI: {fileID: 0}
   csgoScope: {fileID: 5506603170031170302}
   muzzleFlashParticle: {fileID: 198481540338831756, guid: 49aa1d4c5624e66418cbfbe9784d6f23, type: 3}
-  audioSource: {fileID: 0}
-  shotClip: {fileID: 0}
-  emptyClip: {fileID: 0}
-  reloadStartClip: {fileID: 0}
-  reloadEndClip: {fileID: 0}
-  drawClip: {fileID: 0}
-  holsterClip: {fileID: 0}
-  shotVolume: 1
-  shotPitch: 1
   currentAmmo: 0
   reserveAmmo: 0
 --- !u!95 &5748523995275120256
@@ -3171,7 +3163,6 @@ MonoBehaviour:
   playerMovement: {fileID: 8575215206317879289}
   playerShoot: {fileID: 186762147422348795}
   armsAnimator: {fileID: 7737834752848102791}
-  csgoScope: {fileID: 0}
   aimInput: Fire2
 --- !u!1 &4619539932793535139
 GameObject:
@@ -4345,9 +4336,6 @@ MonoBehaviour:
   scrollZoomSensitivity: 8
   cameraLocalOffset: {x: 0, y: 0, z: 4}
   offsetLerpSpeed: 14
-  manageOverlayHere: 1
-  safeMinFOV: 15
-  safeMaxFOV: 90
 --- !u!114 &6064994175220001128
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4367,8 +4355,6 @@ MonoBehaviour:
   centerPull: 0.384
   uiScaleOnScope: 1.15
   uiLerpSpeed: 12
-  controlActiveHere: 0
-  dontScale: 1
 --- !u!1 &5982616735339148963
 GameObject:
   m_ObjectHideFlags: 0
