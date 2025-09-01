@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.AI;
 
 public class BotHealth : BaseHealthSystem, IDamageable
 {
@@ -113,38 +114,41 @@ public class BotHealth : BaseHealthSystem, IDamageable
 
     protected override void Die()
     {
-        if (isDead) return; // tránh gọi nhiều lần
+        if (isDead) return;
         isDead = true;
 
         Debug.Log($"{gameObject.name} (Bot) Dead!");
-
-        // 1. Ngắt AI (NavMeshAgent, script bắn, di chuyển…)
-        var agent = GetComponent<UnityEngine.AI.NavMeshAgent>();
+        GameObject root = transform.root.gameObject;
+        // 1. Ngắt AI
+        var agent = root.GetComponent<NavMeshAgent>();
         if (agent != null)
         {
             agent.isStopped = true;
             agent.enabled = false;
         }
 
-        foreach (var comp in GetComponents<MonoBehaviour>())
+        // 2. Disable toàn bộ script trong cây bot
+        foreach (var comp in root.GetComponentsInChildren<MonoBehaviour>())
         {
-            if (comp != this) comp.enabled = false; // disable mọi script khác
-        }
-        gameObject.layer = LayerMask.NameToLayer("Default");
-        foreach (Transform child in transform)
-        {
-            child.gameObject.layer = LayerMask.NameToLayer("Default");
+            if (comp != this) comp.enabled = false;
         }
 
-        // 2. Ngắt collider (tránh nhận damage/tấn công)
-        //var col = GetComponent<Collider>();
-        //if (col != null) col.isTrigger = true;
+        // 3. Đổi toàn bộ layer sang Default (bot chết không bị tấn công nữa)
+        SetLayerRecursively(root, LayerMask.NameToLayer("Default"));
 
-        // 3. Play animation chết
-
+        // 4. Play animation chết
         if (anim != null)
         {
-            anim.SetTrigger(name: "Die");   // cần set trigger "Die" trong Animator
+            anim.SetTrigger("Die");
+        }
+    }
+
+    private void SetLayerRecursively(GameObject obj, int layer)
+    {
+        obj.layer = layer;
+        foreach (Transform child in obj.transform)
+        {
+            SetLayerRecursively(child.gameObject, layer);
         }
     }
 }
