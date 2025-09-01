@@ -61,9 +61,10 @@ public class AudioManager : MonoBehaviour
 
     public void PlayMusic(string name)
     {
-        var sound = Array.Find(musicSounds, s => s.name == name);
-        if (sound == null) return;
+        var sounds = Array.FindAll(musicSounds, s => s.name == name);
+        if (sounds == null || sounds.Length == 0) return;
 
+        var sound = sounds[UnityEngine.Random.Range(0, sounds.Length)];
         musicSource.clip = sound.clip;
         musicSource.volume = musicVolume * masterVolume;
         musicSource.Play();
@@ -71,9 +72,10 @@ public class AudioManager : MonoBehaviour
 
     public void PlaySFX(string name)
     {
-        var sound = Array.Find(sfxSounds, s => s.name == name);
-        if (sound == null) return;
+        var sounds = Array.FindAll(sfxSounds, s => s.name == name);
+        if (sounds == null || sounds.Length == 0) return;
 
+        var sound = sounds[UnityEngine.Random.Range(0, sounds.Length)];
         sfxSource.PlayOneShot(sound.clip, sfxVolume * masterVolume);
     }
 

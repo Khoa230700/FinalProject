@@ -6,73 +6,66 @@ public class SelectorCharacter : MonoBehaviour
 {
     [Header("References")]
     public TMP_Text nameTMP;
-    public Transform[] cameraPoints; // vị trí camera cho từng nhân vật
-    public string[] characterNames;  // tên hiển thị cho từng nhân vật
+    public Transform[] cameraPoints;
+    public GameObject[] previewCharacters; 
 
     [Header("Animation")]
     public float animDuration = 0.5f;
 
-    private int selectedIndex = -1;  // chưa chọn nhân vật nào
+    private int selectedIndex = -1;
+    private int lastIndex = -1;
     private Transform cam;
-    private Vector3 defaultPos;
-    private Quaternion defaultRot;
 
     private void Start()
     {
         cam = Camera.main.transform;
 
-        // lưu vị trí gốc của camera trong scene
-        defaultPos = cam.position;
-        defaultRot = cam.rotation;
-
-        // Không auto chọn nhân vật ở Start
-        if (nameTMP != null)
-            nameTMP.text = "Chọn nhân vật...";
+        foreach (var c in previewCharacters)
+            c.SetActive(false);
     }
 
     public void SetCharacter(int index)
     {
         if (index < 0 || index >= cameraPoints.Length) return;
 
-        int lastIndex = selectedIndex;
+        if (lastIndex != -1 && lastIndex < previewCharacters.Length)
+            previewCharacters[lastIndex].SetActive(false);
+
+        if (index < previewCharacters.Length)
+            previewCharacters[index].SetActive(true);
+
+
+        if (lastIndex == -1)
+        {
+            selectedIndex = index;
+
+            var targetPoint = cameraPoints[selectedIndex];
+            cam.position = targetPoint.position;
+            cam.rotation = targetPoint.rotation;
+
+            if (nameTMP != null && selectedIndex < previewCharacters.Length)
+                nameTMP.text = previewCharacters[selectedIndex].name;
+
+            lastIndex = selectedIndex;
+            return;
+        }
+
+        lastIndex = selectedIndex;
         selectedIndex = index;
-
-        if (lastIndex == selectedIndex) return;
-
+        AudioManager.Instance.PlaySFX("Ready");
         UpdatePreview();
     }
 
     private void UpdatePreview()
     {
-        Transform targetPoint;
+        if (selectedIndex == -1) return;
 
-        if (selectedIndex == -1)
-        {
-            // nếu chưa chọn thì giữ ở camera gốc
-            targetPoint = null;
-        }
-        else
-        {
-            // chọn đúng nhân vật -> cameraPoint tương ứng
-            targetPoint = cameraPoints[selectedIndex];
+        var targetPoint = cameraPoints[selectedIndex];
 
-            // tween camera đến vị trí/rotation mới
-            cam.DOMove(targetPoint.position, animDuration);
-            cam.DORotateQuaternion(targetPoint.rotation, animDuration);
+        cam.DOMove(targetPoint.position, animDuration);
+        cam.DORotateQuaternion(targetPoint.rotation, animDuration);
 
-            if (nameTMP != null && selectedIndex < characterNames.Length)
-                nameTMP.text = characterNames[selectedIndex];
-        }
-    }
-
-    public void ResetToDefault()
-    {
-        // nếu muốn cho phép quay lại góc gốc
-        cam.DOMove(defaultPos, animDuration);
-        cam.DORotateQuaternion(defaultRot, animDuration);
-        selectedIndex = -1;
-
-        if (nameTMP != null)
-            nameTMP.text = "Chọn nhân vật...";
+        if (nameTMP != null && selectedIndex < previewCharacters.Length)
+            nameTMP.text = previewCharacters[selectedIndex].name;
     }
 }
