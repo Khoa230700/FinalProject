@@ -39,7 +39,8 @@ public class HorizontalSelectorUI : MonoBehaviour
 
         if (itemSelectors.Count > 0 && index < itemSelectors.Count)
         {
-            UpdateSelection("");
+            //     UpdateText();
+            // CreateIndicatorUI();
             itemSelectors[index].OnValueChange?.Invoke();
         }
     }

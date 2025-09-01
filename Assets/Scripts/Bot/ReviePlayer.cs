@@ -5,7 +5,7 @@ using UnityEngine.AI;
 public class ReviePlayer : MonoBehaviour
 {
     public NavMeshAgent agent;
-    public PlayerHealthSystem player;
+    public PlayerHealthTest player;
     public L4DBotController controller; // script AI gốc
 
     private bool isReviving = false;
@@ -15,7 +15,7 @@ public class ReviePlayer : MonoBehaviour
     private void Awake()
     {
         agent = GetComponent<NavMeshAgent>();
-        player = FindAnyObjectByType<PlayerHealthSystem>();
+        player = FindAnyObjectByType<PlayerHealthTest>();
 
         // set mặc định khi start
         agent.stoppingDistance = defaultStoppingDistance;

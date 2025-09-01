@@ -20,7 +20,6 @@ public class PlayerHealthSystem : BaseHealthSystem, IDamageable
     [SerializeField] private float currentShield = 0f;
     public float MaxShield => maxShield;
     public float CurrentShield => currentShield;
-    public bool IsDown { get; private set; } = false;
 
     // Hồi giáp (có thể lấy từ stats)
     [SerializeField] private float shieldRegenPerSecond = 0f; // 0 = tắt
@@ -53,6 +52,9 @@ public class PlayerHealthSystem : BaseHealthSystem, IDamageable
         // NEW — đăng ký sự kiện để đẩy giá trị sang BarUI
         OnHealthChanged += HandleHealthChanged;
         OnShieldChanged += HandleShieldChanged;
+
+        healthBar = SelectorSpawner.Instance.HealthBar;
+        shieldBar = SelectorSpawner.Instance.ShieldBar;
 
         // NEW — cập nhật UI lần đầu (phòng khi UI bật sau Start)
         HandleHealthChanged(currentHealth, maxHealth);
@@ -138,13 +140,20 @@ public class PlayerHealthSystem : BaseHealthSystem, IDamageable
         return isHeavyWeapon ? baseMoveSpeed * 0.8f : baseMoveSpeed;
     }
 
+    // FIXED: Override cả 2 method để support hitPoint
     public override void TakeDamage(float damage)
+    {
+        TakeDamage(damage, Vector3.zero);
+    }
+
+    public override void TakeDamage(float damage, Vector3 hitPoint)
     {
         if (damage <= 0f) return;
         _lastDamageTime = Time.time;
 
         float remainingDamage = damage;
 
+        // Shield hấp thụ trước
         if (currentShield > 0f)
         {
             float shieldAbsorb = Mathf.Min(currentShield, remainingDamage);
@@ -153,9 +162,15 @@ public class PlayerHealthSystem : BaseHealthSystem, IDamageable
             BroadcastShield(); // sẽ kích hoạt HandleShieldChanged -> cập nhật thanh giáp
         }
 
+        // Phần còn lại cho base xử lý (health + armor)
         if (remainingDamage > 0f)
         {
-            base.TakeDamage(remainingDamage); // Base sẽ BroadcastHealth -> cập nhật thanh máu
+            base.TakeDamage(remainingDamage, hitPoint); // Base sẽ BroadcastHealth + OnTakeDamage event
+        }
+        else
+        {
+            // Nếu shield hấp thụ hết, vẫn trigger OnTakeDamage event cho UI
+            OnTakeDamage?.Invoke(-damage, hitPoint);
         }
     }
 
@@ -178,11 +193,4 @@ public class PlayerHealthSystem : BaseHealthSystem, IDamageable
         GameManager.Instance.ChangeState(GameManager.GameState.GameOver);
         // Không gọi base.Die() vì base là abstract
     }
-    public void Revive()
-    {
-        IsDown = false;
-        currentHealth = maxHealth * 0.5f; // hồi 50% máu
-        Debug.Log("✅ Player revived! HP = " + currentHealth);
-    }
-
 }
