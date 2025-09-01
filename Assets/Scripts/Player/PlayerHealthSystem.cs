@@ -20,6 +20,7 @@ public class PlayerHealthSystem : BaseHealthSystem, IDamageable
     [SerializeField] private float currentShield = 0f;
     public float MaxShield => maxShield;
     public float CurrentShield => currentShield;
+    public bool IsDown { get; private set; } = false;
 
     // Hồi giáp (có thể lấy từ stats)
     [SerializeField] private float shieldRegenPerSecond = 0f; // 0 = tắt
@@ -177,6 +178,11 @@ public class PlayerHealthSystem : BaseHealthSystem, IDamageable
         GameManager.Instance.ChangeState(GameManager.GameState.GameOver);
         // Không gọi base.Die() vì base là abstract
     }
-
+    public void Revive()
+    {
+        IsDown = false;
+        currentHealth = maxHealth * 0.5f; // hồi 50% máu
+        Debug.Log("✅ Player revived! HP = " + currentHealth);
+    }
 
 }
