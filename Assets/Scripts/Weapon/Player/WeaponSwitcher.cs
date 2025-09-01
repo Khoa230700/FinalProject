@@ -23,6 +23,8 @@ public class WeaponSwitcher : MonoBehaviour
             weapons.Add(w);
         }
 
+        weaponUI = SelectorSpawner.Instance.WeaponUI;
+
         ActivateWeapon(currentWeaponIndex);
     }
 

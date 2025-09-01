@@ -14,9 +14,8 @@ public class ShopPoint : MonoBehaviour
     private Transform player;
     private Coroutine pathCoroutine;
 
-    void OnEnable()
+    private void OnEnable()
     {
-        player = GameObject.FindGameObjectWithTag("Player").transform;
         pathCoroutine = StartCoroutine(PathLoop());
     }
 
@@ -28,6 +27,8 @@ public class ShopPoint : MonoBehaviour
 
     private void Start()
     {
+        player = SelectorSpawner.Instance.Player.transform;
+
         if (shopUI == null)
             shopUI = FindAnyObjectByType<ShopUI>();
     }

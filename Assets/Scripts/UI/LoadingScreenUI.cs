@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq.Expressions;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -10,189 +9,266 @@ public class LoadingScreenUI : MonoBehaviour
 {
     public static LoadingScreenUI instance;
 
+    [Header("UI COMPONENTS")]
     public CanvasGroup canvasGroup;
-    public TextMeshProUGUI statusText;
-    public TextMeshProUGUI titleText;
-    public TextMeshProUGUI descriptionText;
-    public TextMeshProUGUI hintsText;
+    public TextMeshProUGUI statusText, titleText, descriptionText, hintsText;
     public Slider progressBar;
     public Transform spinnerParent;
     public Image imageObject;
     public Animator animator;
     public AudioSource audioSource;
 
-    [Range(0.25f, 10)] public float fadeSpeed = 4, backgroundFadeSpeed = 2, contentFadeSpeed = 2;
-
-    [Header("HINTS SETTINGS")]
-    [SerializeField] private bool enableRandomHints = true;
-    [Range(1, 5)] public float hintTimer = 5;
-    [Range(0.1f, 10)] public float hintFadeDuration = 1.5f;
+    [Header("SETTINGS")]
+    [Range(0.25f, 10)] public float fadeSpeed = 4f;
+    [SerializeField] private bool enableRandomHints = true, enableRandomImages = true;
+    [Range(1f, 10f)] public float hintTimer = 5f, imageTimer = 5f;
+    [Range(0.1f, 10f)] public float hintFadeDuration = 1.5f, imageFadingSpeed = 4f;
     [TextArea] public List<string> hintList = new();
-    private int currentHintIndex;
-
-    [Header("BACKGROUND IMAGES SETTINGS")]
-    [SerializeField] private bool enableRandomImages = true;
-    [Range(1, 5)] public float imageTimer = 5;
-    [Range(0.1f, 10)] public float imageFadingSpeed = 4;
     public List<Sprite> imageList = new();
-    private int currentImageIndex;
 
-    [Header("VIRTUAL SETTINGS")]
+    [Header("VIRTUAL LOADING")]
     public bool enableVirtualLoading = false;
-    public float virtualLoadingTimer = 5;
-    private float currentVirtualTime;
+    [Range(1f, 20f)] public float virtualLoadingTimer = 5f;
 
-    private bool processLoading;
-    private AsyncOperation loadingProcess = new();
+    private bool isProcessingLoad, isDestroying;
+    private AsyncOperation loadingProcess;
+    private float currentVirtualTime;
+    private int currentHintIndex = -1, currentImageIndex = -1;
+
+    void Awake()
+    {
+        if (instance != null && instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        instance = this;
+        DontDestroyOnLoad(gameObject);
+    }
 
     void OnEnable()
     {
-        Time.timeScale = 0f;
-
         StopAllCoroutines();
-
-        if (enableRandomHints && hintList.Count > 0) StartCoroutine(RandomHint());
-        if (enableRandomImages && imageList.Count > 0) StartCoroutine(RandomImage());
-
-        imageObject.sprite = GetRandomItem(imageList, ref currentImageIndex);
         statusText.text = "0%";
-        progressBar.value = 0;
+        progressBar.value = 0f;
+        currentVirtualTime = 0f;
+
+        if (imageList.Count > 0)
+            imageObject.sprite = GetRandomItem(imageList, ref currentImageIndex);
+
+        if (enableRandomHints && hintList.Count > 0)
+            StartCoroutine(CycleHints());
+
+        if (enableRandomImages && imageList.Count > 1)
+            StartCoroutine(CycleImages());
+    }
+
+    void OnDestroy()
+    {
+        isDestroying = true;
+        StopAllCoroutines();
+        if (instance == this) instance = null;
     }
 
     public static void LoadScene(string targetScene)
     {
-        if (instance != null) Destroy(instance);
-        instance = Instantiate(Resources.Load<GameObject>("Loading").GetComponent<LoadingScreenUI>());
-        // instance = Instantiate(loadingScreenPrefab);
-        instance.gameObject.SetActive(true);
-        DontDestroyOnLoad(instance.gameObject);
-        instance.StartCoroutine(instance.LoadSceneRoutine(targetScene));
+        if (instance != null) instance.CleanupAndDestroy();
+
+        var prefab = Resources.Load<GameObject>("Loading");
+        if (prefab == null)
+        {
+            Debug.LogError("Loading screen prefab not found in Resources!");
+            return;
+        }
+
+        var loadingUI = Instantiate(prefab).GetComponent<LoadingScreenUI>();
+        loadingUI?.StartCoroutine(loadingUI.LoadSceneRoutine(targetScene));
     }
 
-    public IEnumerator LoadSceneRoutine(string targetScene)
+    IEnumerator LoadSceneRoutine(string targetScene)
     {
-        // Time.timeScale = 1f;
+        gameObject.SetActive(true);
         yield return new WaitForSecondsRealtime(0.1f);
 
-        processLoading = true;
+        isProcessingLoad = true;
         loadingProcess = SceneManager.LoadSceneAsync(targetScene);
         loadingProcess.allowSceneActivation = false;
+
+        if (animator != null && canvasGroup.alpha < 1f)
+            animator.Play("In");
     }
 
     void Update()
     {
-        if (!processLoading) return;
+        if (!isProcessingLoad || isDestroying) return;
 
-        if (enableVirtualLoading)
-            ProcessVirtualLoading();
-        else
-            ProcessLoading();
+        if (enableVirtualLoading) ProcessVirtualLoading();
+        else ProcessRealLoading();
     }
 
-    void ProcessLoading()
+    void ProcessRealLoading()
     {
-        if (!loadingProcess.allowSceneActivation)
-            loadingProcess.allowSceneActivation = true;
+        if (loadingProcess == null) return;
 
-        progressBar.value = Mathf.Lerp(progressBar.value, loadingProcess.progress, 0.1f * Time.unscaledDeltaTime * 60);
-        statusText.text = Mathf.Round(progressBar.value * 100) + "%";
-
-        if (canvasGroup.alpha == 0) animator.Play("In");
+        progressBar.value = Mathf.Lerp(progressBar.value, loadingProcess.progress, Time.unscaledDeltaTime * fadeSpeed);
+        statusText.text = Mathf.RoundToInt(progressBar.value * 100f) + "%";
 
         if (loadingProcess.progress >= 0.9f)
         {
-            Time.timeScale = 1f;
-
-            animator.Play("Out");
-            var length = animator.GetCurrentAnimatorStateInfo(0).length;
-            Destroy(gameObject, length);
+            progressBar.value = 1f;
+            statusText.text = "100%";
+            loadingProcess.allowSceneActivation = true;
+            FinishLoading();
         }
     }
 
     void ProcessVirtualLoading()
     {
-        progressBar.value += 1 / virtualLoadingTimer * Time.unscaledDeltaTime;
-        statusText.text = Mathf.Round(progressBar.value * 100) + "%";
         currentVirtualTime += Time.unscaledDeltaTime;
+        float progress = Mathf.Clamp01(currentVirtualTime / virtualLoadingTimer);
 
-        if (canvasGroup.alpha == 0) animator.Play("In");
+        progressBar.value = progress;
+        statusText.text = Mathf.RoundToInt(progress * 100f) + "%";
 
         if (currentVirtualTime >= virtualLoadingTimer)
         {
-            if (!loadingProcess.allowSceneActivation) loadingProcess.allowSceneActivation = true;
+            if (loadingProcess != null && !loadingProcess.allowSceneActivation)
+                loadingProcess.allowSceneActivation = true;
 
-            if (loadingProcess.progress >= 0.9f)
-            {
-                Time.timeScale = 1f;
-
-                animator.Play("Out");
-                var length = animator.GetCurrentAnimatorStateInfo(0).length;
-                Destroy(gameObject, length);
-            }
+            if (loadingProcess == null || loadingProcess.progress >= 0.9f)
+                FinishLoading();
         }
     }
 
-    private IEnumerator RandomHint()
+    void FinishLoading()
     {
-        while (true)
+        if (isDestroying) return;
+        isProcessingLoad = false;
+
+        if (animator != null)
         {
-            string hint = GetRandomItem(hintList, ref currentHintIndex);
-            hintsText.text = hint;
-
-            yield return FadeTextAlpha(0, 1);
-            yield return new WaitForSecondsRealtime(hintTimer);
-            yield return FadeTextAlpha(1, 0);
+            animator.Play("Out");
+            StartCoroutine(DestroyAfterDelay());
+        }
+        else
+        {
+            Destroy(gameObject, 0.5f);
         }
     }
 
-    private IEnumerator RandomImage()
+    IEnumerator DestroyAfterDelay()
     {
-        while (true)
+        yield return new WaitForSecondsRealtime(0.1f);
+        float length = animator.GetCurrentAnimatorStateInfo(0).length;
+        yield return new WaitForSecondsRealtime(length);
+        CleanupAndDestroy();
+    }
+
+    void CleanupAndDestroy()
+    {
+        if (isDestroying) return;
+        isDestroying = true;
+        Time.timeScale = 1f;
+        Destroy(gameObject);
+    }
+
+    IEnumerator CycleHints()
+    {
+        if (hintList.Count > 0)
+        {
+            hintsText.text = GetRandomItem(hintList, ref currentHintIndex);
+            yield return FadeText(hintsText, 0f, 1f, hintFadeDuration);
+        }
+
+        while (!isDestroying)
+        {
+            if (hintList.Count == 0) yield break;
+
+            yield return new WaitForSecondsRealtime(hintTimer);
+            if (isDestroying) yield break;
+
+            yield return FadeText(hintsText, 1f, 0f, hintFadeDuration);
+            if (isDestroying) yield break;
+
+            hintsText.text = GetRandomItem(hintList, ref currentHintIndex);
+            yield return FadeText(hintsText, 0f, 1f, hintFadeDuration);
+        }
+    }
+
+    IEnumerator CycleImages()
+    {
+        while (!isDestroying)
         {
             yield return new WaitForSecondsRealtime(imageTimer);
-            yield return FadeImageAlpha(1, 0);
+            if (imageList.Count <= 1 || isDestroying) yield break;
+
+            yield return FadeImage(imageObject, 1f, 0f, 1f / imageFadingSpeed);
+            if (isDestroying) yield break;
+
             imageObject.sprite = GetRandomItem(imageList, ref currentImageIndex);
-            yield return FadeImageAlpha(0, 1);
+            yield return FadeImage(imageObject, 0f, 1f, 1f / imageFadingSpeed);
         }
     }
 
-    private IEnumerator FadeTextAlpha(float from, float to)
+    IEnumerator FadeText(TextMeshProUGUI text, float from, float to, float duration)
     {
-        float t = 0f;
-        Color color = hintsText.color;
-        while (t < 1f)
+        if (text == null) yield break;
+
+        float elapsed = 0f;
+        Color color = text.color;
+
+        while (elapsed < duration && !isDestroying)
         {
-            t += Time.unscaledDeltaTime / hintFadeDuration;
-            color.a = Mathf.Lerp(from, to, t);
-            hintsText.color = color;
+            elapsed += Time.unscaledDeltaTime;
+            color.a = Mathf.Lerp(from, to, elapsed / duration);
+            text.color = color;
             yield return null;
         }
-    }
 
-    private IEnumerator FadeImageAlpha(float from, float to)
-    {
-        float t = 0f;
-        Color color = imageObject.color;
-        while (t < 1f)
+        if (!isDestroying)
         {
-            t += Time.unscaledDeltaTime * imageFadingSpeed;
-            color.a = Mathf.Lerp(from, to, t);
-            imageObject.color = color;
-            yield return null;
+            color.a = to;
+            text.color = color;
         }
     }
 
-    private T GetRandomItem<T>(List<T> list, ref int lastIndex)
+    IEnumerator FadeImage(Image img, float from, float to, float duration)
     {
-        if (list.Count <= 1) return list[0];
+        if (img == null) yield break;
+
+        float elapsed = 0f;
+        Color color = img.color;
+
+        while (elapsed < duration && !isDestroying)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            color.a = Mathf.Lerp(from, to, elapsed / duration);
+            img.color = color;
+            yield return null;
+        }
+
+        if (!isDestroying)
+        {
+            color.a = to;
+            img.color = color;
+        }
+    }
+
+    T GetRandomItem<T>(List<T> list, ref int lastIndex)
+    {
+        if (list?.Count == 0) return default;
+        if (list.Count == 1) return list[0];
+
         int newIndex;
+        int attempts = 0;
         do
         {
             newIndex = Random.Range(0, list.Count);
+            attempts++;
         }
-        while (newIndex == lastIndex);
-        lastIndex = newIndex;
+        while (newIndex == lastIndex && attempts < 10);
 
+        lastIndex = newIndex;
         return list[newIndex];
     }
 }

@@ -57,26 +57,24 @@ MonoBehaviour:
   animator: {fileID: 6453892166232487333}
   audioSource: {fileID: 5504540153964398811}
   fadeSpeed: 2
-  backgroundFadeSpeed: 1
-  contentFadeSpeed: 1
   enableRandomHints: 1
+  enableRandomImages: 1
   hintTimer: 5
+  imageTimer: 5
   hintFadeDuration: 1.5
+  imageFadingSpeed: 1.5
   hintList:
   - "Keep your face to the sunshine and you can\u2019t see a <sub>shadow</sub>"
   - Do not pray for an easy life, pray for the <size=150%>strength</size> to endure
     a difficult one.
   - You should learn from your <color=red>competitor</color> but never copy. Copy
     and you die.
-  enableRandomImages: 1
-  imageTimer: 5
-  imageFadingSpeed: 1.5
   imageList:
   - {fileID: 21300000, guid: eedf83a390c738d4c948c42b4652ed26, type: 3}
   - {fileID: 21300000, guid: 0f3c1ef069e9070479f0a720a9c2998d, type: 3}
   - {fileID: 21300000, guid: 21ad83572fa160d45b68dacd2dc504fc, type: 3}
   enableVirtualLoading: 1
-  virtualLoadingTimer: 20
+  virtualLoadingTimer: 5
 --- !u!82 &5504540153964398811
 AudioSource:
   m_ObjectHideFlags: 0

@@ -7,9 +7,10 @@ public class TestAll : MonoBehaviour
        // Test damage
        if (Input.GetKeyDown(KeyCode.T))
        {
-           GameObject.FindGameObjectWithTag("Player")
+            Debug.Log(GameObject.FindGameObjectWithTag("Player").name);
+            GameObject.FindGameObjectWithTag("Player")
                .GetComponent<PlayerHealthSystem>()
-               .TakeDamage(Random.Range(10, 50));
+               .TakeDamage(Random.Range(10, 50), transform.position);
        }
    }
 }

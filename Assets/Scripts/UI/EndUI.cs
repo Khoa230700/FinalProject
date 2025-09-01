@@ -9,16 +9,10 @@ public class EndUI : MonoBehaviour
     [SerializeField] private GameObject buttonsGroup;
 
     private Tween coinTween;
-    private MeshMouseLook meshMouseLook;
-
-    private void Awake()
-    {
-        meshMouseLook = FindAnyObjectByType<MeshMouseLook>();
-    }
 
     void OnEnable()
     {
-        Time.timeScale = 0f;
+        PauseGameUI.Instance.Pause();
     }
 
     public void ShowGain()
@@ -41,7 +35,6 @@ public class EndUI : MonoBehaviour
         .OnComplete(() =>
         {
             buttonsGroup.SetActive(true);
-            meshMouseLook.Show();
         });
     }
 }
