@@ -1,84 +1,154 @@
-using System.Collections;
 using UnityEngine;
-using static UnityEngine.Rendering.DebugUI;
+using UnityEngine.AI;
 
-public class BotHealth : MonoBehaviour, IDamageable
+public class BotHealth : BaseHealthSystem, IDamageable
 {
-    [Header("Settings")]
-    public float maxHealth = 100;
-    [HideInInspector] public float currentHealth;
+    [Header("Bot Settings")]
+    [SerializeField] private float maxShield = 0f;
+    [SerializeField] private float currentShield = 0f;
+    public float MaxShield => maxShield;
+    public float CurrentShield => currentShield;
 
-    [Header("Regeneration")]
-    public bool useRegen;
-    public float regenRate;
-    public float regenDelay;
-    public float secPerRegen;
-    private Coroutine regenRoutine;
-    [SerializeField] private BotShield shield;
+    [SerializeField] private float shieldRegenPerSecond = 0f;
+    [SerializeField] private float shieldRegenDelay = 3f;
+    private float _lastDamageTime = -999f;
 
-    private void Start()
+    [Header("Movement Settings")]
+    [SerializeField] private float baseMoveSpeed = 4f;
+    public float BaseMoveSpeed => baseMoveSpeed;
+
+    [Header("UI Binding")]
+    [SerializeField] private BarUI healthBar;
+    [SerializeField] private BarUI shieldBar;
+
+    private bool isDead = false;
+    public Animator anim;
+    public event System.Action<float, float> OnShieldChanged;
+
+    protected override void Start()
     {
-        UpdateHealth(maxHealth);
-        shield ??= GetComponent<BotShield>();
+        // khởi tạo máu, giáp
+        currentShield = Mathf.Clamp(currentShield <= 0 ? maxShield : currentShield, 0f, maxShield);
+
+        base.Start();       // Base init máu
+        BroadcastShield();
+
+        // đăng ký sự kiện đẩy UI
+        OnHealthChanged += HandleHealthChanged;
+        OnShieldChanged += HandleShieldChanged;
+
+        // cập nhật UI lần đầu
+        HandleHealthChanged(currentHealth, maxHealth);
+        HandleShieldChanged(currentShield, maxShield);
     }
 
-    //* Nh?n s�t th??ng qua l� ch?n v� t�nh to�n s�t th??ng c�n l?i, th�m kh? n?ng xuy�n l� ch?n , th�m v�o ?i?m va ch?m
-    public void TakeDamage(float damage, float penetrationPercent = 0f, Vector3 hitPoint = default)
+    private void OnDisable()
     {
-        //* Kh?i ??ng t�i t?o khi nh?n s�t th??ng
-        if (regenRoutine != null) StopCoroutine(regenRoutine);
-        if (useRegen) regenRoutine = StartCoroutine(RegenRoutine());
-
-        penetrationPercent = Mathf.Clamp01(penetrationPercent / 100f);
-
-        float damageThroughShield = damage * (1f - penetrationPercent); //* S�t th??ng v�o l� ch?n
-        float damageBypassShield = damage * penetrationPercent; //* S�t th??ng xuy�n qua l� ch?n
-        float leftoverDamage = (shield != null && shield.HasShield()) //* S�t th??ng c�n l?i sau khi l� ch?n h?p th?
-        ? shield.TakeDamage(damageThroughShield)
-            : damageThroughShield;
-
-        float finalHealthDamage = leftoverDamage + damageBypassShield; //* T?ng s�t th??ng v�o m�u
-
-        // OnTakeDamage?.Invoke(-finalHealthDamage, hitPoint); //* G?i s? ki?n khi M�U nh?n s�t th??ng
-        //OnTakeDamage?.Invoke(-damage, hitPoint); //* G?i s? ki?n khi nh?n s�t th??ng
-
-        UpdateHealth(-finalHealthDamage);
-
+        OnHealthChanged -= HandleHealthChanged;
+        OnShieldChanged -= HandleShieldChanged;
     }
 
-    //* T�i t?o m�u theo th?i gian
-    private IEnumerator RegenRoutine()
+    private void Update()
     {
-        yield return new WaitForSeconds(regenDelay);
-
-        while (useRegen && currentHealth < maxHealth)
+        // regen giáp
+        if (shieldRegenPerSecond > 0f && Time.time >= _lastDamageTime + Mathf.Max(0f, shieldRegenDelay))
         {
-            // // yield return null;
-            yield return new WaitForSeconds(secPerRegen);
+            if (currentShield < maxShield)
+            {
+                currentShield = Mathf.Min(maxShield, currentShield + shieldRegenPerSecond * Time.deltaTime);
+                BroadcastShield();
+            }
+        }
+    }
 
-            UpdateHealth(regenRate);
+    // ===== UI handlers =====
+    private void HandleHealthChanged(float current, float max)
+    {
+        if (healthBar == null) return;
+        healthBar.maxValue = Mathf.Max(1f, max);
+        healthBar.SetValue(current);
+    }
+
+    private void HandleShieldChanged(float current, float max)
+    {
+        if (shieldBar == null) return;
+        shieldBar.maxValue = Mathf.Max(0f, max);
+        shieldBar.SetValue(current);
+    }
+
+    // ===== API =====
+    public override void TakeDamage(float damage)
+    {
+        if (damage <= 0f) return;
+        _lastDamageTime = Time.time;
+
+        float remainingDamage = damage;
+
+        // giáp absorb trước
+        if (currentShield > 0f)
+        {
+            float absorb = Mathf.Min(currentShield, remainingDamage);
+            currentShield -= absorb;
+            remainingDamage -= absorb;
+            BroadcastShield();
         }
 
-        regenRoutine = null;
+        // trừ máu
+        if (remainingDamage > 0f)
+        {
+            base.TakeDamage(remainingDamage);
+        }
     }
 
-    //* H?i m�u (+ h?i, - tr?)
-    public void UpdateHealth(float amount)
+    public void AddShield(float amount)
     {
-        currentHealth = Mathf.Clamp(currentHealth + amount, 0, maxHealth);
-      
-
-        if (currentHealth <= 0)
-            Die();
+        if (amount <= 0f) return;
+        currentShield = Mathf.Clamp(currentShield + amount, 0f, maxShield);
+        BroadcastShield();
     }
 
-    public void Die()
+    private void BroadcastShield()
     {
-        Debug.Log("Die!");
+        OnShieldChanged?.Invoke(currentShield, maxShield);
     }
 
-    public void TakeDamage(float amount)
+    protected override void Die()
     {
-       
+        if (isDead) return;
+        isDead = true;
+
+        Debug.Log($"{gameObject.name} (Bot) Dead!");
+        GameObject root = transform.root.gameObject;
+        // 1. Ngắt AI
+        var agent = root.GetComponent<NavMeshAgent>();
+        if (agent != null)
+        {
+            agent.isStopped = true;
+            agent.enabled = false;
+        }
+
+        // 2. Disable toàn bộ script trong cây bot
+        foreach (var comp in root.GetComponentsInChildren<MonoBehaviour>())
+        {
+            if (comp != this) comp.enabled = false;
+        }
+
+        // 3. Đổi toàn bộ layer sang Default (bot chết không bị tấn công nữa)
+        SetLayerRecursively(root, LayerMask.NameToLayer("Default"));
+
+        // 4. Play animation chết
+        if (anim != null)
+        {
+            anim.SetTrigger("Die");
+        }
+    }
+
+    private void SetLayerRecursively(GameObject obj, int layer)
+    {
+        obj.layer = layer;
+        foreach (Transform child in obj.transform)
+        {
+            SetLayerRecursively(child.gameObject, layer);
+        }
     }
 }

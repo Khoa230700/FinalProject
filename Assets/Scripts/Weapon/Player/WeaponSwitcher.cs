@@ -7,6 +7,12 @@ public class WeaponSwitcher : MonoBehaviour
     public WeaponUI weaponUI;
     [SerializeField] private List<GameObject> weaponList = new List<GameObject>();
 
+    [Header("Audio (optional)")]
+    public bool playGenericSwitchSfx = false;
+    public AudioSource audioSource;      // đặt trên Player
+    public AudioClip switchClip;         // âm chung “đổi vũ khí”
+    [Range(0f, 1f)] public float switchVolume = 1f;
+
     private readonly List<IWeapon> weapons = new List<IWeapon>();
     private int currentWeaponIndex = 0;
     private bool isSwitching = false;
@@ -36,7 +42,6 @@ public class WeaponSwitcher : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Alpha2)) StartCoroutine(SwitchWeaponRoutine(1));
         if (Input.GetKeyDown(KeyCode.Alpha3)) StartCoroutine(SwitchWeaponRoutine(2));
 
-        // Bắn / Đánh
         if (Input.GetMouseButtonDown(0)) Current?.FireOnce();
         if (Input.GetMouseButton(0)) Current?.StartFiring();
         if (Input.GetMouseButtonUp(0)) Current?.StopFiring();
@@ -50,9 +55,11 @@ public class WeaponSwitcher : MonoBehaviour
         isSwitching = true;
 
         var prev = weapons[currentWeaponIndex];
-
-        // Hủy reload nếu là vũ khí bắn đạn
         if (prev is IReloadable r) r.CancelReload();
+
+        // sfx đổi vũ khí (tuỳ chọn – phát ngay khi bấm)
+        if (playGenericSwitchSfx && audioSource && switchClip)
+            audioSource.PlayOneShot(switchClip, switchVolume);
 
         prev.OnDeselected();
         yield return prev.SwitchOut(this);
@@ -61,7 +68,6 @@ public class WeaponSwitcher : MonoBehaviour
         currentWeaponIndex = newIndex;
 
         var cur = weapons[currentWeaponIndex];
-        // OnSelected đã được gọi trong ActivateWeapon => KHÔNG gọi lại ở đây
         yield return cur.SwitchIn(this);
 
         isSwitching = false;
@@ -73,6 +79,5 @@ public class WeaponSwitcher : MonoBehaviour
             weaponList[i].SetActive(i == index);
 
         weapons[index].OnSelected(weaponUI);
-        // Nếu dùng crosshair riêng theo vũ khí, mỗi IWeapon nên tự set trong OnSelected.
     }
 }
