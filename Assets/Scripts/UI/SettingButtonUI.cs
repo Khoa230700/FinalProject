@@ -20,6 +20,12 @@ public class SettingButtonUI : MonoBehaviour, IPointerEnterHandler
 
     public void OnPointerEnter(PointerEventData eventData)
     {
+        if (detailIcon != null || detailBackground != null
+            || detailTitle != null || detailDescription != null)
+        {
+            return;
+        }
+
         detailIcon.gameObject.SetActive(true);
         detailBackground.gameObject.SetActive(true);
         detailIcon.sprite = iconSprite;
