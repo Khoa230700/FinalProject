@@ -17938,20 +17938,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHealth: 100
+  armor: 0
   OnTakeDamage:
     m_PersistentCalls:
       m_Calls: []
-  useRegen: 0
-  regenRate: 1
-  regenDelay: 0
-  secPerRegen: 0
-  animator: {fileID: 7782639213635766222}
-  agent: {fileID: 1347417874387146396}
-  mainCollider: {fileID: 8519695064508646468}
-  aiScripts:
-  - {fileID: 49863134466986894}
-  - {fileID: 686851909392243525}
-  shield: {fileID: 4366115670805413203}
+  maxShield: 0
+  currentShield: 0
+  shieldRegenPerSecond: 0
+  shieldRegenDelay: 3
+  baseMoveSpeed: 4
+  anim: {fileID: 7782639213635766222}
+  healthBar: {fileID: 0}
+  shieldBar: {fileID: 0}
 --- !u!114 &4366115670805413203
 MonoBehaviour:
   m_ObjectHideFlags: 0
