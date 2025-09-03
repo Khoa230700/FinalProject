@@ -20,10 +20,19 @@ public class EnemiAI : MonoBehaviour
     public float moveSpeed = 4f;
     public LayerMask targetLayer;
 
+    //sound
+    private EnemySoundController soundController;
+    public AudioClip attackSound;
+    public AudioSource audioSource;
 
     private void Start()
     {
         //player = GameObject.FindWithTag("Player").transform;
+        soundController = GetComponent<EnemySoundController>();
+        if (audioSource == null)
+        {
+            audioSource = GetComponent<AudioSource>();
+        }
     }
     void Update()
     {
@@ -48,6 +57,7 @@ public class EnemiAI : MonoBehaviour
             else
             {
                 Attack();
+                PlayAttackSound();
             }
         }
     }
@@ -113,5 +123,22 @@ public class EnemiAI : MonoBehaviour
             lastAttackTime = Time.time;
         }
         enemyAnimation.SetTrigger("attack");
+        soundController.PlayAttackSound();
+        //audioSource.PlayOneShot(attackSound);
+    }
+
+
+    public void PlayAttackSound()
+    {
+        Debug.Log("Enemy is attacking. Playing sound.");
+        if (attackSound != null && audioSource != null)
+        {
+            audioSource.pitch = Random.Range(0.95f, 1.05f); // Optional
+            audioSource.PlayOneShot(attackSound);
+        }
+        else
+        {
+            Debug.LogWarning("Missing AudioClip or AudioSource.");
+        }
     }
 }

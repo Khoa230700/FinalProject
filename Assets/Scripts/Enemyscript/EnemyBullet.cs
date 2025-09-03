@@ -24,6 +24,7 @@ public class EnemyBullet : MonoBehaviour
         {
             Debug.Log("Player hit by projectile!");
             // Deal damage to player here
+            GetComponent<PlayerHealth>().TakeDamage(10);
             Destroy(gameObject);
         }
     }
