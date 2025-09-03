@@ -31,6 +31,8 @@ public class PlayerShoot : MonoBehaviour, IWeapon, IReloadable
     private Coroutine shotResetCoroutine;
     public bool IsReadyToShoot { get; private set; } = true;
 
+    public static System.Action<Vector3> OnAnyHit; // point
+
     // guard to avoid double-shot in same frame
     private int _lastShotFrame = -1;
     private bool initialized = false;
@@ -172,6 +174,8 @@ public class PlayerShoot : MonoBehaviour, IWeapon, IReloadable
                     if (hb.hitboxType == Hitbox.HitboxType.Head) dmg *= 2f;
                     hb.ownerHealthSystem.TakeDamage(dmg);
                     hb.OnHit(dmg, hit.point);
+
+                    OnAnyHit?.Invoke(hit.point); // <--- phát tín hiệu
                 }
             }
         }
