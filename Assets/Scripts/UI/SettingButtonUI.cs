@@ -20,8 +20,8 @@ public class SettingButtonUI : MonoBehaviour, IPointerEnterHandler
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        if (detailIcon != null || detailBackground != null
-            || detailTitle != null || detailDescription != null)
+        if (detailIcon == null || detailBackground == null
+            || detailTitle == null || detailDescription == null)
         {
             return;
         }

@@ -16,7 +16,7 @@ public class SelectorCharacter : MonoBehaviour
     private int lastIndex = -1;
     private Transform cam;
 
-    private void Start()
+    private void Awake()
     {
         cam = Camera.main.transform;
 
@@ -33,7 +33,6 @@ public class SelectorCharacter : MonoBehaviour
 
         if (index < previewCharacters.Length)
             previewCharacters[index].SetActive(true);
-
 
         if (lastIndex == -1)
         {
