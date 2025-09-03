@@ -1712,7 +1712,6 @@ GameObject:
   - component: {fileID: 8544334847368187436}
   - component: {fileID: 7414361622151578782}
   - component: {fileID: 2746969822871216562}
-  - component: {fileID: 7891282764500313473}
   m_Layer: 8
   m_Name: FPS Player Shooter Sniper
   m_TagString: Player
@@ -1780,6 +1779,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerStats: {fileID: 11400000, guid: 8606be53847325644b6794de9ebc91ad, type: 2}
   csgoScope: {fileID: 5506603170031170302}
+  audioSource: {fileID: 0}
+  footstepClips: []
+  jumpSound: {fileID: 0}
+  landSound: {fileID: 0}
+  stepIntervalWalk: 0.6
+  stepIntervalRun: 0.4
+  stepSpeedScale: 1
 --- !u!114 &8544334847368187436
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1813,6 +1819,8 @@ MonoBehaviour:
   - {fileID: 1559585607835018549}
   - {fileID: 4538897647001835457}
   - {fileID: 1812598803216876599}
+  audioSource: {fileID: 0}
+  switchSound: {fileID: 0}
 --- !u!114 &2746969822871216562
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1839,23 +1847,6 @@ MonoBehaviour:
   baseMoveSpeed: 5
   healthBar: {fileID: 0}
   shieldBar: {fileID: 0}
---- !u!114 &7891282764500313473
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2393662489545346051}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 33e34d18da5fd2e4d9fdeb7703af43bc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  gunData: {fileID: 0}
-  level: 0
-  OnLevelChanged:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!1 &2537921353113568113
 GameObject:
   m_ObjectHideFlags: 0
@@ -2363,6 +2354,9 @@ MonoBehaviour:
   weaponUI: {fileID: 0}
   csgoScope: {fileID: 0}
   muzzleFlashParticle: {fileID: 198481540338831756, guid: 49aa1d4c5624e66418cbfbe9784d6f23, type: 3}
+  gunAudioSource: {fileID: 0}
+  reloadSound: {fileID: 0}
+  emptyMagSound: {fileID: 0}
   currentAmmo: 0
   reserveAmmo: 0
 --- !u!95 &6418266595371665982
@@ -2943,6 +2937,9 @@ MonoBehaviour:
   weaponUI: {fileID: 0}
   csgoScope: {fileID: 5506603170031170302}
   muzzleFlashParticle: {fileID: 198481540338831756, guid: 49aa1d4c5624e66418cbfbe9784d6f23, type: 3}
+  gunAudioSource: {fileID: 0}
+  reloadSound: {fileID: 0}
+  emptyMagSound: {fileID: 0}
   currentAmmo: 0
   reserveAmmo: 0
 --- !u!95 &5748523995275120256
