@@ -5,32 +5,59 @@ using System.Collections;
 public class WeaponSwitcher : MonoBehaviour
 {
     public WeaponUI weaponUI;
+
     [SerializeField] private List<GameObject> weaponList = new List<GameObject>();
 
+    [Header("Audio")]
+    [Tooltip("AudioSource trên Player/HUD để phát tiếng khi đổi súng.")]
+    public AudioSource audioSource;
+    [Tooltip("Âm thanh khi đổi sang vũ khí khác.")]
+    public AudioClip switchSound;
+
+    // LUÔN giữ kích thước == weaponList.Count để mapping theo index không bị lệch
     private readonly List<IWeapon> weapons = new List<IWeapon>();
+
     private int currentWeaponIndex = 0;
     private bool isSwitching = false;
 
-    public IWeapon Current => (weapons.Count > 0) ? weapons[currentWeaponIndex] : null;
+    public IWeapon Current
+        => (weapons.Count > 0 &&
+            currentWeaponIndex >= 0 &&
+            currentWeaponIndex < weapons.Count)
+           ? weapons[currentWeaponIndex]
+           : null;
 
+    // ---------------- LIFECYCLE ----------------
     void Awake()
     {
-        weapons.Clear();
-        foreach (var go in weaponList)
+        BuildWeaponsFromList(); // chỉ build danh sách vũ khí, KHÔNG đụng đến UI ở đây
+    }
+
+    void Start()
+    {
+        // Tìm WeaponUI an toàn: ưu tiên SelectorSpawner.Instance, fallback FindObjectOfType
+        if (weaponUI == null)
         {
-            var w = go.GetComponentInChildren<IWeapon>();
-            if (w == null) Debug.LogError($"{go.name} missing IWeapon component");
-            weapons.Add(w);
+            var selector = (SelectorSpawner.Instance != null) ? SelectorSpawner.Instance : null;
+            weaponUI = selector != null ? selector.WeaponUI : FindObjectOfType<WeaponUI>(true);
+            if (weaponUI == null)
+                Debug.LogWarning("WeaponSwitcher: Không tìm thấy WeaponUI. OnSelected sẽ nhận null (nên code IWeapon xử lý null an toàn).");
         }
 
-        weaponUI = SelectorSpawner.Instance.WeaponUI;
+        if (weapons.Count == 0)
+        {
+            Debug.LogError("WeaponSwitcher: Không có vũ khí hợp lệ trong weaponList.");
+            return;
+        }
 
+        // Giới hạn chỉ số và kích hoạt vũ khí đầu tiên
+        currentWeaponIndex = Mathf.Clamp(currentWeaponIndex, 0, Mathf.Max(0, weaponList.Count - 1));
         ActivateWeapon(currentWeaponIndex);
     }
 
     void Update()
     {
-        if (isSwitching) return;
+        if (isSwitching || weapons.Count == 0) return;
 
         if (Input.GetKeyDown(KeyCode.Alpha1)) StartCoroutine(SwitchWeaponRoutine(0));
         if (Input.GetKeyDown(KeyCode.Alpha2)) StartCoroutine(SwitchWeaponRoutine(1));
@@ -42,6 +69,49 @@ public class WeaponSwitcher : MonoBehaviour
         if (Input.GetMouseButtonUp(0)) Current?.StopFiring();
     }
 
+    // ---------------- BUILD ----------------
+    private void BuildWeaponsFromList()
+    {
+        weapons.Clear();
+
+        if (weaponList == null || weaponList.Count == 0)
+        {
+            Debug.LogError("WeaponSwitcher: weaponList rỗng hoặc null.");
+            return;
+        }
+
+        for (int i = 0; i < weaponList.Count; i++)
+        {
+            var go = weaponList[i];
+
+            if (go == null)
+            {
+                Debug.LogError($"WeaponSwitcher: weaponList[{i}] là null.");
+                weapons.Add(null); // placeholder để không lệch index
+                continue;
+            }
+
+            if (go == this.gameObject)
+            {
+                Debug.LogError("WeaponSwitcher: KHÔNG được thêm chính GameObject có WeaponSwitcher vào weaponList.");
+                weapons.Add(null);
+                continue;
+            }
+
+            // Lấy cả khi object đang inactive
+            var w = go.GetComponentInChildren<IWeapon>(true);
+            if (w == null)
+            {
+                Debug.LogError($"{go.name}: thiếu component IWeapon (trên chính nó hoặc con).");
+                weapons.Add(null);
+                continue;
+            }
+
+            weapons.Add(w);
+        }
+    }
+
+    // ---------------- SWITCH ----------------
     private IEnumerator SwitchWeaponRoutine(int newIndex)
     {
         if (newIndex < 0 || newIndex >= weaponList.Count || newIndex == currentWeaponIndex)
@@ -49,30 +119,73 @@ public class WeaponSwitcher : MonoBehaviour
 
         isSwitching = true;
 
-        var prev = weapons[currentWeaponIndex];
+        var prev = (currentWeaponIndex >= 0 && currentWeaponIndex < weapons.Count)
+                 ? weapons[currentWeaponIndex] : null;
 
         // Hủy reload nếu là vũ khí bắn đạn
         if (prev is IReloadable r) r.CancelReload();
 
-        prev.OnDeselected();
-        yield return prev.SwitchOut(this);
+        prev?.OnDeselected();
+        if (prev != null) yield return prev.SwitchOut(this);
 
         ActivateWeapon(newIndex);
         currentWeaponIndex = newIndex;
 
-        var cur = weapons[currentWeaponIndex];
-        // OnSelected đã được gọi trong ActivateWeapon => KHÔNG gọi lại ở đây
-        yield return cur.SwitchIn(this);
+        // Phát âm thanh đổi súng ngay khi vũ khí mới được active
+        PlaySwitchSound();
+
+        var cur = (currentWeaponIndex >= 0 && currentWeaponIndex < weapons.Count)
+                ? weapons[currentWeaponIndex] : null;
+
+        if (cur != null) yield return cur.SwitchIn(this);
+        else Debug.LogError($"WeaponSwitcher: weapons[{currentWeaponIndex}] null.");
 
         isSwitching = false;
     }
 
+    private void PlaySwitchSound()
+    {
+        if (switchSound == null) return;
+
+        if (audioSource != null)
+            audioSource.PlayOneShot(switchSound);
+        else
+            AudioSource.PlayClipAtPoint(switchSound, transform.position);
+    }
+
+    // ---------------- ACTIVATE ----------------
     void ActivateWeapon(int index)
     {
-        for (int i = 0; i < weaponList.Count; i++)
-            weaponList[i].SetActive(i == index);
+        if (weaponList == null || weaponList.Count == 0)
+        {
+            Debug.LogError("WeaponSwitcher: weaponList rỗng.");
+            return;
+        }
+        if (index < 0 || index >= weaponList.Count)
+        {
+            Debug.LogError($"WeaponSwitcher: index {index} ngoài phạm vi weaponList.");
+            return;
+        }
 
-        weapons[index].OnSelected(weaponUI);
-        // Nếu dùng crosshair riêng theo vũ khí, mỗi IWeapon nên tự set trong OnSelected.
+        for (int i = 0; i < weaponList.Count; i++)
+        {
+            var go = weaponList[i];
+            if (go == null) continue;
+
+            // Không bao giờ tắt chính object gắn WeaponSwitcher
+            if (go == this.gameObject) continue;
+
+            go.SetActive(i == index);
+        }
+
+        // Gọi OnSelected an toàn
+        if (index < weapons.Count && weapons[index] != null)
+        {
+            weapons[index].OnSelected(weaponUI);
+        }
+        else
+        {
+            Debug.LogError($"WeaponSwitcher: weapons[{index}] null hoặc không khớp với weaponList.");
+        }
     }
 }
