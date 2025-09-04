@@ -25,10 +25,15 @@ public class RangeEnemy : MonoBehaviour
     private Transform currentTarget;
     public float moveSpeed = 4f;
     public LayerMask targetLayer;
+
+    //sound
+    private EnemySoundController soundController;
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
         agent.stoppingDistance = stopDistance;
+
+        soundController = GetComponent<EnemySoundController>();
     }
 
     void Update()
@@ -72,6 +77,7 @@ public class RangeEnemy : MonoBehaviour
             
         }
         animator.SetTrigger("rangeattack");
+        soundController.PlayAttackSound();
     }
 
     //void MeleeAttack()
