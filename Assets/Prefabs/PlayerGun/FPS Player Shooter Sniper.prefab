@@ -1301,7 +1301,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &6367786861773823768
 Transform:
   m_ObjectHideFlags: 0
@@ -3933,7 +3933,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &500052456234813616
 Transform:
   m_ObjectHideFlags: 0
@@ -5423,7 +5423,7 @@ MonoBehaviour:
   scopeLens: {fileID: 4128772428749821544}
   scopeOverlayUI: {fileID: 424012912021214882}
   csgoScope: {fileID: 5506603170031170302}
-  centerPull: 0.384
+  centerPull: 0.662
   uiScaleOnScope: 1.15
   uiLerpSpeed: 12
 --- !u!1 &5982616735339148963
@@ -7730,8 +7730,8 @@ Transform:
   m_GameObject: {fileID: 9126336712150412277}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.116, y: 1.668, z: 50}
-  m_LocalScale: {x: 1.6221848, y: 1.6221853, z: 1.6221852}
+  m_LocalPosition: {x: 0.123, y: 1.671, z: 0.9184}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 500052456234813616}
