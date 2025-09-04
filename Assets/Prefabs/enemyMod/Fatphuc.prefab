@@ -991,8 +991,7 @@ GameObject:
   - component: {fileID: -6100191757446191242}
   - component: {fileID: -7673066498880708693}
   - component: {fileID: -3740064040049013403}
-  - component: {fileID: -2254959943892124642}
-  - component: {fileID: 4659498335798863567}
+  - component: {fileID: 5702827493646169960}
   m_Layer: 2
   m_Name: Fatphuc
   m_TagString: Untagged
@@ -2757,7 +2756,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   trackingType: 0
   targetID: Fatphuc
---- !u!114 &-2254959943892124642
+--- !u!114 &5702827493646169960
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2766,62 +2765,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 2428255698981894573}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3fe91dc294731a9428c0941ea7579110, type: 3}
+  m_Script: {fileID: 11500000, guid: 3206f98c11e13ca4da6d8c67e088634e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  complexMaskingMode: 0
-  drawingMode: 1
-  outlineLayer: 0
-  outlineTargets:
-  - CutoutMask: 8
-    renderer: {fileID: 8598716363093316061}
-    SubmeshIndex: 0
-    BoundsMode: 0
-    Bounds:
-      m_Center: {x: 0, y: 0, z: 0}
-      m_Extent: {x: 0.5, y: 0.5, z: 0.5}
-    CutoutThreshold: 0.5
-    CullMode: 2
-    cutoutTextureName: 
-    cutoutTextureIndex: 0
-  renderStyle: 1
-  outlineParameters:
-    enabled: 1
-    color: {r: 0.96981126, g: 0, b: 0.0058170585, a: 1}
-    dilateShift: 1
-    blurShift: 1
-    fillPass:
-      shader: {fileID: 0}
-      serializedProperties: []
-  backParameters:
-    enabled: 1
-    color: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-    dilateShift: 1
-    blurShift: 1
-    fillPass:
-      shader: {fileID: 0}
-      serializedProperties: []
-  frontParameters:
-    enabled: 1
-    color: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-    dilateShift: 1
-    blurShift: 1
-    fillPass:
-      shader: {fileID: 0}
-      serializedProperties: []
---- !u!114 &4659498335798863567
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2428255698981894573}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 08c9ae4dc92959e40a9e30b1d736fd01, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  outlinable: {fileID: -2254959943892124642}
+  attackClip: {fileID: 8300000, guid: a0139cf4f6d393a459f2f46596d68f83, type: 3}
+  attackClip2: {fileID: 8300000, guid: 7f59f16d9e6b99c429cdf38446996869, type: 3}
+  deathClip: {fileID: 8300000, guid: 0080087116fd60140b2f9f92bdf30bc9, type: 3}
 --- !u!1 &2514346375837288734
 GameObject:
   m_ObjectHideFlags: 0
@@ -3595,7 +3544,6 @@ GameObject:
   m_Component:
   - component: {fileID: 7086198733766880298}
   - component: {fileID: 8598716363093316061}
-  - component: {fileID: -4855721095575193254}
   m_Layer: 0
   m_Name: Object005
   m_TagString: Untagged
@@ -3739,18 +3687,6 @@ SkinnedMeshRenderer:
     m_Center: {x: 0.07314342, y: 0.14098863, z: 0.00000008940697}
     m_Extent: {x: 0.96222097, y: 0.39210737, z: 0.8483907}
   m_DirtyAABB: 0
---- !u!114 &-4855721095575193254
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5224259269211964634}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 034bc47afcbf5e141a58d5c20b7808e4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &5299910573100974792
 GameObject:
   m_ObjectHideFlags: 0

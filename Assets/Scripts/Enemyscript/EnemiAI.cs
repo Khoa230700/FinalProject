@@ -3,6 +3,7 @@ using UnityEngine.AI;
 using System.Collections;
 using System.Linq;
 using NUnit;
+using static Unity.VisualScripting.Member;
 
 public class EnemiAI : MonoBehaviour
 {
@@ -22,27 +23,29 @@ public class EnemiAI : MonoBehaviour
 
     //sound
     private EnemySoundController soundController;
-    public AudioClip attackSound;
-    public AudioSource audioSource;
-
+    //public AudioSource attackClip;
+    //public AudioClip attackClip;
+    //public AudioSource audioSource;
     private void Start()
     {
         //player = GameObject.FindWithTag("Player").transform;
         soundController = GetComponent<EnemySoundController>();
-        if (audioSource == null)
-        {
-            audioSource = GetComponent<AudioSource>();
-        }
+        //attackClip = GetComponent<AudioSource>();
+        //Debug.Log("AudioSource loaded: " + (AudioSource != null));
+        //Debug.Log("AudioClip assigned: " + (AudioSource.clip != null));
+
+        // Try playing immediately
+        //AudioSource.Play();
+        //AudioSource source = GetComponent<AudioSource>();
+        //source.clip = attackClip;
+        //source.Play();
+
+        //audioSource = GetComponent<AudioSource>();
+
     }
     void Update()
     {
-        //IDamageable target = GetClosestDamageableInRange();
-
-        //if (target != null && Time.time >= lastAttackTime + attackCooldown)
-        //{
-        //    target.TakeDamage(damage);
-        //    lastAttackTime = Time.time;
-        //}
+        
 
         FindClosestTarget();
 
@@ -56,8 +59,7 @@ public class EnemiAI : MonoBehaviour
             }
             else
             {
-                Attack();
-                PlayAttackSound();
+                Attack();              
             }
         }
     }
@@ -124,21 +126,8 @@ public class EnemiAI : MonoBehaviour
         }
         enemyAnimation.SetTrigger("attack");
         soundController.PlayAttackSound();
-        //audioSource.PlayOneShot(attackSound);
+        //AudioSource.PlayOneShot(attackClip);
+        
     }
-
-
-    public void PlayAttackSound()
-    {
-        Debug.Log("Enemy is attacking. Playing sound.");
-        if (attackSound != null && audioSource != null)
-        {
-            audioSource.pitch = Random.Range(0.95f, 1.05f); // Optional
-            audioSource.PlayOneShot(attackSound);
-        }
-        else
-        {
-            Debug.LogWarning("Missing AudioClip or AudioSource.");
-        }
-    }
+  
 }

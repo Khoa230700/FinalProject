@@ -17,11 +17,13 @@ public class Spidey : MonoBehaviour
     public float meleeDistance = 2f;
     public float stopDistance = 20f;
     public Animator animator;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    // sound
+    private EnemySoundController soundController;
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
         agent.stoppingDistance = stopDistance;
+        soundController = GetComponent<EnemySoundController>();
     }
 
     // Update is called once per frame
@@ -64,6 +66,7 @@ public class Spidey : MonoBehaviour
             Debug.Log("Enemy attacks the player!");
         }
         animator.SetTrigger("MeleeAttack");
+        soundController.PlayAttackSound2();
     }
 
     void HookAttack()
@@ -74,5 +77,6 @@ public class Spidey : MonoBehaviour
             enemy.ThrowHook(player);
         }
         animator.SetTrigger("Hook");
+        soundController.PlayAttackSound();
     }
 }

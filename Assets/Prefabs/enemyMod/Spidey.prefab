@@ -1662,6 +1662,8 @@ GameObject:
   - component: {fileID: 2420646766827667407}
   - component: {fileID: 5121047111705103983}
   - component: {fileID: 2917527412690122344}
+  - component: {fileID: 8202269615271736228}
+  - component: {fileID: 972552845388532186}
   m_Layer: 2
   m_Name: Spidey
   m_TagString: Untagged
@@ -3241,6 +3243,36 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bfb390852452ce84f8cf4791c7405347, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &8202269615271736228
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5310924650989402046}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3206f98c11e13ca4da6d8c67e088634e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  attackClip: {fileID: 8300000, guid: 6bd0c75ded3cb1c43b6b36acdeb81509, type: 3}
+  attackClip2: {fileID: 8300000, guid: 008b38e87a5560340af24901912bec36, type: 3}
+  deathClip: {fileID: 8300000, guid: 1babad39e2d70a442b3d21caa86fb61c, type: 3}
+--- !u!114 &972552845388532186
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5310924650989402046}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f1730b4b272874547b147ce0dc8e6a9a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxHealth: 100
+  currentHealth: 0
+  animator: {fileID: 5200343183436194158}
 --- !u!1 &5323077740420511903
 GameObject:
   m_ObjectHideFlags: 0
