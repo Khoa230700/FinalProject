@@ -63,4 +63,10 @@ public class ChapterButtonUI : MonoBehaviour
     {
         FindAnyObjectByType<LoadSceneManager>().LoadScene(sceneName);
     }
+
+    [ContextMenu("Test")]
+    public void Test()
+    {
+        PlayerPrefs.SetInt(sceneName + "_Completed", 1);
+    }
 }
