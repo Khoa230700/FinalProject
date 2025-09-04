@@ -25,7 +25,9 @@ public class SplashScreenUI : MonoBehaviour
 
     private IEnumerator ShowSplash()
     {
-        yield return new WaitForSeconds(7.5f);
+        var length = GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).length;
+        Debug.Log(length);
+        yield return new WaitForSeconds(length);
         gameObject.SetActive(false);
     }
 

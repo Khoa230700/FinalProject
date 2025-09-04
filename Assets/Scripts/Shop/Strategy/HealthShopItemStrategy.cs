@@ -20,22 +20,25 @@ public class HealthShopItemStrategy : IShopItemStrategy
     {
         var health = item as PlayerHealthSystem;
         string label = "";
+        Color color;
         int cost = 0;
 
         if (!ui.shopManager.NeedsHeal(health))
         {
             label = "Full Health";
+            color = new Color(0.392f, 0.698f, 0.812f);
         }
         else
         {
             cost = ui.shopManager.GetHealCost(health);
             label = $"$ {cost}";
+            color = ui.shopManager.NeedsHeal(health) && CoinManager.Instance.HasEnoughCoins(cost)
+            ? new Color(0.392f, 0.698f, 0.812f)
+            : Color.red;
         }
 
         ui.priceText.text = label;
-        ui.priceText.color = ui.shopManager.NeedsHeal(health) && CoinManager.Instance.HasEnoughCoins(cost)
-            ? Color.red
-            : new Color(0.392f, 0.698f, 0.812f);
+        ui.priceText.color = color;
         ui.priceText.gameObject.SetActive(true);
     }
 
