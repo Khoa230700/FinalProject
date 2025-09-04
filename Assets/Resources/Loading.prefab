@@ -64,15 +64,26 @@ MonoBehaviour:
   hintFadeDuration: 1.5
   imageFadingSpeed: 1.5
   hintList:
-  - "Keep your face to the sunshine and you can\u2019t see a <sub>shadow</sub>"
-  - Do not pray for an easy life, pray for the <size=150%>strength</size> to endure
-    a difficult one.
-  - You should learn from your <color=red>competitor</color> but never copy. Copy
-    and you die.
+  - The cities fell in days. The screams still echo.
+  - Running is sometimes better than fighting.
+  - Aim for the head. Always.
+  - "If you smell something awful - it\u2019s either a corpse or dinner."
+  - Healing takes time - cover your teammates.
+  - Ammo is scarce - make every shot count.
+  - Trust is deadlier than the infected.
+  - The world ended not with a bang, but with a bite.
+  - Every bullet you fire writes another line in your story.
+  - "Zombies don\u2019t need to reload. You do."
+  - Running is a tactic, not a weakness.
+  - "Humanity isn\u2019t gone. It\u2019s just\u2026 changed."
   imageList:
-  - {fileID: 21300000, guid: eedf83a390c738d4c948c42b4652ed26, type: 3}
-  - {fileID: 21300000, guid: 0f3c1ef069e9070479f0a720a9c2998d, type: 3}
-  - {fileID: 21300000, guid: 21ad83572fa160d45b68dacd2dc504fc, type: 3}
+  - {fileID: 21300000, guid: a8d67cfdf16f69c49812fcde5d6e91a3, type: 3}
+  - {fileID: 21300000, guid: f2f8f167e8decc443b33887fbbc6e0d2, type: 3}
+  - {fileID: 21300000, guid: b09ee60e350a8ce4795169505580ee35, type: 3}
+  - {fileID: 21300000, guid: 7620f7047210fad4ca8c8ee76b6b89be, type: 3}
+  - {fileID: 21300000, guid: 49b2ac4692d24d844b00ea0c2619ad55, type: 3}
+  - {fileID: 21300000, guid: 04ae38ec77beb064a978b2c92e4160c8, type: 3}
+  - {fileID: 21300000, guid: 75f07914e2814ed45a072f52fc442b1f, type: 3}
   enableVirtualLoading: 1
   virtualLoadingTimer: 5
 --- !u!82 &5504540153964398811
