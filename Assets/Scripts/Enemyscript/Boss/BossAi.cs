@@ -66,6 +66,10 @@ public class BossAi : MonoBehaviour
     private float destinationUpdateRate = 0.5f;
     private float nextDestinationUpdateTime = 0f;
 
+
+
+    //Sound
+    private EnemySoundController soundController;
     private void Start()
     {
         agent = GetComponent<NavMeshAgent>();
@@ -75,6 +79,8 @@ public class BossAi : MonoBehaviour
 
         bossHealth = GetComponent<BossHealth>();
         bossHealth.OnPhase2Enter += EnterPhase2;
+
+        soundController = GetComponent<EnemySoundController>();
     }
 
     private void Update()
@@ -92,11 +98,11 @@ public class BossAi : MonoBehaviour
 
         float distance = Vector3.Distance(transform.position, player.position);
 
-        if (distance > detectRange)
-        {
-            agent.isStopped = true;
-            return;
-        }
+        //if (distance > detectRange)
+        //{
+        //    agent.isStopped = true;
+        //    return;
+        //}
 
         bool canSlam = distance <= slamRange && Time.time - lastSlamAttackTime >= slamAttackCooldown;
         bool canFire = distance <= triggerRange && HasLineOfSight() && Time.time >= nextFireTime;
@@ -174,6 +180,7 @@ public class BossAi : MonoBehaviour
         //}
         enemyAnimation.SetTrigger("Slam");
         Invoke(nameof(EndAttack), 2f);
+        soundController.PlayAttackSound();
     }
 
     // --- Fire Breath ---
@@ -188,6 +195,8 @@ public class BossAi : MonoBehaviour
 
         Invoke(nameof(StopFireBreath), channelTime);
         enemyAnimation.SetBool("FireBreath",true);
+
+        soundController.PlayAttackSound2();
     }
 
     void StopFireBreath()
@@ -230,7 +239,7 @@ public class BossAi : MonoBehaviour
         isAttacking = true;
         agent.isStopped = true;
         //Debug.Log("Boss uses SHOUT!");
-        enemyAnimation.SetTrigger("Shout"); // Assuming you have an animation trigger
+        enemyAnimation.SetTrigger("Shout");
 
         Collider[] hitPlayers = Physics.OverlapSphere(transform.position, Shoutrange);
         foreach (var hit in hitPlayers)
@@ -238,7 +247,7 @@ public class BossAi : MonoBehaviour
             if (hit.CompareTag("Player"))
             {
                 hit.GetComponent<PlayerHealth>()?.TakeDamage(15);
-                // Or trigger a stun, knockback, etc.
+                //  trigger a stun, knockback
             }
         }
         Invoke(nameof(EndAttack), 1.5f);

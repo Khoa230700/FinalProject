@@ -9,7 +9,8 @@ public class EnemyM : MonoBehaviour
 
     private EnemyTracker tracker;
     private bool isDead = false;
-
+    //sound
+    private EnemySoundController soundController;
     void OnEnable()
     {
         currentHealth = maxHealth;
@@ -24,6 +25,7 @@ public class EnemyM : MonoBehaviour
     void Awake()
     {
         tracker = GetComponent<EnemyTracker>();
+        soundController = GetComponent<EnemySoundController>();
     }
 
     private void Update()
@@ -60,6 +62,7 @@ public class EnemyM : MonoBehaviour
 
         tracker?.OnDeath2?.Invoke();
         gameObject.SetActive(false);
+        soundController.PlayDeathSound();
     }
 
     public void StopAttack()
@@ -92,7 +95,8 @@ public class EnemyM : MonoBehaviour
         {
             GetComponent<EnemiAI>(),
             GetComponent<RangeEnemy>(),
-            GetComponent<suicideEnemy>()
+            GetComponent<suicideEnemy>(),
+            GetComponent<Spidey>()
         };
         foreach (var script in attackScripts)
         {
