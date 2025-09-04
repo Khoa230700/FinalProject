@@ -30,15 +30,15 @@ public class suicideEnemy : MonoBehaviour
     public float moveSpeed = 4f;
     public LayerMask targetLayer;
 
+
+    //sound
+    private EnemySoundController soundController;
+
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
         enemyAnimation = GetComponent<Animator>();
-        //float distance = Vector3.Distance(transform.position, player.position);
-        //if (distance <= attackRange)
-        //{
-        //    Attack();
-        //}
+        soundController = GetComponent<EnemySoundController>();
     }
 
     void Update()
@@ -103,6 +103,7 @@ public class suicideEnemy : MonoBehaviour
             Destroy(explo, explosionlifetime);
             enemyAnimation.SetTrigger("attack");
             StartCoroutine(DestroyAfterDelay());
+            soundController.PlayAttackSound();
         }
     }
     IEnumerator DestroyAfterDelay()

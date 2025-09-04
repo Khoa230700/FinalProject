@@ -991,6 +991,7 @@ GameObject:
   - component: {fileID: -6100191757446191242}
   - component: {fileID: -7673066498880708693}
   - component: {fileID: -3740064040049013403}
+  - component: {fileID: 5702827493646169960}
   m_Layer: 2
   m_Name: Fatphuc
   m_TagString: Untagged
@@ -2755,6 +2756,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   trackingType: 0
   targetID: Fatphuc
+--- !u!114 &5702827493646169960
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2428255698981894573}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3206f98c11e13ca4da6d8c67e088634e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  attackClip: {fileID: 8300000, guid: a0139cf4f6d393a459f2f46596d68f83, type: 3}
+  attackClip2: {fileID: 8300000, guid: 7f59f16d9e6b99c429cdf38446996869, type: 3}
+  deathClip: {fileID: 8300000, guid: 0080087116fd60140b2f9f92bdf30bc9, type: 3}
 --- !u!1 &2514346375837288734
 GameObject:
   m_ObjectHideFlags: 0
