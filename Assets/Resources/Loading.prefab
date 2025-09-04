@@ -59,9 +59,9 @@ MonoBehaviour:
   fadeSpeed: 2
   enableRandomHints: 1
   enableRandomImages: 1
-  hintTimer: 5
-  imageTimer: 5
-  hintFadeDuration: 1.5
+  hintTimer: 3
+  imageTimer: 3
+  hintFadeDuration: 1
   imageFadingSpeed: 1.5
   hintList:
   - The cities fell in days. The screams still echo.
@@ -85,7 +85,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 04ae38ec77beb064a978b2c92e4160c8, type: 3}
   - {fileID: 21300000, guid: 75f07914e2814ed45a072f52fc442b1f, type: 3}
   enableVirtualLoading: 1
-  virtualLoadingTimer: 5
+  virtualLoadingTimer: 10
 --- !u!82 &5504540153964398811
 AudioSource:
   m_ObjectHideFlags: 0
@@ -93,13 +93,13 @@ AudioSource:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 948103164451650808}
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: e7b6535290de1fa4dbc94d6bd1cca600, type: 3}
   m_Resource: {fileID: 8300000, guid: e7b6535290de1fa4dbc94d6bd1cca600, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 0
+  m_Volume: 0.5
   m_Pitch: 1
   Loop: 1
   Mute: 0

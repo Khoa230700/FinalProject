@@ -141,9 +141,13 @@ public class LoadingScreenUI : MonoBehaviour
     }
 
     void FinishLoading()
-    {
+{
         if (isDestroying) return;
         isProcessingLoad = false;
+
+        // 👇 fade âm thanh khi gần xong
+        if (audioSource != null && audioSource.volume > 0f)
+            StartCoroutine(FadeAudio(audioSource.volume, 0f, 1.0f)); // 1.0f = thời gian fade (giây)
 
         if (animator != null)
         {
@@ -253,6 +257,24 @@ public class LoadingScreenUI : MonoBehaviour
             img.color = color;
         }
     }
+
+    IEnumerator FadeAudio(float from, float to, float duration)
+    {
+        if (audioSource == null) yield break;
+
+        float elapsed = 0f;
+        audioSource.volume = from;
+
+        while (elapsed < duration && !isDestroying)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            audioSource.volume = Mathf.Lerp(from, to, elapsed / duration);
+            yield return null;
+        }
+
+        audioSource.volume = to;
+    }
+
 
     T GetRandomItem<T>(List<T> list, ref int lastIndex)
     {
