@@ -58,9 +58,9 @@ public class EnemyM : MonoBehaviour
         if (animator != null)
             animator.SetBool("isAlive", false);
 
+        GetComponent<EnemyTracker>().Die();
         yield return new WaitForSeconds(2f);
 
-        tracker?.OnDeath2?.Invoke();
         gameObject.SetActive(false);
         soundController.PlayDeathSound();
     }

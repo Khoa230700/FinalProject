@@ -16,7 +16,7 @@ public class CoinManager : MonoBehaviour
         Instance = this;
 
         LoadCoins();
-        sessionCoins = 99999999;//Test
+        sessionCoins = 0;//Test
     }
 
     public void AddCoins(int amount)

@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class SpawnManager : MonoBehaviour
 {
+    public static SpawnManager Instance { get; private set; }
     [SerializeField] private Transform[] spawnPoints; // 10 spawn point
     [SerializeField] private ObjectPooler objectPooler; // Pool chứa các enemy prefab
 
@@ -12,6 +13,7 @@ public class SpawnManager : MonoBehaviour
 
     private void Awake()
     {
+        Instance = this;
         // Map Enum -> Tag (phải khớp tag trong ObjectPooler)
         enemyTagMap = new Dictionary<EnemyType, string>
         {
@@ -33,6 +35,7 @@ public class SpawnManager : MonoBehaviour
 
     private void SpawnEnemyType(EnemyType type, int count)
     {
+        int countTest = 0; // Test
         if (count <= 0) return;
 
         // Nếu không tìm thấy tag → báo lỗi
@@ -70,22 +73,26 @@ public class SpawnManager : MonoBehaviour
                 continue;
             }
 
-            EnemyTracker tracker = enemy.GetComponent<EnemyTracker>();
-            if (tracker != null)
-            {
-                tracker.OnDeath += OnEnemyDeath;
-            }
-            else
-            {
-                Debug.LogError($"SpawnManager: Prefab '{enemy.name}' không có EnemyTracker!");
-            }
+            // EnemyTracker tracker = enemy.GetComponent<EnemyTracker>();
+            // if (tracker != null)
+            // {
+            //     tracker.OnDeath += OnEnemyDeath;
+            //     countTest++;
+            // }
+            // else
+            // {
+            //     Debug.LogError($"SpawnManager: Prefab '{enemy.name}' không có EnemyTracker!");
+            // }
 
             ActiveEnemyCount++;
         }
+        Debug.Log("Spawned " + count + " enemies of type " + type + ". Total active: " + ActiveEnemyCount);
+        Debug.Log("Count test: " + countTest);
     }
 
-    private void OnEnemyDeath()
+    public void OnEnemyDeath()
     {
         ActiveEnemyCount--;
+        Debug.Log("Enemy died. Remaining: " + ActiveEnemyCount);
     }
 }

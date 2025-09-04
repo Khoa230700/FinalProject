@@ -2316,7 +2316,7 @@ MonoBehaviour:
   moveSpeed: 3.5
   targetLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 256
 --- !u!114 &800144705376637159
 MonoBehaviour:
   m_ObjectHideFlags: 0
