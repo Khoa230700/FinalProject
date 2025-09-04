@@ -7,7 +7,7 @@ public class SelectorCharacter : MonoBehaviour
     [Header("References")]
     public TMP_Text nameTMP;
     public Transform[] cameraPoints;
-    public GameObject[] previewCharacters; 
+    public GameObject[] previewCharacters;
 
     [Header("Animation")]
     public float animDuration = 0.5f;
@@ -59,10 +59,20 @@ public class SelectorCharacter : MonoBehaviour
     {
         if (selectedIndex == -1) return;
 
+        if (cam == null && Camera.main != null)
+            cam = Camera.main.transform;
+
         var targetPoint = cameraPoints[selectedIndex];
 
-        cam.DOMove(targetPoint.position, animDuration);
-        cam.DORotateQuaternion(targetPoint.rotation, animDuration);
+        DOTween.Kill(cam);
+
+        cam.DOMove(targetPoint.position, animDuration)
+            .SetEase(Ease.InOutSine)
+            .SetTarget(cam);
+
+        cam.DORotateQuaternion(targetPoint.rotation, animDuration)
+            .SetEase(Ease.InOutSine)
+            .SetTarget(cam);
 
         if (nameTMP != null && selectedIndex < previewCharacters.Length)
             nameTMP.text = previewCharacters[selectedIndex].name;

@@ -35,6 +35,9 @@ public class LoadingScreenUI : MonoBehaviour
     private float currentVirtualTime;
     private int currentHintIndex = -1, currentImageIndex = -1;
 
+    // === PRELOAD HANDLER ===
+    private static LoadingScreenUI preloadInstance;
+
     void Awake()
     {
         if (instance != null && instance != this)
@@ -44,11 +47,58 @@ public class LoadingScreenUI : MonoBehaviour
         }
         instance = this;
         DontDestroyOnLoad(gameObject);
+
+        gameObject.SetActive(false); // ẩn khi preload
     }
 
     void OnEnable()
     {
-        StopAllCoroutines();
+        if (audioSource != null && audioSource.clip != null)
+        {
+            audioSource.Stop();   // reset clip
+            audioSource.time = 0; // đảm bảo phát từ đầu
+            audioSource.Play();   // phát lại
+            audioSource.volume = 0.5f;
+        }
+    }
+
+    // --- Hàm khởi tạo preload ---
+    public static void Preload()
+    {
+        if (preloadInstance != null) return;
+
+        var prefab = Resources.Load<GameObject>("Loading"); // Prefab phải nằm trong Resources/Loading.prefab
+        if (prefab == null)
+        {
+            Debug.LogError("Loading prefab not found in Resources!");
+            return;
+        }
+
+        var go = Instantiate(prefab);
+        preloadInstance = go.GetComponent<LoadingScreenUI>();
+        preloadInstance.gameObject.SetActive(false);
+        DontDestroyOnLoad(preloadInstance.gameObject);
+    }
+
+    // --- Hàm gọi load scene ---
+    public static void LoadScene(string targetScene)
+    {
+        if (preloadInstance == null)
+        {
+            Preload(); // nếu chưa có thì preload ngay
+        }
+
+        preloadInstance.gameObject.SetActive(true);
+        preloadInstance.StartCoroutine(preloadInstance.LoadSceneRoutine(targetScene));
+    }
+
+    IEnumerator LoadSceneRoutine(string targetScene)
+    {
+        yield return new WaitForSecondsRealtime(0.1f);
+
+        isProcessingLoad = true;
+        isDestroying = false;
+
         statusText.text = "0%";
         progressBar.value = 0f;
         currentVirtualTime = 0f;
@@ -61,36 +111,7 @@ public class LoadingScreenUI : MonoBehaviour
 
         if (enableRandomImages && imageList.Count > 1)
             StartCoroutine(CycleImages());
-    }
 
-    void OnDestroy()
-    {
-        isDestroying = true;
-        StopAllCoroutines();
-        if (instance == this) instance = null;
-    }
-
-    public static void LoadScene(string targetScene)
-    {
-        if (instance != null) instance.CleanupAndDestroy();
-
-        var prefab = Resources.Load<GameObject>("Loading");
-        if (prefab == null)
-        {
-            Debug.LogError("Loading screen prefab not found in Resources!");
-            return;
-        }
-
-        var loadingUI = Instantiate(prefab).GetComponent<LoadingScreenUI>();
-        loadingUI?.StartCoroutine(loadingUI.LoadSceneRoutine(targetScene));
-    }
-
-    IEnumerator LoadSceneRoutine(string targetScene)
-    {
-        gameObject.SetActive(true);
-        yield return new WaitForSecondsRealtime(0.1f);
-
-        isProcessingLoad = true;
         loadingProcess = SceneManager.LoadSceneAsync(targetScene);
         loadingProcess.allowSceneActivation = false;
 
@@ -141,13 +162,13 @@ public class LoadingScreenUI : MonoBehaviour
     }
 
     void FinishLoading()
-{
+    {
         if (isDestroying) return;
         isProcessingLoad = false;
+        if (Time.timeScale == 0f) Time.timeScale = 1f;
 
-        // 👇 fade âm thanh khi gần xong
         if (audioSource != null && audioSource.volume > 0f)
-            StartCoroutine(FadeAudio(audioSource.volume, 0f, 1.0f)); // 1.0f = thời gian fade (giây)
+            StartCoroutine(FadeAudio(audioSource.volume, 0f, 1.0f));
 
         if (animator != null)
         {
@@ -156,7 +177,7 @@ public class LoadingScreenUI : MonoBehaviour
         }
         else
         {
-            Destroy(gameObject, 0.5f);
+            CleanupAndDestroy();
         }
     }
 
@@ -172,8 +193,9 @@ public class LoadingScreenUI : MonoBehaviour
     {
         if (isDestroying) return;
         isDestroying = true;
-        Time.timeScale = 1f;
-        Destroy(gameObject);
+
+        // Không destroy mà chỉ ẩn để dùng lại
+        gameObject.SetActive(false);
     }
 
     IEnumerator CycleHints()
@@ -274,7 +296,6 @@ public class LoadingScreenUI : MonoBehaviour
 
         audioSource.volume = to;
     }
-
 
     T GetRandomItem<T>(List<T> list, ref int lastIndex)
     {
