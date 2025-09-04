@@ -26,6 +26,7 @@ public class L4DBotController : MonoBehaviour
     {
         agent = GetComponent<NavMeshAgent>();
         animator = GetComponent<Animator>();
+        player = SelectorSpawner.Instance.Player.transform;
     }
 
     private void Update()

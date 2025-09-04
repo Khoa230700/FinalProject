@@ -96,7 +96,7 @@ public class ShopPoint : MonoBehaviour
         int index = 1;
         while (arrow != null && index < waypoints.Length)
         {
-            Vector3 targetPos = waypoints[index] + Vector3.up * 1f;
+            Vector3 targetPos = waypoints[index] + Vector3.up;
 
             while (Vector3.Distance(arrow.transform.position, targetPos) > 0.1f)
             {
