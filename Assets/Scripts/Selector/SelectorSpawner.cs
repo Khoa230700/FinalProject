@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class SelectorSpawner : MonoBehaviour
@@ -5,12 +6,13 @@ public class SelectorSpawner : MonoBehaviour
     public static SelectorSpawner Instance { get; private set; }
 
     [Header("Prefabs")]
-    public GameObject[] playerPfs;
+    public PlayerSelectorUI[] playerPfs;
 
     [Header("UI")]
     [SerializeField] private BarUI healthBar;
     [SerializeField] private BarUI shieldBar;
     [SerializeField] private WeaponUI weaponUI;
+    [SerializeField] private PlayerClassNameUI playerClassNameUI;
 
     public GameObject Player { get; private set; }
     public BarUI HealthBar => healthBar;
@@ -30,6 +32,17 @@ public class SelectorSpawner : MonoBehaviour
         int selectedIndex = PlayerPrefs.GetInt("CharacterHSelector", 0);
         if (selectedIndex < 0 || selectedIndex >= playerPfs.Length) selectedIndex = 0;
 
-        Player = Instantiate(playerPfs[selectedIndex], transform.position, transform.rotation);
+        Player = Instantiate(playerPfs[selectedIndex].playerPrefab, transform.position, transform.rotation);
+
+        playerClassNameUI.UpdateUI(playerPfs[selectedIndex]);
     }
+}
+
+[Serializable]
+public class PlayerSelectorUI
+{
+    public GameObject playerPrefab;
+    public Sprite avatar;
+    public Sprite classAvatar;
+    public string name;
 }

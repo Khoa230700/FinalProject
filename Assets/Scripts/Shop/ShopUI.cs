@@ -105,8 +105,9 @@ public class ShopUI : MonoBehaviour
 
                 var upgradeState = gun.GetComponent<GunUpgradeState>();
                 int slotIndex = gun.gunData.gunSlot == GunSlot.Primary ? 0 : 1;
-                
+
                 itemSlots[slotIndex]?.UpdateSlot(gun, "Gun", upgradeState.level, gun.currentAmmo, gun.reserveAmmo);
+                Debug.Log(upgradeState);
             }
             else if (weapon is MeleeWeapon melee)
             {

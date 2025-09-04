@@ -5669,7 +5669,7 @@ Canvas:
   m_AdditionalShaderChannelsFlag: 0
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 0
+  m_SortingOrder: -1
   m_TargetDisplay: 0
 --- !u!114 &259106162807285103
 MonoBehaviour:
@@ -12453,6 +12453,7 @@ GameObject:
   - component: {fileID: 1099547618457403765}
   - component: {fileID: 1290957722592879917}
   - component: {fileID: 1768139399252358845}
+  - component: {fileID: 7792612891871804892}
   m_Layer: 8
   m_Name: PlayerScriptScar
   m_TagString: Untagged
@@ -12506,6 +12507,7 @@ MonoBehaviour:
   shootPoint: {fileID: 6481840753769091412}
   armsAnimator: {fileID: 7647387420528565276}
   weaponUI: {fileID: 0}
+  shopUI: {fileID: 0}
   csgoScope: {fileID: 0}
   muzzleFlashParticle: {fileID: 198481540338831756, guid: 49aa1d4c5624e66418cbfbe9784d6f23, type: 3}
   gunAudioSource: {fileID: 1768139399252358845}
@@ -12645,6 +12647,23 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &7792612891871804892
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3274615956103956452}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 33e34d18da5fd2e4d9fdeb7703af43bc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gunData: {fileID: 11400000, guid: 75c6d813c44f7474ea7e659d491a9207, type: 2}
+  level: 0
+  OnLevelChanged:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &3286820874864420029
 GameObject:
   m_ObjectHideFlags: 0
@@ -12922,7 +12941,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   data: {fileID: 11400000, guid: 62b4d60c4bc45754c8098b4d63d130c2, type: 2}
-  level: 20
+  level: 0
   armsAnimator: {fileID: 6971584806731992023}
   swingOrigin: {fileID: 7206213178234435600}
   aimCamera: {fileID: 0}
@@ -24184,7 +24203,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &6365296034206012781
 Transform:
   m_ObjectHideFlags: 0
@@ -30867,7 +30886,7 @@ Canvas:
   m_AdditionalShaderChannelsFlag: 0
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 0
+  m_SortingOrder: -1
   m_TargetDisplay: 0
 --- !u!114 &937887799433399421
 MonoBehaviour:
@@ -36435,6 +36454,7 @@ MonoBehaviour:
   shootPoint: {fileID: 555857752179451204}
   armsAnimator: {fileID: 5362724390142590294}
   weaponUI: {fileID: 0}
+  shopUI: {fileID: 0}
   csgoScope: {fileID: 0}
   muzzleFlashParticle: {fileID: 198481540338831756, guid: 49aa1d4c5624e66418cbfbe9784d6f23, type: 3}
   gunAudioSource: {fileID: 8017790302251922082}

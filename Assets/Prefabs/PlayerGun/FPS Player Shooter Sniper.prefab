@@ -1417,7 +1417,7 @@ Canvas:
   m_AdditionalShaderChannelsFlag: 0
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 0
+  m_SortingOrder: -1
   m_TargetDisplay: 0
 --- !u!114 &2964552921872022036
 MonoBehaviour:
@@ -2719,6 +2719,7 @@ MonoBehaviour:
   shootPoint: {fileID: 7273187557222652850}
   armsAnimator: {fileID: 2228220168125291594}
   weaponUI: {fileID: 0}
+  shopUI: {fileID: 0}
   csgoScope: {fileID: 0}
   muzzleFlashParticle: {fileID: 198481540338831756, guid: 49aa1d4c5624e66418cbfbe9784d6f23, type: 3}
   gunAudioSource: {fileID: 1926936187852394843}
@@ -3065,7 +3066,7 @@ Canvas:
   m_AdditionalShaderChannelsFlag: 0
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 0
+  m_SortingOrder: -1
   m_TargetDisplay: 0
 --- !u!114 &7410812435983688081
 MonoBehaviour:
@@ -3668,6 +3669,7 @@ MonoBehaviour:
   shootPoint: {fileID: 1547085161081651443}
   armsAnimator: {fileID: 7737834752848102791}
   weaponUI: {fileID: 0}
+  shopUI: {fileID: 0}
   csgoScope: {fileID: 5506603170031170302}
   muzzleFlashParticle: {fileID: 198481540338831756, guid: 49aa1d4c5624e66418cbfbe9784d6f23, type: 3}
   gunAudioSource: {fileID: 2371396123406249843}
