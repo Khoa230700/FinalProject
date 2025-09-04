@@ -1,23 +1,22 @@
 using UnityEngine;
-using System;
 
 public class EnemyTracker : MonoBehaviour
 {
-    public Action OnDeath;
-    public Action OnDeath2;
+    // public Action OnDeath;
     private QuestTracker questTracker;
 
     private void Start()
     {
         questTracker = GetComponent<QuestTracker>();
-        OnDeath2 += Die;
     }
 
     public void Die()
     {
-        OnDeath?.Invoke();
+        // OnDeath?.Invoke();
         questTracker.OnKilled();
-        Debug.Log($"{gameObject.name} has died.");
-        gameObject.SetActive(false);
+        SpawnManager.Instance.OnEnemyDeath();
+        CoinManager.Instance.AddCoins(Random.Range(5, 15)); // Thêm 5-15 coin khi enemy chết
+        // Debug.Log($"{gameObject.name} has died.");
+        // gameObject.SetActive(false);
     }
 }

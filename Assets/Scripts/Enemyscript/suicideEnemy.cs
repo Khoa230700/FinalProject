@@ -108,6 +108,7 @@ public class suicideEnemy : MonoBehaviour
     }
     IEnumerator DestroyAfterDelay()
     {
+        GetComponent<EnemyTracker>().Die();
         yield return new WaitForSeconds(1);
         Destroy(gameObject);
     }
