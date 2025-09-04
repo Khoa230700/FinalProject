@@ -35,9 +35,29 @@ public class MeleeData : ScriptableObject
     public AnimationCurve rangeByLevel = AnimationCurve.Linear(0, 1f, 5, 1.15f);
     public AnimationCurve cdByLevel = AnimationCurve.Linear(0, 1f, 5, 0.7f);
 
+    public int GetMaxLevel()
+    {
+        float maxTime = 0f;
+
+        if (damageByLevel != null && damageByLevel.length > 0)
+            maxTime = Mathf.Max(maxTime, damageByLevel.keys[damageByLevel.length - 1].time);
+
+        if (rangeByLevel != null && rangeByLevel.length > 0)
+            maxTime = Mathf.Max(maxTime, rangeByLevel.keys[rangeByLevel.length - 1].time);
+
+        if (cdByLevel != null && cdByLevel.length > 0)
+            maxTime = Mathf.Max(maxTime, cdByLevel.keys[cdByLevel.length - 1].time);
+
+        return Mathf.RoundToInt(maxTime);
+    }
+
     public float GetDamage(int level) => baseDamage * EvalOrOne(damageByLevel, level);
     public float GetRange(int level) => baseRange * EvalOrOne(rangeByLevel, level);
     public float GetCooldown(int level) => baseHitCooldown * (cdByLevel != null ? Mathf.Clamp(cdByLevel.Evaluate(level), 0.1f, 10f) : 1f);
+
+    public float GetMaxDamage() => GetDamage(GetMaxLevel());
+    public float GetMaxRange() => GetRange(GetMaxLevel());
+    public float GetMaxCooldown() => GetCooldown(GetMaxLevel());
 
     float EvalOrOne(AnimationCurve c, int lvl)
     {

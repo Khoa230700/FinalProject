@@ -5,21 +5,20 @@ using UnityEngine.EventSystems;
 public class ShopUI : MonoBehaviour
 {
     [SerializeField] private GameObject canvasSetting;
-    [SerializeField] private EquipItemUI[] itemSlots = new EquipItemUI[5]; // [primary, secondary, melee, health, shield]
+    [SerializeField] private ShopEquipItemUI[] itemSlots = new ShopEquipItemUI[5]; // [primary, secondary, melee, health, shield]
 
     public bool isOpen { get; private set; }
     public bool canOpen { get; set; } = true;
 
     private Animator animator;
     private PressKeyEvent pressKeyEvent;
-    private EquipDescriptionsUI descriptionsUI;
-    private Coroutine currentRoutine;
+    private ShopEquipDescriptionsUI descriptionsUI;
     private WaveManager waveManager;
+    private Coroutine currentRoutine;
 
     // Cached player components
     private IWeapon[] weapons;
-    private PlayerHealth playerHealth;
-    private PlayerShield playerShield;
+    private PlayerHealthSystem playetStats;
     private PlayerMovement playerMovement;
     private MeshMouseLook mouseLook;
 
@@ -27,7 +26,7 @@ public class ShopUI : MonoBehaviour
     {
         animator = GetComponent<Animator>();
         pressKeyEvent = canvasSetting?.GetComponent<PressKeyEvent>();
-        descriptionsUI = FindAnyObjectByType<EquipDescriptionsUI>();
+        descriptionsUI = FindAnyObjectByType<ShopEquipDescriptionsUI>();
         waveManager = FindAnyObjectByType<WaveManager>();
 
         CachePlayerComponents();
@@ -42,14 +41,14 @@ public class ShopUI : MonoBehaviour
     {
         CoinManager.Instance.OnCoinChanged -= OnCoinsChanged;
     }
+
     private void CachePlayerComponents()
     {
         var player = GameObject.FindWithTag("Player");
         if (player == null) return;
 
         weapons = player.GetComponentsInChildren<IWeapon>(true);
-        playerHealth = player.GetComponent<PlayerHealth>();
-        playerShield = player.GetComponent<PlayerShield>();
+        playetStats = player.GetComponent<PlayerHealthSystem>();
         playerMovement = player.GetComponent<PlayerMovement>();
         mouseLook = player.GetComponent<MeshMouseLook>();
     }
@@ -60,7 +59,7 @@ public class ShopUI : MonoBehaviour
 
         isOpen = true;
 
-        EventSystem.current?.SetSelectedGameObject(itemSlots[0]?.gameObject);
+        // EventSystem.current?.SetSelectedGameObject(itemSlots[0]?.gameObject);
         UpdateAllSlots();
 
         if (currentRoutine != null) StopCoroutine(currentRoutine);
@@ -90,6 +89,13 @@ public class ShopUI : MonoBehaviour
 
     private void UpdateAllSlots()
     {
+        // Clear all slots for (EMPTY slot)
+        foreach (var slot in itemSlots)
+        {
+            if (slot != null)
+                slot.UpdateSlot(null, null);
+        }
+
         // Update weapon slots
         foreach (var weapon in weapons)
         {
@@ -97,8 +103,10 @@ public class ShopUI : MonoBehaviour
             {
                 if (gun.currentAmmo == 0 && gun.reserveAmmo == 0) gun.Initialize();
 
+                var upgradeState = gun.GetComponent<GunUpgradeState>();
                 int slotIndex = gun.gunData.gunSlot == GunSlot.Primary ? 0 : 1;
-                itemSlots[slotIndex]?.UpdateSlot(gun, "Gun", 0, gun.currentAmmo, gun.reserveAmmo);
+                
+                itemSlots[slotIndex]?.UpdateSlot(gun, "Gun", upgradeState.level, gun.currentAmmo, gun.reserveAmmo);
             }
             else if (weapon is MeleeWeapon melee)
             {
@@ -107,10 +115,9 @@ public class ShopUI : MonoBehaviour
         }
 
         // Update stat slots
-        itemSlots[3]?.UpdateSlot(playerHealth, "Health");
-        itemSlots[4]?.UpdateSlot(playerShield, "Shield");
+        itemSlots[3]?.UpdateSlot(playetStats, "Health");
+        itemSlots[4]?.UpdateSlot(playetStats, "Shield");
 
-        // Force refresh all slots to update button states
         RefreshAllSlots();
     }
 

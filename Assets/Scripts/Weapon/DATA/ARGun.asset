@@ -17,7 +17,7 @@ MonoBehaviour:
   gunSlot: 0
   gunSprite: {fileID: 21300000, guid: ac85248f1c5cec54cbce0be0c0bdea9d, type: 3}
   gunSpriteFullColor: {fileID: 21300000, guid: f03105c21d53a8f488d3a25bc1c79050, type: 3}
-  damage: 50
+  damage: 1
   range: 10
   pelletCount: 1
   spreadAngle: 0
@@ -27,23 +27,204 @@ MonoBehaviour:
   burstCooldown: 0.3
   fireMode: 1
   availableFireModes: 0100000002000000
+  semiAutoMinInterval: 0
   magazineSize: 30
   reserveAmmo: 150
   reloadTime: 2.5
   hasScope: 1
   scopeZoom: 0
-  crosshairData:
-    normalColor: {r: 1, g: 1, b: 1, a: 1}
-    enemyColor: {r: 1, g: 0, b: 0, a: 1}
-    type: 1
-    staticCrosshair:
-      sprite: {fileID: 0}
-      size: {x: 64, y: 64}
-    dynamicCrosshair:
-      idleScale: 1
-      moveScale: 1.2
-      jumpScale: 1.8
-      bounceSize: 2
-      moveSpeed: 3
   tracerPrefab: {fileID: 6749693277989217856, guid: dfcafcdd61ac0e447b7e869afc9b8d0c, type: 3}
-  shootSound: {fileID: 0}
+  shootSound: {fileID: 8300000, guid: 3b632c69fa87d714cb42155e0c91e7ea, type: 3}
+  bulletRefillCost: 10
+  damageByLevel:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0.120000005
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 5
+      value: 1.6
+      inSlope: 0.120000005
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  rangeByLevel:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0.04000001
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 5
+      value: 1.2
+      inSlope: 0.04000001
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  rofByLevel:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0.05
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 5
+      value: 1.25
+      inSlope: 0.05
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reloadByLevel:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: -0.04
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 5
+      value: 0.8
+      inSlope: -0.04
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  magazineByLevel:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0.1
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 5
+      value: 1.5
+      inSlope: 0.1
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadByLevel:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: -0.029999996
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 5
+      value: 0.85
+      inSlope: -0.029999996
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  semiAutoIntervalByLevel:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: -0.04
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 5
+      value: 0.8
+      inSlope: -0.04
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  scopeZoomByLevel:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: -0.029999996
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 5
+      value: 0.85
+      inSlope: -0.029999996
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4

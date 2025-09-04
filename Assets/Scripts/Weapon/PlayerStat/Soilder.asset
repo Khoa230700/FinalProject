@@ -15,9 +15,9 @@ MonoBehaviour:
   walkSpeed: 5
   runSpeed: 8
   jumpHeight: 2
-  gravity: -9.81
-  airControlMultiplier: 0.5
+  gravity: -15
+  airControlMultiplier: 0.196
   maxHealth: 100
   maxShield: 50
-  shieldRegenPerSecond: 15
-  shieldRegenDelay: 3
+  shieldRegenPerSecond: 0
+  shieldRegenDelay: 0

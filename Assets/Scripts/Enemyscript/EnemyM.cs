@@ -28,6 +28,15 @@ public class EnemyM : MonoBehaviour
         soundController = GetComponent<EnemySoundController>();
     }
 
+    private void Update()
+    {
+        //test
+        if(Input.GetKeyDown(KeyCode.K))
+        {
+            TakeDamage(1000);
+        }
+    }
+
     public void TakeDamage(float amount)
     {
         if (isDead) return;

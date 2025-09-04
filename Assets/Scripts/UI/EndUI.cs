@@ -6,20 +6,13 @@ public class EndUI : MonoBehaviour
 {
     [SerializeField] private GameObject gainPanel;
     [SerializeField] private TextMeshProUGUI coinGainText;
+    [SerializeField] private GameObject buttonsGroup;
 
     private Tween coinTween;
-    private MeshMouseLook meshMouseLook;
-
-    private void Start()
-    {
-        meshMouseLook = FindAnyObjectByType<MeshMouseLook>();
-
-    }
 
     void OnEnable()
     {
-        meshMouseLook.Show();
-        Time.timeScale = 0f;
+        PauseGameUI.Instance.Pause();
     }
 
     public void ShowGain()
@@ -38,6 +31,10 @@ public class EndUI : MonoBehaviour
         },
         sessionCoins, 1.5f)
         .SetEase(Ease.OutQuad)
-        .SetUpdate(true);
+        .SetUpdate(true)
+        .OnComplete(() =>
+        {
+            buttonsGroup.SetActive(true);
+        });
     }
 }

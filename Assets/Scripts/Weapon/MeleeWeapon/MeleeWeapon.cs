@@ -7,12 +7,37 @@ public class MeleeWeapon : MonoBehaviour, IWeapon
     [Header("Data")]
     public MeleeData data;
     [Range(0, 20)] public int level = 0;   // 0 = base
+    public int maxLevel => data ? data.GetMaxLevel() : 0;
 
     [Header("Refs")]
     public Animator armsAnimator;
     public Transform swingOrigin;          // đặt ở đầu lưỡi rìu/dao
     public Camera aimCamera;               // kéo thả Main Camera
     public WeaponUI weaponUI;
+
+    [Header("Audio")]
+    [Tooltip("AudioSource trên prefab vũ khí (khuyến nghị). Nếu trống sẽ fallback PlayClipAtPoint tại swingOrigin).")]
+    public AudioSource audioSource;
+
+    [Tooltip("Âm vung vũ khí (nếu rỗng sẽ fallback sang data.swingSfx).")]
+    public AudioClip[] swingClips;
+
+    [Tooltip("Âm trúng mục tiêu (nếu rỗng sẽ fallback sang data.hitSfx).")]
+    public AudioClip[] hitClips;
+
+    [Tooltip("Âm hụt, khi không trúng gì.")]
+    public AudioClip[] missClips;
+
+    [Range(0f, 2f)] public float swingVolume = 1f;
+    [Range(0f, 2f)] public float hitVolume = 1f;
+    [Range(0f, 2f)] public float missVolume = 1f;
+
+    [Header("Audio Options")]
+    [Tooltip("Chỉ phát âm trúng 1 lần trong mỗi cú vung để tránh spam.")]
+    public bool playHitSfxOncePerSwing = true;
+
+    [Tooltip("Ngẫu nhiên cao độ (pitch) ± giá trị này khi phát qua AudioSource.")]
+    [Range(0f, 0.25f)] public float randomPitchJitter = 0.05f;
 
     [Header("Debug Draw")]
     public bool drawGizmos = true;         // vẽ vùng đánh trong Scene view
@@ -25,11 +50,15 @@ public class MeleeWeapon : MonoBehaviour, IWeapon
     bool canAttack = true;
     bool isHolding = false;
 
+    // Audio runtime flags
+    bool _playedHitThisSwing = false;
+    bool _anyHitThisSwing = false;
+
     public void OnSelected(WeaponUI ui)
     {
         weaponUI = ui;
         weaponUI?.ClearUI(); // ẩn UI đạn nếu muốn
-        weaponUI?.SetWeaponSprite(data.weaponSprite);
+        if (data != null) weaponUI?.SetWeaponSprite(data.weaponSprite);
     }
     public void OnDeselected() { }
 
@@ -45,6 +74,8 @@ public class MeleeWeapon : MonoBehaviour, IWeapon
     IEnumerator DoSwing()
     {
         canAttack = false;
+        _playedHitThisSwing = false;
+        _anyHitThisSwing = false;
 
         // Chọn animation
         string anim = (data.animSwings != null && data.animSwings.Length > 0)
@@ -52,7 +83,9 @@ public class MeleeWeapon : MonoBehaviour, IWeapon
             : data.animSwing; // fallback 1 anim
         if (armsAnimator) armsAnimator.Play(anim, 0, 0f);
 
-        if (data.swingSfx) AudioSource.PlayClipAtPoint(data.swingSfx, swingOrigin.position);
+        // Âm "whoosh" vung vũ khí (phát ngay khi bắt đầu vung)
+        var swingClip = PickOne(swingClips, data ? data.swingSfx : null);
+        PlayAt(swingClip, swingOrigin.position, swingVolume);
 
         // “Damage window”
         yield return new WaitForSeconds(data.swingDelay);
@@ -101,6 +134,13 @@ public class MeleeWeapon : MonoBehaviour, IWeapon
             yield return null; // tạo cảm giác “quét” theo frame
         }
 
+        // Nếu không trúng gì → phát âm hụt
+        if (!_anyHitThisSwing)
+        {
+            var missClip = PickOne(missClips, null);
+            PlayAt(missClip, swingOrigin.position, missVolume);
+        }
+
         yield return new WaitForSeconds(Mathf.Max(0f, data.GetCooldown(level)));
         canAttack = true;
     }
@@ -117,7 +157,8 @@ public class MeleeWeapon : MonoBehaviour, IWeapon
             {
                 hb.ownerHealthSystem.TakeDamage(dmg);
                 hb.OnHit(dmg, hitPoint);
-                if (data.hitSfx) AudioSource.PlayClipAtPoint(data.hitSfx, hitPoint);
+                _anyHitThisSwing = true;
+                PlayImpactSfx(hitPoint);
             }
             return;
         }
@@ -129,7 +170,8 @@ public class MeleeWeapon : MonoBehaviour, IWeapon
             if (hitTargets.Add(dmgable))
             {
                 dmgable.TakeDamage(Mathf.RoundToInt(dmg));
-                if (data.hitSfx) AudioSource.PlayClipAtPoint(data.hitSfx, hitPoint);
+                _anyHitThisSwing = true;
+                PlayImpactSfx(hitPoint);
             }
             return;
         }
@@ -138,12 +180,55 @@ public class MeleeWeapon : MonoBehaviour, IWeapon
         var root = col.transform.root;
         if (hitTargets.Add(root))
         {
-            // nếu muốn vẫn gọi OnHit effect ở đây, nhưng không biết health system
             // Fx only:
             var hbAny = col.GetComponentInParent<Hitbox>();
             if (hbAny != null) hbAny.OnHit(dmg, hitPoint);
+
+            _anyHitThisSwing = true;
+            PlayImpactSfx(hitPoint);
         }
     }
+
+    // ---- Audio helpers ----
+    AudioClip PickOne(AudioClip[] clips, AudioClip fallback)
+    {
+        if (clips != null && clips.Length > 0)
+        {
+            int idx = Random.Range(0, clips.Length);
+            return clips[idx];
+        }
+        return fallback;
+    }
+
+    void PlayAt(AudioClip clip, Vector3 pos, float volume = 1f)
+    {
+        if (clip == null) return;
+
+        if (audioSource != null)
+        {
+            // Random pitch nhỏ cho tự nhiên (không ảnh hưởng global)
+            float oldPitch = audioSource.pitch;
+            audioSource.pitch = 1f + Random.Range(-randomPitchJitter, randomPitchJitter);
+            audioSource.PlayOneShot(clip, volume);
+            audioSource.pitch = oldPitch;
+        }
+        else
+        {
+            AudioSource.PlayClipAtPoint(clip, pos, volume);
+        }
+    }
+
+    void PlayImpactSfx(Vector3 pos)
+    {
+        if (playHitSfxOncePerSwing && _playedHitThisSwing) return;
+
+        var clip = PickOne(hitClips, data ? data.hitSfx : null);
+        if (clip == null) return;
+
+        PlayAt(clip, pos, hitVolume);
+        _playedHitThisSwing = true;
+    }
+    // -----------------------
 
     public Coroutine SwitchOut(MonoBehaviour runner) => runner.StartCoroutine(SwitchOutRoutine());
     IEnumerator SwitchOutRoutine()

@@ -10,8 +10,8 @@ public enum BarDirection { Left, Right, Top, Bottom }
 public class BarUI : MonoBehaviour
 {
     [Header("Values")]
-    [Range(0, 100)] public float currentValue;
-    public float maxValue = 100;
+    public float currentValue;
+    public float maxValue;
 
     [Header("Settings")]
     public float delayedFillSpeed = 0.5f;
@@ -113,6 +113,7 @@ public class BarUI : MonoBehaviour
     public void SetMaxValue(float newMax)
     {
         maxValue = newMax;
+        currentValue = newMax;
         UpdateUI();
     }
 }

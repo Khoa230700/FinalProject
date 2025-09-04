@@ -401,20 +401,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHealth: 100
+  armor: 0
   OnTakeDamage:
     m_PersistentCalls:
       m_Calls: []
-  useRegen: 0
-  regenRate: 1
-  regenDelay: 0
-  secPerRegen: 0
-  animator: {fileID: 5229804335748444862}
-  agent: {fileID: 5924586812206501642}
-  mainCollider: {fileID: 7471356476971691667}
-  aiScripts:
-  - {fileID: 1432243501291199269}
-  - {fileID: 7284171553910722365}
-  shield: {fileID: 1884421177641275335}
+  maxShield: 0
+  currentShield: 0
+  shieldRegenPerSecond: 0
+  shieldRegenDelay: 3
+  baseMoveSpeed: 4
+  anim: {fileID: 5229804335748444862}
+  healthBar: {fileID: 0}
+  shieldBar: {fileID: 0}
 --- !u!114 &1884421177641275335
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -673,8 +671,8 @@ Transform:
   m_GameObject: {fileID: 2002530431916539898}
   serializedVersion: 2
   m_LocalRotation: {x: 0.08898504, y: -0.10118165, z: 0.39850584, w: 0.90721387}
-  m_LocalPosition: {x: -0, y: 23.1603, z: 0}
-  m_LocalScale: {x: 1.0000004, y: 1.0000001, z: 0.99999994}
+  m_LocalPosition: {x: 0, y: 23.1603, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 394248585276667370}
@@ -1018,6 +1016,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3533fe83422f2544895abc1c82971a77, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  damage: 50
+  attackRange: 0.22
+  attackRadius: 1.41
+  cooldown: 1
+  enemyMask:
+    serializedVersion: 2
+    m_Bits: 64
+  swingOrigin: {fileID: 2801550588296635517}
+  drawGizmos: 1
 --- !u!65 &6590447101737242600
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -3223,7 +3230,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8703899664860278597}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
