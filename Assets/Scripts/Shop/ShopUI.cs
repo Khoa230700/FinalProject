@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -9,6 +10,7 @@ public class ShopUI : MonoBehaviour
 
     public bool isOpen { get; private set; }
     public bool canOpen { get; set; } = true;
+    public bool ingoreConditions = false;
 
     private Animator animator;
     private PressKeyEvent pressKeyEvent;
@@ -55,9 +57,16 @@ public class ShopUI : MonoBehaviour
 
     public void Show()
     {
-        if (isOpen || !canOpen || !waveManager.isBetweenWaves) return;
+        if (isOpen) return;
+        if (!ingoreConditions)
+        {
+            if (!canOpen || !waveManager.isBetweenWaves)
+                return;
+        }
 
         isOpen = true;
+        canvasSetting?.SetActive(false);
+        playerMovement.enabled = false;
 
         // EventSystem.current?.SetSelectedGameObject(itemSlots[0]?.gameObject);
         UpdateAllSlots();
@@ -65,9 +74,7 @@ public class ShopUI : MonoBehaviour
         if (currentRoutine != null) StopCoroutine(currentRoutine);
         currentRoutine = StartCoroutine(AnimateShop("In", () =>
         {
-            canvasSetting?.SetActive(false);
             if (pressKeyEvent) pressKeyEvent.enabled = false;
-            playerMovement.enabled = false;
             mouseLook.Show();
         }));
     }
@@ -107,7 +114,6 @@ public class ShopUI : MonoBehaviour
                 int slotIndex = gun.gunData.gunSlot == GunSlot.Primary ? 0 : 1;
 
                 itemSlots[slotIndex]?.UpdateSlot(gun, "Gun", upgradeState.level, gun.currentAmmo, gun.reserveAmmo);
-                Debug.Log(upgradeState);
             }
             else if (weapon is MeleeWeapon melee)
             {
@@ -138,7 +144,7 @@ public class ShopUI : MonoBehaviour
         }
     }
 
-    private IEnumerator AnimateShop(string animationName, System.Action onComplete = null)
+    private IEnumerator AnimateShop(string animationName, Action onComplete = null)
     {
         animator.Play(animationName);
         yield return new WaitForSeconds(animator.GetCurrentAnimatorStateInfo(0).length);

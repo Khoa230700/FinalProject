@@ -11,6 +11,13 @@ public class ShopTimerUI : MonoBehaviour
     {
         if (timerUI == null || timerText == null || shopUI == null) return;
 
+        if (shopUI.ingoreConditions)
+        {
+            timerText.gameObject.SetActive(false);
+            shopUI.canOpen = true;
+            return;
+        }
+
         float timer = timerUI.GetTimerForShop();
 
         if (timer <= 0f)
@@ -24,6 +31,7 @@ public class ShopTimerUI : MonoBehaviour
         int minutes = Mathf.FloorToInt(timer / 60f);
         int seconds = Mathf.FloorToInt(timer % 60f);
 
+        timerText.gameObject.SetActive(true);
         timerText.text = $"{minutes:00}:{seconds:00}";
         timerText.color = (timer <= 5f) ? Color.red : Color.white;
 
