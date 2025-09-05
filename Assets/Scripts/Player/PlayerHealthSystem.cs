@@ -189,8 +189,23 @@ public class PlayerHealthSystem : BaseHealthSystem, IDamageable
     protected override void Die()
     {
         Debug.Log("Player Dead!");
+        GetComponent<PlayerMovement>().enabled = false; //Test
         // EventBus.PlayerDied(); // nếu có
         GameManager.Instance.ChangeState(GameManager.GameState.GameOver);
         // Không gọi base.Die() vì base là abstract
+    }
+
+    [ContextMenu("Test")] //Test
+    public void Respawn()
+    {
+        CoinManager.Instance.RemoveCoins(Random.Range(100, 800)); // sự trừng phạt
+
+        currentHealth = maxHealth;
+        BroadcastHealth();
+
+        currentShield = maxShield;
+        BroadcastShield();
+
+        GetComponent<PlayerMovement>().enabled = true; //Test
     }
 }

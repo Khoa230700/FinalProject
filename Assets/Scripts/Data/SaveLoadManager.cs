@@ -9,20 +9,13 @@ public class SaveLoadManager : MonoBehaviour
 
     [Header("Options")]
     public EncryptionType encryption = EncryptionType.AES;
-    [Tooltip("Giây giữa các lần autosave. <= 0 để tắt.")]
     public float autoSaveInterval = 60f;
-    public bool autoLoadOnStart = true;
-    public bool saveOnQuit = true;
-    public bool saveOnPause = true;
-    public bool findRefsAutomatically = true;
     public bool verbose = true;
 
-    [Header("Scene refs (optional nếu Auto)")]
-    [SerializeField] private List<PlayerShoot> guns = new();
-    [SerializeField] private MeleeWeapon melee;
+    private List<PlayerShoot> guns = new();
+    private MeleeWeapon melee;
 
     bool isDirty;
-    Coroutine autosaveCo;
 
     void Awake()
     {
@@ -30,32 +23,27 @@ public class SaveLoadManager : MonoBehaviour
         Instance = this;
         DontDestroyOnLoad(gameObject);
 
-        if (findRefsAutomatically) DiscoverRefs();
+        DiscoverRefs();
         Subscribe();
     }
 
     void Start()
     {
-        if (autoLoadOnStart) LoadAndApply();
-        if (autoSaveInterval > 0) autosaveCo = StartCoroutine(AutoSaveLoop());
+        LoadAndApply();
+        if (autoSaveInterval > 0) StartCoroutine(AutoSaveLoop());
     }
 
     void OnDestroy() => Unsubscribe();
 
     void OnApplicationPause(bool pause)
     {
-        if (saveOnPause && pause) SaveNow();
+        if (pause) SaveNow();
     }
 
     void OnApplicationQuit()
     {
-        if (saveOnQuit) SaveNow();
+        SaveNow();
     }
-
-    // Cho phép đăng ký động (nếu bạn spawn vũ khí runtime)
-    public void RegisterGun(PlayerShoot gun) { if (gun == null) return; if (!guns.Contains(gun)) guns.Add(gun); SubscribeOne(gun); }
-    public void UnregisterGun(PlayerShoot gun) { if (gun == null) return; guns.Remove(gun); UnsubscribeOne(gun); }
-    public void SetMelee(MeleeWeapon m) { melee = m; }
 
     public void MarkDirty() => isDirty = true;
 
@@ -107,7 +95,7 @@ public class SaveLoadManager : MonoBehaviour
         var weapons = SaveLoadData.Data.weaponData ?? new WeaponData();
         weapons.guns.Clear();
 
-        //gun
+        // Guns
         foreach (var g in GetGunsSafe())
         {
             var up = g.GetComponent<GunUpgradeState>();
@@ -119,7 +107,7 @@ public class SaveLoadManager : MonoBehaviour
             });
         }
 
-        //melee
+        // Melee
         if (melee != null && melee.data != null)
         {
             weapons.melee = new MeleeSave
@@ -130,9 +118,11 @@ public class SaveLoadManager : MonoBehaviour
         }
 
         SaveLoadData.Data.weaponData = weapons;
+
+        // Coins
         SaveLoadData.Data.coins = CoinManager.Instance?.GetCoins() ?? 0;
 
-        // Save quests
+        // Quests
         if (QuestManager.Instance != null)
         {
             var questData = new QuestData();
@@ -162,14 +152,14 @@ public class SaveLoadManager : MonoBehaviour
         }
 
         // Player
-        if (SelectorSpawner.Instance != null && SelectorSpawner.Instance.Player != null)
-        {
-            Transform t = SelectorSpawner.Instance.Player.transform;
-            SaveLoadData.Data.playerData.posX = t.position.x;
-            SaveLoadData.Data.playerData.posY = t.position.y;
-            SaveLoadData.Data.playerData.posZ = t.position.z;
-            SaveLoadData.Data.playerData.rotY = t.eulerAngles.y;
-        }
+        // if (SelectorSpawner.Instance != null && SelectorSpawner.Instance.Player != null)
+        // {
+        //     Transform t = SelectorSpawner.Instance.Player.transform;
+        //     SaveLoadData.Data.playerData.posX = t.position.x;
+        //     SaveLoadData.Data.playerData.posY = t.position.y;
+        //     SaveLoadData.Data.playerData.posZ = t.position.z;
+        //     SaveLoadData.Data.playerData.rotY = t.eulerAngles.y;
+        // }
     }
 
     void ApplyToScene(GameData data)
@@ -208,7 +198,7 @@ public class SaveLoadManager : MonoBehaviour
             }
         }
 
-        //Coins
+        // Coins
         if (CoinManager.Instance != null)
         {
             CoinManager.Instance.LoadCoins();
@@ -245,19 +235,19 @@ public class SaveLoadManager : MonoBehaviour
             }
         }
 
-        // Player
-        if (SelectorSpawner.Instance != null && SelectorSpawner.Instance.Player != null && data.playerData != null)
-        {
-            var t = SelectorSpawner.Instance.Player.transform;
-            t.position = new Vector3(data.playerData.posX, data.playerData.posY, data.playerData.posZ);
-            t.rotation = Quaternion.Euler(0, data.playerData.rotY, 0);
-        }
+        // // Player
+        // if (SelectorSpawner.Instance != null && SelectorSpawner.Instance.Player != null && data.playerData != null)
+        // {
+        //     var t = SelectorSpawner.Instance.Player.transform;
+        //     t.position = new Vector3(data.playerData.posX, data.playerData.posY, data.playerData.posZ);
+        //     t.rotation = Quaternion.Euler(0, data.playerData.rotY, 0);
+        // }
     }
 
     // Helpers
     List<PlayerShoot> GetGunsSafe()
     {
-        if (findRefsAutomatically && (guns == null || guns.Count == 0))
+        if (guns == null || guns.Count == 0)
             DiscoverRefs();
 
         guns.RemoveAll(g => g == null);
@@ -289,9 +279,6 @@ public class SaveLoadManager : MonoBehaviour
             up.OnLevelChanged.RemoveListener(OnGunLevelChanged);
             up.OnLevelChanged.AddListener(OnGunLevelChanged);
         }
-
-        // Gợi ý: nếu PlayerShoot có event OnAmmoChanged/OnReloaded, hãy subscribe:
-        // g.OnAmmoChanged += OnAmmoChanged;
     }
 
     void Unsubscribe()
@@ -307,21 +294,12 @@ public class SaveLoadManager : MonoBehaviour
     {
         var up = g.GetComponent<GunUpgradeState>();
         if (up != null) up.OnLevelChanged.RemoveListener(OnGunLevelChanged);
-
-        // g.OnAmmoChanged -= OnAmmoChanged;
     }
 
     void OnGunLevelChanged(int _)
     {
         MarkDirty();
         QueueAutosave(1.5f);
-    }
-
-    // Nếu muốn gọi thủ công từ PlayerShoot khi bắn/nạp đạn:
-    public void NotifyAmmoChanged()
-    {
-        MarkDirty();
-        QueueAutosave(3f);
     }
 
     static string GetGunId(GunData data)
