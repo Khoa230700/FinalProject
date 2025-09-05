@@ -250,7 +250,7 @@ public class BossAi : MonoBehaviour
                 //  trigger a stun, knockback
             }
         }
-        Invoke(nameof(EndAttack), 1.5f);
+        Invoke(nameof(EndAttack), 3f);
     }
     void ResumeMovement()
     {
