@@ -11,7 +11,7 @@ public enum EncryptionType
     AES
 }
 
-public static class SaveLoadUtils
+public static class SaveLoadData
 {
     private static readonly object locker = new(); // Thread-safety
     public static GameData Data { get; private set; } = new();

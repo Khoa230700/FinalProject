@@ -182,7 +182,7 @@ public class QuestManager : MonoBehaviour
     //SAVE
     public void SaveQuestData()
     {
-        SaveLoadUtils.Data.questData = new QuestData();
+        SaveLoadData.Data.questData = new QuestData();
 
         //Lưu các quest đang active
         foreach (var quest in activeQuests)
@@ -203,19 +203,19 @@ public class QuestManager : MonoBehaviour
                 });
             }
 
-            SaveLoadUtils.Data.questData.activeQuests.Add(questSave);
+            SaveLoadData.Data.questData.activeQuests.Add(questSave);
         }
 
         //Lưu id quest đã hoàn thành
-        SaveLoadUtils.Data.questData.completedQuestIDs = completedQuestIDs;
+        SaveLoadData.Data.questData.completedQuestIDs = completedQuestIDs;
 
-        SaveLoadUtils.Save(EncryptionType.None);
+        SaveLoadData.Save(EncryptionType.None);
     }
 
     //LOAD
     public void LoadQuestData()
     {
-        QuestData questData = SaveLoadUtils.Load(EncryptionType.None).questData;
+        QuestData questData = SaveLoadData.Load(EncryptionType.None).questData;
 
         if (questData == null)
         {
