@@ -568,7 +568,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   data: {fileID: 11400000, guid: 62b4d60c4bc45754c8098b4d63d130c2, type: 2}
-  level: 20
+  level: 0
   armsAnimator: {fileID: 7796485733909455407}
   swingOrigin: {fileID: 1308769137523631464}
   aimCamera: {fileID: 0}
@@ -6346,6 +6346,7 @@ MonoBehaviour:
   shootPoint: {fileID: 1575151801354920015}
   armsAnimator: {fileID: 3028229162289663889}
   weaponUI: {fileID: 0}
+  shopUI: {fileID: 0}
   csgoScope: {fileID: 0}
   muzzleFlashParticle: {fileID: 198481540338831756, guid: 49aa1d4c5624e66418cbfbe9784d6f23, type: 3}
   gunAudioSource: {fileID: 6642479102638921013}
@@ -7093,6 +7094,7 @@ MonoBehaviour:
   shootPoint: {fileID: 2236893323447717625}
   armsAnimator: {fileID: 7699473390604045346}
   weaponUI: {fileID: 0}
+  shopUI: {fileID: 0}
   csgoScope: {fileID: 0}
   muzzleFlashParticle: {fileID: 198481540338831756, guid: 49aa1d4c5624e66418cbfbe9784d6f23, type: 3}
   gunAudioSource: {fileID: 858753646218117161}

@@ -14,55 +14,37 @@ public class CoinManager : MonoBehaviour
     private void Awake()
     {
         Instance = this;
-
         LoadCoins();
-        sessionCoins = 0;//Test
+        sessionCoins = 0; // reset khi bắt đầu session
     }
 
     public void AddCoins(int amount)
     {
-        if (amount > 0)
-        {
-            sessionCoins += amount;
-        }
+        if (amount > 0) sessionCoins += amount;
 
         int newAmount = Mathf.Max(0, currentCoins + amount);
-
         OnCoinChanged?.Invoke(currentCoins, newAmount);
 
         currentCoins = newAmount;
         SaveCoins();
     }
 
+    public void RemoveCoins(int amount) => AddCoins(-amount);
+    public int GetCoins() => currentCoins;
+    public int GetSessionCoins() => sessionCoins;
+    public bool HasEnoughCoins(int amount) => currentCoins >= amount;
 
-    public void RemoveCoins(int amount)
+    public void SaveCoins()
     {
-        AddCoins(-amount);
+        SaveLoadData.Data.coins = currentCoins;
+        SaveLoadManager.Instance?.MarkDirty();
     }
 
-    public int GetCoins()
+    public void LoadCoins()
     {
-        return currentCoins;
-    }
+        int old = currentCoins;
+        currentCoins = SaveLoadData.Data.coins;
 
-    public int GetSessionCoins()
-    {
-        return sessionCoins;
-    }
-
-    public bool HasEnoughCoins(int amount)
-    {
-        return currentCoins >= amount;
-    }
-
-    private void SaveCoins()
-    {
-        PlayerPrefs.SetInt("PlayerCoins", currentCoins);
-        PlayerPrefs.Save();
-    }
-
-    private void LoadCoins()
-    {
-        currentCoins = PlayerPrefs.GetInt("PlayerCoins", 0);
+        OnCoinChanged?.Invoke(old, currentCoins);
     }
 }

@@ -114,6 +114,7 @@ public class ShopManager : MonoBehaviour
 
         CoinManager.Instance.RemoveCoins(upgradeCost);
         AudioManager.Instance.PlaySFX("Purchase");
+        SaveLoadManager.Instance?.QueueAutosave(1.0f);
 
         gunUpgradeState.LevelUp();
 
@@ -149,6 +150,7 @@ public class ShopManager : MonoBehaviour
 
         CoinManager.Instance.RemoveCoins(upgradeCost);
         AudioManager.Instance.PlaySFX("Purchase");
+        SaveLoadManager.Instance?.QueueAutosave(1.0f);
         
         melee.level++;
 

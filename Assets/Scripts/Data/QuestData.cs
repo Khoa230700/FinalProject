@@ -1,13 +1,14 @@
+using System;
 using System.Collections.Generic;
 
-[System.Serializable]
+[Serializable]
 public class QuestData
 {
     public List<QuestDataSO> activeQuests = new();
     public List<string> completedQuestIDs = new();
 }
 
-[System.Serializable]
+[Serializable]
 public class QuestDataSO
 {
     public string questID;
@@ -15,7 +16,7 @@ public class QuestDataSO
     public List<ObjectiveData> objectives = new();
 }
 
-[System.Serializable]
+[Serializable]
 public class ObjectiveData
 {
     public string objectiveID;
