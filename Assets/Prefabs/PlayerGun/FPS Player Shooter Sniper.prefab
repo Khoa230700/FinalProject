@@ -2115,6 +2115,15 @@ MonoBehaviour:
   baseMoveSpeed: 5
   healthBar: {fileID: 0}
   shieldBar: {fileID: 0}
+  animator: {fileID: 0}
+  deathTriggerName: DieBack
+  usePhysicsDeath: 1
+  disableCharacterControllerOnDeath: 1
+  disableOnDeath: []
+  ragdoll: {fileID: 0}
+  deathBackForce: 6
+  deathUpForce: 2
+  deathTorque: 8
 --- !u!82 &6982715678529923871
 AudioSource:
   m_ObjectHideFlags: 0
