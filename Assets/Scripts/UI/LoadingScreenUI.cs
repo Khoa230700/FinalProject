@@ -15,7 +15,6 @@ public class LoadingScreenUI : MonoBehaviour
     public Slider progressBar;
     public Transform spinnerParent;
     public Image imageObject;
-    public Animator animator;
     public AudioSource audioSource;
 
     [Header("SETTINGS")]
@@ -30,13 +29,15 @@ public class LoadingScreenUI : MonoBehaviour
     public bool enableVirtualLoading = false;
     [Range(1f, 20f)] public float virtualLoadingTimer = 5f;
 
-    private bool isProcessingLoad, isDestroying;
+    private bool isProcessingLoad;
     private AsyncOperation loadingProcess;
     private float currentVirtualTime;
     private int currentHintIndex = -1, currentImageIndex = -1;
 
-    // === PRELOAD HANDLER ===
-    private static LoadingScreenUI preloadInstance;
+    // --- TOI UU ---
+    private int lastDisplayedPercent = -1;
+    private Coroutine hintCoroutine, imageCoroutine;
+    private Dictionary<float, WaitForSecondsRealtime> waitCache = new();
 
     void Awake()
     {
@@ -45,10 +46,10 @@ public class LoadingScreenUI : MonoBehaviour
             Destroy(gameObject);
             return;
         }
+
         instance = this;
         DontDestroyOnLoad(gameObject);
 
-        // Đảm bảo Canvas luôn ở trên cùng
         Canvas canvas = GetComponentInChildren<Canvas>();
         if (canvas != null)
         {
@@ -59,20 +60,10 @@ public class LoadingScreenUI : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-    void OnEnable()
-    {
-        if (audioSource != null && audioSource.clip != null)
-        {
-            audioSource.Stop();
-            audioSource.time = 0;
-            audioSource.Play();
-            audioSource.volume = 0.5f;
-        }
-    }
-
+    #region Preload & LoadScene
     public static void Preload()
     {
-        if (preloadInstance != null) return;
+        if (instance != null) return;
 
         var prefab = Resources.Load<GameObject>("Loading");
         if (prefab == null)
@@ -82,195 +73,163 @@ public class LoadingScreenUI : MonoBehaviour
         }
 
         var go = Instantiate(prefab);
-        preloadInstance = go.GetComponent<LoadingScreenUI>();
-        preloadInstance.gameObject.SetActive(false);
-        DontDestroyOnLoad(preloadInstance.gameObject);
+        instance = go.GetComponent<LoadingScreenUI>();
     }
 
     public static void LoadScene(string targetScene)
     {
-        if (preloadInstance == null)
-        {
-            Preload();
-        }
+        if (instance == null) Preload();
+        if (instance.isProcessingLoad) return; // Ngăn trùng lặp
 
-        // Force activate UI immediately
-        preloadInstance.gameObject.SetActive(true);
-        preloadInstance.StartCoroutine(preloadInstance.LoadSceneRoutine(targetScene));
+        instance.gameObject.SetActive(true);
+        instance.StartCoroutine(instance.LoadSceneRoutine(targetScene));
     }
+    #endregion
 
     IEnumerator LoadSceneRoutine(string targetScene)
     {
-        Debug.Log("Loading screen started");
-        
-        // CRITICAL: Ensure UI is visible IMMEDIATELY
-        gameObject.SetActive(true);
-        canvasGroup.alpha = 1f;
-        canvasGroup.interactable = false;
-        canvasGroup.blocksRaycasts = true;
-
-        // Force canvas to update
-        Canvas.ForceUpdateCanvases();
-        
         isProcessingLoad = true;
-        isDestroying = false;
 
-        // Set initial values
-        statusText.text = "Loading... 0%";
+        // Reset trạng thái
         progressBar.value = 0f;
+        statusText.text = "0%";
+        lastDisplayedPercent = 0;
         currentVirtualTime = 0f;
 
-        if (imageList.Count > 0)
-            imageObject.sprite = GetRandomItem(imageList, ref currentImageIndex);
+        // --- BƯỚC QUAN TRỌNG: Đảm bảo UI render trước ---
+        yield return null; // Cho Unity render UI lần đầu
 
-        // Start hint and image cycling
-        if (enableRandomHints && hintList.Count > 0)
-            StartCoroutine(CycleHints());
+        // Tắt raycast tạm thời
+        canvasGroup.blocksRaycasts = false;
+        canvasGroup.alpha = 0f;
 
-        if (enableRandomImages && imageList.Count > 1)
-            StartCoroutine(CycleImages());
+        // --- 1. FADE IN HOÀN TOÀN TRƯỚC KHI LOAD ---
+        StartCoroutine(FadeCanvasGroup(0f, 1f, 1f / fadeSpeed, () =>
+        {
+            // Chỉ bắt đầu load khi fade-in xong
+            StartLoadingProcess(targetScene);
+        }));
+    }
 
-        // CRITICAL: Wait multiple frames to ensure UI is rendered
-        yield return null; // Wait 1 frame
-        yield return null; // Wait another frame
-        yield return new WaitForSecondsRealtime(0.1f); // Extra safety delay
+    // --- Hàm gọi chỉ khi fade-in xong ---
+    void StartLoadingProcess(string targetScene)
+    {
+        if (!isProcessingLoad) return;
 
-        Debug.Log("Starting scene load...");
-
-        // Start loading the scene
+        // --- BẮT ĐẦU QUÁ TRÌNH LOAD ---
+        Application.backgroundLoadingPriority = ThreadPriority.Low;
         loadingProcess = SceneManager.LoadSceneAsync(targetScene);
         loadingProcess.allowSceneActivation = false;
 
-        // Play entrance animation if available
-        if (animator != null)
-            animator.Play("In");
-
-        Debug.Log("Scene loading in progress...");
-    }
-
-    void Update()
-    {
-        if (!isProcessingLoad || isDestroying) return;
-
-        // Ensure UI remains visible
-        if (canvasGroup.alpha < 1f)
+        // --- Cài đặt âm thanh ---
+        if (audioSource != null && audioSource.clip != null)
         {
-            canvasGroup.alpha = 1f;
+            audioSource.Play();
+            audioSource.volume = 0.5f;
         }
 
-        if (enableVirtualLoading) ProcessVirtualLoading();
-        else ProcessRealLoading();
+        // --- Cập nhật UI ---
+        if (imageList.Count > 0)
+            imageObject.sprite = GetRandomItem(imageList, ref currentImageIndex);
+
+        // --- Bắt đầu hint/image nếu cần ---
+        if (enableRandomHints && hintList.Count > 0)
+            hintCoroutine = StartCoroutine(CycleHints());
+
+        if (enableRandomImages && imageList.Count > 1)
+            imageCoroutine = StartCoroutine(CycleImages());
+
+        // --- Bắt đầu vòng lặp kiểm tra tiến độ ---
+        StartCoroutine(UpdateLoadingLoop());
     }
 
-    void ProcessRealLoading()
+    // --- Vòng lặp chính kiểm tra progress mỗi frame ---
+    IEnumerator UpdateLoadingLoop()
     {
-        if (loadingProcess == null) return;
-
-        float targetProgress = Mathf.Clamp01(loadingProcess.progress / 0.9f);
-        progressBar.value = Mathf.Lerp(progressBar.value, targetProgress, Time.unscaledDeltaTime * fadeSpeed);
-        statusText.text = "Loading... " + Mathf.RoundToInt(progressBar.value * 100f) + "%";
-
-        if (loadingProcess.progress >= 0.9f && progressBar.value >= 0.95f)
+        while (isProcessingLoad)
         {
-            progressBar.value = 1f;
-            statusText.text = "Loading... 100%";
-            loadingProcess.allowSceneActivation = true;
+            UpdateLoadingProgress();
+            yield return null;
+        }
+    }
+
+    void UpdateLoadingProgress()
+    {
+        float progress = 0f;
+
+        if (enableVirtualLoading)
+        {
+            currentVirtualTime += Time.unscaledDeltaTime;
+            progress = Mathf.Clamp01(currentVirtualTime / virtualLoadingTimer);
+        }
+        else
+        {
+            progress = loadingProcess != null ? Mathf.Clamp01(loadingProcess.progress / 0.9f) : 0f;
+        }
+
+        // Smooth lerp progress bar
+        progressBar.value = Mathf.Lerp(progressBar.value, progress, Time.unscaledDeltaTime * fadeSpeed);
+
+        // Cập nhật text chỉ khi % thay đổi
+        int currentPercent = Mathf.RoundToInt(progressBar.value * 100f);
+        if (currentPercent != lastDisplayedPercent)
+        {
+            statusText.text = currentPercent + "%";
+            lastDisplayedPercent = currentPercent;
+        }
+
+        // Fade âm thanh
+        if (audioSource != null)
+            audioSource.volume = Mathf.Lerp(0.5f, 0f, progressBar.value);
+
+        // Kiểm tra hoàn thành
+        bool isFinished = 
+            (!enableVirtualLoading && loadingProcess.progress >= 0.9f && progressBar.value >= 0.99f) ||
+            (enableVirtualLoading && currentVirtualTime >= virtualLoadingTimer);
+
+        if (isFinished)
+        {
             FinishLoading();
-        }
-    }
-
-    void ProcessVirtualLoading()
-    {
-        currentVirtualTime += Time.unscaledDeltaTime;
-        float progress = Mathf.Clamp01(currentVirtualTime / virtualLoadingTimer);
-
-        progressBar.value = progress;
-        statusText.text = "Loading... " + Mathf.RoundToInt(progress * 100f) + "%";
-
-        if (currentVirtualTime >= virtualLoadingTimer)
-        {
-            if (loadingProcess != null && !loadingProcess.allowSceneActivation)
-                loadingProcess.allowSceneActivation = true;
-
-            if (loadingProcess == null || loadingProcess.progress >= 0.9f)
-                FinishLoading();
         }
     }
 
     void FinishLoading()
     {
-        if (isDestroying) return;
-        
-        Debug.Log("Loading finished");
+        if (!isProcessingLoad) return;
         isProcessingLoad = false;
-        
-        // Reset loading priority back to normal
+
+        // Đảm bảo 100%
+        progressBar.value = 1f;
+        if (lastDisplayedPercent != 100) statusText.text = "100%";
+
+        if (loadingProcess != null)
+            loadingProcess.allowSceneActivation = true;
+
         Application.backgroundLoadingPriority = ThreadPriority.Normal;
-        
         if (Time.timeScale == 0f) Time.timeScale = 1f;
 
-        if (audioSource != null && audioSource.volume > 0f)
-            StartCoroutine(FadeAudio(audioSource.volume, 0f, 1.0f));
-
-        if (animator != null)
+        // Fade out và hủy
+        StartCoroutine(FadeCanvasGroup(1f, 0f, 1f / fadeSpeed, () =>
         {
-            animator.Play("Out");
-            StartCoroutine(DestroyAfterDelay());
-        }
-        else
-        {
-            CleanupAndDestroy();
-        }
+            gameObject.SetActive(false);
+            if (hintCoroutine != null) StopCoroutine(hintCoroutine);
+            if (imageCoroutine != null) StopCoroutine(imageCoroutine);
+        }));
     }
 
-    IEnumerator DestroyAfterDelay()
-    {
-        yield return new WaitForSecondsRealtime(0.1f);
-        
-        // Get animation length safely
-        float length = 1f; // Default fallback
-        try
-        {
-            var stateInfo = animator.GetCurrentAnimatorStateInfo(0);
-            if (stateInfo.IsName("Out"))
-                length = stateInfo.length;
-        }
-        catch
-        {
-            Debug.LogWarning("Could not get animator state info, using default delay");
-        }
-        
-        yield return new WaitForSecondsRealtime(length);
-        CleanupAndDestroy();
-    }
-
-    void CleanupAndDestroy()
-    {
-        if (isDestroying) return;
-        isDestroying = true;
-
-        Debug.Log("Loading screen cleanup");
-        gameObject.SetActive(false);
-    }
-
+    #region Hint & Image Cycling
     IEnumerator CycleHints()
     {
-        if (hintList.Count > 0)
+        hintsText.gameObject.SetActive(hintList.Count > 0);
+        if (hintList.Count == 0) yield break;
+
+        hintsText.text = GetRandomItem(hintList, ref currentHintIndex);
+        yield return FadeText(hintsText, 0f, 1f, hintFadeDuration);
+
+        while (true)
         {
-            hintsText.text = GetRandomItem(hintList, ref currentHintIndex);
-            yield return FadeText(hintsText, 0f, 1f, hintFadeDuration);
-        }
-
-        while (!isDestroying)
-        {
-            if (hintList.Count == 0) yield break;
-
-            yield return new WaitForSecondsRealtime(hintTimer);
-            if (isDestroying) yield break;
-
+            yield return GetWaiter(hintTimer);
             yield return FadeText(hintsText, 1f, 0f, hintFadeDuration);
-            if (isDestroying) yield break;
-
             hintsText.text = GetRandomItem(hintList, ref currentHintIndex);
             yield return FadeText(hintsText, 0f, 1f, hintFadeDuration);
         }
@@ -278,79 +237,74 @@ public class LoadingScreenUI : MonoBehaviour
 
     IEnumerator CycleImages()
     {
-        while (!isDestroying)
+        if (imageList.Count <= 1) yield break;
+
+        while (true)
         {
-            yield return new WaitForSecondsRealtime(imageTimer);
-            if (imageList.Count <= 1 || isDestroying) yield break;
-
+            yield return GetWaiter(imageTimer);
             yield return FadeImage(imageObject, 1f, 0f, 1f / imageFadingSpeed);
-            if (isDestroying) yield break;
-
             imageObject.sprite = GetRandomItem(imageList, ref currentImageIndex);
             yield return FadeImage(imageObject, 0f, 1f, 1f / imageFadingSpeed);
         }
+    }
+    #endregion
+
+    #region Fade Coroutines & Helpers
+    private WaitForSecondsRealtime GetWaiter(float seconds)
+    {
+        if (!waitCache.ContainsKey(seconds))
+        {
+            waitCache[seconds] = new WaitForSecondsRealtime(seconds);
+        }
+        return waitCache[seconds];
+    }
+
+    IEnumerator FadeCanvasGroup(float from, float to, float duration, System.Action onComplete = null)
+    {
+        float elapsed = 0f;
+        while (elapsed < duration)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            canvasGroup.alpha = Mathf.Lerp(from, to, elapsed / duration);
+            yield return null;
+        }
+        canvasGroup.alpha = to;
+        canvasGroup.blocksRaycasts = (to > 0.1f);
+        onComplete?.Invoke();
     }
 
     IEnumerator FadeText(TextMeshProUGUI text, float from, float to, float duration)
     {
         if (text == null) yield break;
-
         float elapsed = 0f;
         Color color = text.color;
-
-        while (elapsed < duration && !isDestroying)
+        while (elapsed < duration)
         {
             elapsed += Time.unscaledDeltaTime;
             color.a = Mathf.Lerp(from, to, elapsed / duration);
             text.color = color;
             yield return null;
         }
-
-        if (!isDestroying)
-        {
-            color.a = to;
-            text.color = color;
-        }
+        color.a = to;
+        text.color = color;
     }
 
     IEnumerator FadeImage(Image img, float from, float to, float duration)
     {
         if (img == null) yield break;
-
         float elapsed = 0f;
         Color color = img.color;
-
-        while (elapsed < duration && !isDestroying)
+        while (elapsed < duration)
         {
             elapsed += Time.unscaledDeltaTime;
             color.a = Mathf.Lerp(from, to, elapsed / duration);
             img.color = color;
             yield return null;
         }
-
-        if (!isDestroying)
-        {
-            color.a = to;
-            img.color = color;
-        }
+        color.a = to;
+        img.color = color;
     }
-
-    IEnumerator FadeAudio(float from, float to, float duration)
-    {
-        if (audioSource == null) yield break;
-
-        float elapsed = 0f;
-        audioSource.volume = from;
-
-        while (elapsed < duration && !isDestroying)
-        {
-            elapsed += Time.unscaledDeltaTime;
-            audioSource.volume = Mathf.Lerp(from, to, elapsed / duration);
-            yield return null;
-        }
-
-        audioSource.volume = to;
-    }
+    #endregion
 
     T GetRandomItem<T>(List<T> list, ref int lastIndex)
     {
@@ -358,13 +312,9 @@ public class LoadingScreenUI : MonoBehaviour
         if (list.Count == 1) return list[0];
 
         int newIndex;
-        int attempts = 0;
-        do
-        {
+        do {
             newIndex = Random.Range(0, list.Count);
-            attempts++;
-        }
-        while (newIndex == lastIndex && attempts < 10);
+        } while (newIndex == lastIndex);
 
         lastIndex = newIndex;
         return list[newIndex];
