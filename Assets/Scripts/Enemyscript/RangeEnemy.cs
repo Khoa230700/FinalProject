@@ -34,6 +34,10 @@ public class RangeEnemy : MonoBehaviour
         agent.stoppingDistance = stopDistance;
 
         soundController = GetComponent<EnemySoundController>();
+        if (player == null)
+        {
+            player = GameObject.FindWithTag("Player").transform;
+        }
     }
 
     void Update()

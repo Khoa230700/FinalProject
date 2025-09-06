@@ -24,6 +24,10 @@ public class Spidey : MonoBehaviour
         agent = GetComponent<NavMeshAgent>();
         agent.stoppingDistance = stopDistance;
         soundController = GetComponent<EnemySoundController>();
+        if (player == null)
+        {
+            player = GameObject.FindWithTag("Player").transform;
+        }
     }
 
     // Update is called once per frame
