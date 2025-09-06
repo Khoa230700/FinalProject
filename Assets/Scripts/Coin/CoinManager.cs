@@ -47,4 +47,10 @@ public class CoinManager : MonoBehaviour
 
         OnCoinChanged?.Invoke(old, currentCoins);
     }
+
+    [ContextMenu("Test")]
+    public void Test()
+    {
+        AddCoins(UnityEngine.Random.Range(100, 10000));
+    }
 }
