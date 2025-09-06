@@ -20,22 +20,25 @@ public class ShieldShopItemStrategy : IShopItemStrategy
     {
         var shield = item as PlayerHealthSystem;
         string label = "";
+        Color color;
         int cost = 0;
 
         if (!ui.shopManager.NeedsShield(shield))
         {
             label = "Full Shield";
+            color = new Color(0.392f, 0.698f, 0.812f);
         }
         else
         {
             cost = ui.shopManager.GetShieldCost(shield);
             label = $"$ {cost}";
+            color = ui.shopManager.NeedsShield(shield) && CoinManager.Instance.HasEnoughCoins(cost)
+            ? new Color(0.392f, 0.698f, 0.812f)
+            : Color.red;
         }
 
         ui.priceText.text = label;
-        ui.priceText.color = ui.shopManager.NeedsShield(shield) && CoinManager.Instance.HasEnoughCoins(cost)
-            ? Color.red
-            : new Color(0.392f, 0.698f, 0.812f);
+        ui.priceText.color = color;
         ui.priceText.gameObject.SetActive(true);
     }
 

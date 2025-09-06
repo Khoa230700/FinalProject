@@ -14,6 +14,7 @@ public class MeleeWeapon : MonoBehaviour, IWeapon
     public Transform swingOrigin;          // đặt ở đầu lưỡi rìu/dao
     public Camera aimCamera;               // kéo thả Main Camera
     public WeaponUI weaponUI;
+    private ShopUI shopUI;
 
     [Header("Audio")]
     [Tooltip("AudioSource trên prefab vũ khí (khuyến nghị). Nếu trống sẽ fallback PlayClipAtPoint tại swingOrigin).")]
@@ -54,6 +55,11 @@ public class MeleeWeapon : MonoBehaviour, IWeapon
     bool _playedHitThisSwing = false;
     bool _anyHitThisSwing = false;
 
+    void Start()
+    {
+        shopUI = FindAnyObjectByType<ShopUI>();
+    }
+
     public void OnSelected(WeaponUI ui)
     {
         weaponUI = ui;
@@ -67,7 +73,7 @@ public class MeleeWeapon : MonoBehaviour, IWeapon
 
     public void FireOnce()
     {
-        if (!canAttack || data == null || swingOrigin == null) return;
+        if (!canAttack || data == null || swingOrigin == null || shopUI.isOpen) return;
         StartCoroutine(DoSwing());
     }
 

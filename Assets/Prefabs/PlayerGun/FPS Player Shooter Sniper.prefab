@@ -1301,7 +1301,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &6367786861773823768
 Transform:
   m_ObjectHideFlags: 0
@@ -1417,7 +1417,7 @@ Canvas:
   m_AdditionalShaderChannelsFlag: 0
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 0
+  m_SortingOrder: -1
   m_TargetDisplay: 0
 --- !u!114 &2964552921872022036
 MonoBehaviour:
@@ -2115,6 +2115,15 @@ MonoBehaviour:
   baseMoveSpeed: 5
   healthBar: {fileID: 0}
   shieldBar: {fileID: 0}
+  animator: {fileID: 0}
+  deathTriggerName: DieBack
+  usePhysicsDeath: 1
+  disableCharacterControllerOnDeath: 1
+  disableOnDeath: []
+  ragdoll: {fileID: 0}
+  deathBackForce: 6
+  deathUpForce: 2
+  deathTorque: 8
 --- !u!82 &6982715678529923871
 AudioSource:
   m_ObjectHideFlags: 0
@@ -2719,6 +2728,7 @@ MonoBehaviour:
   shootPoint: {fileID: 7273187557222652850}
   armsAnimator: {fileID: 2228220168125291594}
   weaponUI: {fileID: 0}
+  shopUI: {fileID: 0}
   csgoScope: {fileID: 0}
   muzzleFlashParticle: {fileID: 198481540338831756, guid: 49aa1d4c5624e66418cbfbe9784d6f23, type: 3}
   gunAudioSource: {fileID: 1926936187852394843}
@@ -3065,7 +3075,7 @@ Canvas:
   m_AdditionalShaderChannelsFlag: 0
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 0
+  m_SortingOrder: -1
   m_TargetDisplay: 0
 --- !u!114 &7410812435983688081
 MonoBehaviour:
@@ -3668,6 +3678,7 @@ MonoBehaviour:
   shootPoint: {fileID: 1547085161081651443}
   armsAnimator: {fileID: 7737834752848102791}
   weaponUI: {fileID: 0}
+  shopUI: {fileID: 0}
   csgoScope: {fileID: 5506603170031170302}
   muzzleFlashParticle: {fileID: 198481540338831756, guid: 49aa1d4c5624e66418cbfbe9784d6f23, type: 3}
   gunAudioSource: {fileID: 2371396123406249843}
@@ -3933,7 +3944,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &500052456234813616
 Transform:
   m_ObjectHideFlags: 0
@@ -5423,7 +5434,7 @@ MonoBehaviour:
   scopeLens: {fileID: 4128772428749821544}
   scopeOverlayUI: {fileID: 424012912021214882}
   csgoScope: {fileID: 5506603170031170302}
-  centerPull: 0.384
+  centerPull: 0.662
   uiScaleOnScope: 1.15
   uiLerpSpeed: 12
 --- !u!1 &5982616735339148963
@@ -7730,8 +7741,8 @@ Transform:
   m_GameObject: {fileID: 9126336712150412277}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.116, y: 1.668, z: 50}
-  m_LocalScale: {x: 1.6221848, y: 1.6221853, z: 1.6221852}
+  m_LocalPosition: {x: 0.123, y: 1.671, z: 0.9184}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 500052456234813616}

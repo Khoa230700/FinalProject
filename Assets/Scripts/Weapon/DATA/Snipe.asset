@@ -32,7 +32,7 @@ MonoBehaviour:
   reserveAmmo: 25
   reloadTime: 1
   hasScope: 1
-  scopeZoom: 2
+  scopeZoom: 10
   tracerPrefab: {fileID: 6749693277989217856, guid: dfcafcdd61ac0e447b7e869afc9b8d0c, type: 3}
   shootSound: {fileID: 8300000, guid: f100353ca7cfef14987f2d2884d1dd53, type: 3}
   bulletRefillCost: 10

@@ -89,7 +89,6 @@ public class WaveManager : MonoBehaviour
 
             if (timerUI != null)
                 timerUI.UpdateUI($"NEXT WAVE IN {seconds}s", timer / countdown, seconds);
-            Debug.Log(seconds);
             yield return null;
             timer -= Time.deltaTime;
         }

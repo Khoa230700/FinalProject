@@ -1,16 +1,17 @@
 ﻿using UnityEngine;
+using System.Collections.Generic;
 
 /// <summary>
-/// CSGO-style Scope: giữ chuột phải để ngắm, thả để bỏ.
-/// - Zoom mượt theo FOV (lerp).
-/// - Cho phép cuộn chuột để chỉnh mức zoom khi đang ngắm.
+/// CSGO-style Scope:
+/// - Giữ chuột phải để ngắm, thả để bỏ.
+/// - Zoom mượt theo FOV (lerp), cuộn chuột để chỉnh mức zoom khi đang ngắm.
 /// - Tịnh tiến camera local về phía trước khi ngắm để tạo cảm giác "đưa ống ngắm sát mắt".
 /// - Bật/tắt UI overlay (RawImage/Canvas) nếu cần.
-/// 
-/// Gợi ý set-up:
-/// - Gán playerShoot (để kiểm tra gunData.hasScope và lấy scopeZoom).
-/// - Gán playerCamera (nếu null sẽ lấy Camera.main).
-/// - Nếu dùng UI RawImage vòng scope, gán scopeOverlayUI.
+///
+/// Lưu ý an toàn:
+/// - FOV luôn bị clamp cứng (1..179) để tránh tụt về ~0 khi prefab/instance có min/max lỗi.
+/// - Nếu vũ khí không có scope, script vẫn ép trả FOV/offset về bình thường (không return sớm).
+/// - Chống nhiều CSGOScope cùng điều khiển 1 Camera.
 /// </summary>
 public class CSGOScope : MonoBehaviour
 {
@@ -29,8 +30,8 @@ public class CSGOScope : MonoBehaviour
     public float zoomSpeed = 10f;
 
     [Tooltip("Giới hạn FOV khi đang ngắm (cuộn chuột sẽ nằm trong khoảng này).")]
-    public float minScopedFOV = 6f;   // zoom sâu nhất
-    public float maxScopedFOV = 25f;  // zoom nông nhất
+    public float minScopedFOV = 6f;    // zoom sâu nhất
+    public float maxScopedFOV = 25f;   // zoom nông nhất
 
     [Tooltip("Độ nhạy cuộn chuột khi đang ngắm.")]
     public float scrollZoomSensitivity = 8f;
@@ -41,14 +42,22 @@ public class CSGOScope : MonoBehaviour
     [Tooltip("Tốc độ lerp vị trí camera.")]
     public float offsetLerpSpeed = 14f;
 
+    /// <summary>Trạng thái scope cho script khác tham chiếu.</summary>
+    public bool IsScoped { get; private set; } = false;
+
+    // --- Internal state ---
     private float normalFOV;
     private float targetFOV;
 
     private Vector3 camLocalPosDefault;
     private Vector3 camLocalPosTarget;
 
-    /// <summary>Trạng thái scope cho script khác tham chiếu.</summary>
-    public bool IsScoped { get; private set; } = false;
+    // Clamp cứng để chống FOV ~ 0
+    private const float FOV_HARD_MIN = 34f;
+    private const float FOV_HARD_MAX = 179f;
+
+    // Chống nhiều scope điều khiển cùng camera
+    private static readonly Dictionary<Camera, CSGOScope> Owners = new Dictionary<Camera, CSGOScope>();
 
     void Start()
     {
@@ -60,68 +69,92 @@ public class CSGOScope : MonoBehaviour
             return;
         }
 
-        // Đảm bảo min/max FOV hợp lệ
-        if (minScopedFOV > maxScopedFOV)
+        if (playerCamera.orthographic)
         {
-            float t = minScopedFOV;
-            minScopedFOV = maxScopedFOV;
-            maxScopedFOV = t;
+            Debug.LogWarning($"[CSGOScope] Camera '{playerCamera.name}' đang để Orthographic. Đổi sang Perspective để dùng FOV.");
+            playerCamera.orthographic = false; // ép về Perspective cho chắc
         }
 
-        normalFOV = playerCamera.fieldOfView;
+        // Sửa min/max nếu bị đảo/không hợp lệ & clamp cứng
+        float minCfg = Mathf.Max(FOV_HARD_MIN, minScopedFOV);
+        float maxCfg = Mathf.Max(FOV_HARD_MIN, maxScopedFOV);
+        if (minCfg > maxCfg) { float t = minCfg; minCfg = maxCfg; maxCfg = t; }
+        minScopedFOV = Mathf.Clamp(minCfg, FOV_HARD_MIN, FOV_HARD_MAX);
+        maxScopedFOV = Mathf.Clamp(maxCfg, FOV_HARD_MIN, FOV_HARD_MAX);
+
+        normalFOV = Mathf.Clamp(playerCamera.fieldOfView, FOV_HARD_MIN, FOV_HARD_MAX);
         targetFOV = normalFOV;
 
         camLocalPosDefault = playerCamera.transform.localPosition;
         camLocalPosTarget = camLocalPosDefault;
 
-        if (scopeOverlayUI != null) scopeOverlayUI.SetActive(false);
+        if (scopeOverlayUI) scopeOverlayUI.SetActive(false);
+
+        // Đăng ký owner duy nhất cho camera
+        if (Owners.TryGetValue(playerCamera, out var other) && other != null && other != this)
+        {
+            Debug.LogWarning($"[CSGOScope] Camera '{playerCamera.name}' đã được '{other.name}' điều khiển. Vô hiệu hóa CSGOScope trên '{name}'.");
+            enabled = false;
+            return;
+        }
+        Owners[playerCamera] = this;
     }
 
     void OnDisable()
     {
-        // Reset sạch khi component bị tắt (đổi súng, disable object...)
         ForceScopeOut();
+
+        if (playerCamera && Owners.TryGetValue(playerCamera, out var me) && me == this)
+            Owners.Remove(playerCamera);
+    }
+
+    void OnDestroy()
+    {
+        // Phòng trường hợp OnDisable không chạy (tuỳ lifecycle)
+        if (playerCamera && Owners.TryGetValue(playerCamera, out var me) && me == this)
+            Owners.Remove(playerCamera);
     }
 
     void Update()
     {
-        // Không cho ngắm nếu vũ khí không có scope
-        if (playerShoot == null || playerShoot.gunData == null || !playerShoot.gunData.hasScope)
-            return;
+        bool weaponHasScope = (playerShoot != null && playerShoot.gunData != null && playerShoot.gunData.hasScope);
 
-        // Hỗ trợ cả Input Manager cũ và chuột phải trực tiếp
+        // Input scope (chuột phải)
         bool scopeDown = Input.GetButtonDown("Fire2") || Input.GetMouseButtonDown(1);
         bool scopeUp = Input.GetButtonUp("Fire2") || Input.GetMouseButtonUp(1);
 
-        if (scopeDown) ScopeIn();
-        else if (scopeUp) ScopeOut();
-
-        // Cuộn chuột để tinh chỉnh zoom khi đang ngắm
-        if (IsScoped)
+        if (weaponHasScope)
         {
-            float scroll = Input.mouseScrollDelta.y;
-            if (Mathf.Abs(scroll) > Mathf.Epsilon)
+            if (scopeDown) ScopeIn();
+            else if (scopeUp) ScopeOut();
+
+            // Cuộn zoom khi đang scope
+            if (IsScoped)
             {
-                targetFOV = Mathf.Clamp(
-                    targetFOV - scroll * scrollZoomSensitivity,
-                    minScopedFOV,
-                    maxScopedFOV
-                );
+                float scroll = Input.mouseScrollDelta.y;
+                if (Mathf.Abs(scroll) > Mathf.Epsilon)
+                {
+                    targetFOV = Mathf.Clamp(
+                        targetFOV - scroll * scrollZoomSensitivity,
+                        minScopedFOV, maxScopedFOV
+                    );
+                }
             }
         }
+        else
+        {
+            // Nếu súng hiện tại không có scope → đảm bảo trả về bình thường
+            if (IsScoped) ScopeOut();
+            targetFOV = normalFOV;
+            camLocalPosTarget = camLocalPosDefault;
+        }
 
-        // Lerp FOV
-        playerCamera.fieldOfView = Mathf.Lerp(
-            playerCamera.fieldOfView,
-            targetFOV,
-            Time.deltaTime * zoomSpeed
-        );
-
-        // Lerp vị trí camera
+        // Lerp FOV an toàn + Lerp vị trí camera
+        playerCamera.fieldOfView = SafeLerpFov(playerCamera.fieldOfView, targetFOV, Time.deltaTime * zoomSpeed);
         playerCamera.transform.localPosition = Vector3.Lerp(
             playerCamera.transform.localPosition,
             camLocalPosTarget,
-            Time.deltaTime * offsetLerpSpeed
+            Mathf.Clamp01(Time.deltaTime * offsetLerpSpeed)
         );
     }
 
@@ -130,14 +163,17 @@ public class CSGOScope : MonoBehaviour
         if (IsScoped) return;
         IsScoped = true;
 
-        if (scopeOverlayUI != null) scopeOverlayUI.SetActive(true);
+        if (scopeOverlayUI) scopeOverlayUI.SetActive(true);
 
         // Lấy FOV từ data nếu có, không thì dùng scopedFOV
-        float baseScoped = (playerShoot != null && playerShoot.gunData != null && playerShoot.gunData.scopeZoom > 0f)
-                           ? playerShoot.gunData.scopeZoom
-                           : scopedFOV;
+        float baseScoped =
+            (playerShoot && playerShoot.gunData && playerShoot.gunData.scopeZoom > 0f)
+            ? playerShoot.gunData.scopeZoom
+            : scopedFOV;
 
-        targetFOV = Mathf.Clamp(baseScoped, minScopedFOV, maxScopedFOV);
+        // Clamp chặt trong min/max và trong hard range
+        baseScoped = Mathf.Clamp(baseScoped, minScopedFOV, maxScopedFOV);
+        targetFOV = Mathf.Clamp(baseScoped, FOV_HARD_MIN, FOV_HARD_MAX);
 
         // Tiến camera tới trước để tạo cảm giác đưa ống ngắm sát mắt
         camLocalPosTarget = camLocalPosDefault + cameraLocalOffset;
@@ -148,26 +184,31 @@ public class CSGOScope : MonoBehaviour
         if (!IsScoped) return;
         IsScoped = false;
 
-        if (scopeOverlayUI != null) scopeOverlayUI.SetActive(false);
+        if (scopeOverlayUI) scopeOverlayUI.SetActive(false);
 
         targetFOV = normalFOV;
         camLocalPosTarget = camLocalPosDefault; // trả camera về chỗ cũ
     }
 
-    /// <summary>
-    /// Dùng khi cần ép hủy scope từ bên ngoài (đổi súng, pause, cutscene...).
-    /// </summary>
+    /// <summary>Ép hủy scope và trả camera về trạng thái bình thường ngay lập tức.</summary>
     public void ForceScopeOut()
     {
         IsScoped = false;
-        if (scopeOverlayUI != null) scopeOverlayUI.SetActive(false);
+        if (scopeOverlayUI) scopeOverlayUI.SetActive(false);
 
-        if (playerCamera != null)
+        if (playerCamera)
         {
-            playerCamera.fieldOfView = normalFOV;
+            playerCamera.fieldOfView = Mathf.Clamp(normalFOV, FOV_HARD_MIN, FOV_HARD_MAX);
             playerCamera.transform.localPosition = camLocalPosDefault;
         }
-        targetFOV = normalFOV;
+        targetFOV = Mathf.Clamp(normalFOV, FOV_HARD_MIN, FOV_HARD_MAX);
         camLocalPosTarget = camLocalPosDefault;
+    }
+
+    private float SafeLerpFov(float current, float target, float t)
+    {
+        t = Mathf.Clamp01(t);
+        float f = Mathf.Lerp(current, target, t);
+        return Mathf.Clamp(f, FOV_HARD_MIN, FOV_HARD_MAX);
     }
 }

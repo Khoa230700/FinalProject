@@ -35,6 +35,9 @@ public class LoadingScreenUI : MonoBehaviour
     private float currentVirtualTime;
     private int currentHintIndex = -1, currentImageIndex = -1;
 
+    // === PRELOAD HANDLER ===
+    private static LoadingScreenUI preloadInstance;
+
     void Awake()
     {
         if (instance != null && instance != this)
@@ -44,63 +47,116 @@ public class LoadingScreenUI : MonoBehaviour
         }
         instance = this;
         DontDestroyOnLoad(gameObject);
+
+        // Đảm bảo Canvas luôn ở trên cùng
+        Canvas canvas = GetComponentInChildren<Canvas>();
+        if (canvas != null)
+        {
+            canvas.sortingOrder = 9999;
+            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+        }
+
+        gameObject.SetActive(false);
     }
 
     void OnEnable()
     {
-        StopAllCoroutines();
-        statusText.text = "0%";
+        if (audioSource != null && audioSource.clip != null)
+        {
+            audioSource.Stop();
+            audioSource.time = 0;
+            audioSource.Play();
+            audioSource.volume = 0.5f;
+        }
+    }
+
+    public static void Preload()
+    {
+        if (preloadInstance != null) return;
+
+        var prefab = Resources.Load<GameObject>("Loading");
+        if (prefab == null)
+        {
+            Debug.LogError("Loading prefab not found in Resources!");
+            return;
+        }
+
+        var go = Instantiate(prefab);
+        preloadInstance = go.GetComponent<LoadingScreenUI>();
+        preloadInstance.gameObject.SetActive(false);
+        DontDestroyOnLoad(preloadInstance.gameObject);
+    }
+
+    public static void LoadScene(string targetScene)
+    {
+        if (preloadInstance == null)
+        {
+            Preload();
+        }
+
+        // Force activate UI immediately
+        preloadInstance.gameObject.SetActive(true);
+        preloadInstance.StartCoroutine(preloadInstance.LoadSceneRoutine(targetScene));
+    }
+
+    IEnumerator LoadSceneRoutine(string targetScene)
+    {
+        Debug.Log("Loading screen started");
+        
+        // CRITICAL: Ensure UI is visible IMMEDIATELY
+        gameObject.SetActive(true);
+        canvasGroup.alpha = 1f;
+        canvasGroup.interactable = false;
+        canvasGroup.blocksRaycasts = true;
+
+        // Force canvas to update
+        Canvas.ForceUpdateCanvases();
+        
+        isProcessingLoad = true;
+        isDestroying = false;
+
+        // Set initial values
+        statusText.text = "Loading... 0%";
         progressBar.value = 0f;
         currentVirtualTime = 0f;
 
         if (imageList.Count > 0)
             imageObject.sprite = GetRandomItem(imageList, ref currentImageIndex);
 
+        // Start hint and image cycling
         if (enableRandomHints && hintList.Count > 0)
             StartCoroutine(CycleHints());
 
         if (enableRandomImages && imageList.Count > 1)
             StartCoroutine(CycleImages());
-    }
 
-    void OnDestroy()
-    {
-        isDestroying = true;
-        StopAllCoroutines();
-        if (instance == this) instance = null;
-    }
+        // CRITICAL: Wait multiple frames to ensure UI is rendered
+        yield return null; // Wait 1 frame
+        yield return null; // Wait another frame
+        yield return new WaitForSecondsRealtime(0.1f); // Extra safety delay
 
-    public static void LoadScene(string targetScene)
-    {
-        if (instance != null) instance.CleanupAndDestroy();
+        Debug.Log("Starting scene load...");
 
-        var prefab = Resources.Load<GameObject>("Loading");
-        if (prefab == null)
-        {
-            Debug.LogError("Loading screen prefab not found in Resources!");
-            return;
-        }
-
-        var loadingUI = Instantiate(prefab).GetComponent<LoadingScreenUI>();
-        loadingUI?.StartCoroutine(loadingUI.LoadSceneRoutine(targetScene));
-    }
-
-    IEnumerator LoadSceneRoutine(string targetScene)
-    {
-        gameObject.SetActive(true);
-        yield return new WaitForSecondsRealtime(0.1f);
-
-        isProcessingLoad = true;
+        // Start loading the scene
         loadingProcess = SceneManager.LoadSceneAsync(targetScene);
         loadingProcess.allowSceneActivation = false;
 
-        if (animator != null && canvasGroup.alpha < 1f)
+        // Play entrance animation if available
+        if (animator != null)
             animator.Play("In");
+
+        Debug.Log("Scene loading in progress...");
     }
 
     void Update()
     {
         if (!isProcessingLoad || isDestroying) return;
+
+        // Ensure UI remains visible
+        if (canvasGroup.alpha < 1f)
+        {
+            canvasGroup.alpha = 1f;
+        }
 
         if (enableVirtualLoading) ProcessVirtualLoading();
         else ProcessRealLoading();
@@ -110,13 +166,14 @@ public class LoadingScreenUI : MonoBehaviour
     {
         if (loadingProcess == null) return;
 
-        progressBar.value = Mathf.Lerp(progressBar.value, loadingProcess.progress, Time.unscaledDeltaTime * fadeSpeed);
-        statusText.text = Mathf.RoundToInt(progressBar.value * 100f) + "%";
+        float targetProgress = Mathf.Clamp01(loadingProcess.progress / 0.9f);
+        progressBar.value = Mathf.Lerp(progressBar.value, targetProgress, Time.unscaledDeltaTime * fadeSpeed);
+        statusText.text = "Loading... " + Mathf.RoundToInt(progressBar.value * 100f) + "%";
 
-        if (loadingProcess.progress >= 0.9f)
+        if (loadingProcess.progress >= 0.9f && progressBar.value >= 0.95f)
         {
             progressBar.value = 1f;
-            statusText.text = "100%";
+            statusText.text = "Loading... 100%";
             loadingProcess.allowSceneActivation = true;
             FinishLoading();
         }
@@ -128,7 +185,7 @@ public class LoadingScreenUI : MonoBehaviour
         float progress = Mathf.Clamp01(currentVirtualTime / virtualLoadingTimer);
 
         progressBar.value = progress;
-        statusText.text = Mathf.RoundToInt(progress * 100f) + "%";
+        statusText.text = "Loading... " + Mathf.RoundToInt(progress * 100f) + "%";
 
         if (currentVirtualTime >= virtualLoadingTimer)
         {
@@ -143,7 +200,17 @@ public class LoadingScreenUI : MonoBehaviour
     void FinishLoading()
     {
         if (isDestroying) return;
+        
+        Debug.Log("Loading finished");
         isProcessingLoad = false;
+        
+        // Reset loading priority back to normal
+        Application.backgroundLoadingPriority = ThreadPriority.Normal;
+        
+        if (Time.timeScale == 0f) Time.timeScale = 1f;
+
+        if (audioSource != null && audioSource.volume > 0f)
+            StartCoroutine(FadeAudio(audioSource.volume, 0f, 1.0f));
 
         if (animator != null)
         {
@@ -152,14 +219,27 @@ public class LoadingScreenUI : MonoBehaviour
         }
         else
         {
-            Destroy(gameObject, 0.5f);
+            CleanupAndDestroy();
         }
     }
 
     IEnumerator DestroyAfterDelay()
     {
         yield return new WaitForSecondsRealtime(0.1f);
-        float length = animator.GetCurrentAnimatorStateInfo(0).length;
+        
+        // Get animation length safely
+        float length = 1f; // Default fallback
+        try
+        {
+            var stateInfo = animator.GetCurrentAnimatorStateInfo(0);
+            if (stateInfo.IsName("Out"))
+                length = stateInfo.length;
+        }
+        catch
+        {
+            Debug.LogWarning("Could not get animator state info, using default delay");
+        }
+        
         yield return new WaitForSecondsRealtime(length);
         CleanupAndDestroy();
     }
@@ -168,8 +248,9 @@ public class LoadingScreenUI : MonoBehaviour
     {
         if (isDestroying) return;
         isDestroying = true;
-        Time.timeScale = 1f;
-        Destroy(gameObject);
+
+        Debug.Log("Loading screen cleanup");
+        gameObject.SetActive(false);
     }
 
     IEnumerator CycleHints()
@@ -252,6 +333,23 @@ public class LoadingScreenUI : MonoBehaviour
             color.a = to;
             img.color = color;
         }
+    }
+
+    IEnumerator FadeAudio(float from, float to, float duration)
+    {
+        if (audioSource == null) yield break;
+
+        float elapsed = 0f;
+        audioSource.volume = from;
+
+        while (elapsed < duration && !isDestroying)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            audioSource.volume = Mathf.Lerp(from, to, elapsed / duration);
+            yield return null;
+        }
+
+        audioSource.volume = to;
     }
 
     T GetRandomItem<T>(List<T> list, ref int lastIndex)

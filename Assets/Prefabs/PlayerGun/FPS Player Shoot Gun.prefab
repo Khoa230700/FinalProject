@@ -206,7 +206,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &9087395425015633033
 Transform:
   m_ObjectHideFlags: 0
@@ -6001,7 +6001,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &580630977800708063
 Transform:
   m_ObjectHideFlags: 0
@@ -6346,6 +6346,7 @@ MonoBehaviour:
   shootPoint: {fileID: 1575151801354920015}
   armsAnimator: {fileID: 3028229162289663889}
   weaponUI: {fileID: 0}
+  shopUI: {fileID: 0}
   csgoScope: {fileID: 0}
   muzzleFlashParticle: {fileID: 198481540338831756, guid: 49aa1d4c5624e66418cbfbe9784d6f23, type: 3}
   gunAudioSource: {fileID: 6642479102638921013}
@@ -7093,6 +7094,7 @@ MonoBehaviour:
   shootPoint: {fileID: 2236893323447717625}
   armsAnimator: {fileID: 7699473390604045346}
   weaponUI: {fileID: 0}
+  shopUI: {fileID: 0}
   csgoScope: {fileID: 0}
   muzzleFlashParticle: {fileID: 198481540338831756, guid: 49aa1d4c5624e66418cbfbe9784d6f23, type: 3}
   gunAudioSource: {fileID: 858753646218117161}
@@ -7738,7 +7740,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &2473540229389520567
 Transform:
   m_ObjectHideFlags: 0
@@ -7874,6 +7876,14 @@ MonoBehaviour:
   baseMoveSpeed: 5
   healthBar: {fileID: 0}
   shieldBar: {fileID: 0}
+  animator: {fileID: 0}
+  deathTriggerName: DieBack
+  usePhysicsDeath: 1
+  deathBackForce: 6
+  deathUpForce: 2
+  deathTorque: 8
+  disableControllersOnDeath: 1
+  disableOnDeath: []
 --- !u!82 &3138122004126851728
 AudioSource:
   m_ObjectHideFlags: 0

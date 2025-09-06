@@ -67,18 +67,18 @@ public class WeaponUI : MonoBehaviour
     //* Cập nhật giao diện người dùng với số lượng đạn hiện tại và tổng số đạn
     public void UpdateAmmoUI(int currentAmmo, int totalAmmo)
     {
-        //currentAmmo = Mathf.Clamp(currentAmmo, 0, totalAmmo);
-        //storageTxt.text = totalAmmo.ToString();
+        currentAmmo = Mathf.Clamp(currentAmmo, 0, totalAmmo);
+        storageTxt.text = totalAmmo.ToString();
 
-        //bool isLowAmmo = currentAmmo <= gunData.magazineSize * (lowAmmoPercent / 100f);
+        bool isLowAmmo = currentAmmo <= gunData.magazineSize * (lowAmmoPercent / 100f);
 
-        ////* Cập nhật màu sắc của các hình ảnh viên đạn dựa trên số lượng đạn hiện tại
-        //for (int i = 0; i < bulletImages.Count; i++)
-        //{
-        //    bulletImages[i].color = i < currentAmmo
-        //        ? (isLowAmmo ? LowAmmoBulletColor : NormalBulletColor)
-        //        : BulletConsumedColor;
-        //}
+        //* Cập nhật màu sắc của các hình ảnh viên đạn dựa trên số lượng đạn hiện tại
+        for (int i = 0; i < bulletImages.Count; i++)
+        {
+           bulletImages[i].color = i < currentAmmo
+               ? (isLowAmmo ? LowAmmoBulletColor : NormalBulletColor)
+               : BulletConsumedColor;
+        }
     }
 
     public void ClearUI()

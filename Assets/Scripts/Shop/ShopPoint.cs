@@ -91,10 +91,12 @@ public class ShopPoint : MonoBehaviour
         Vector3 spawnPos = player.position + player.forward * 4f + Vector3.up * 1.5f;
         GameObject arrow = Instantiate(arrowPrefab, spawnPos, Quaternion.identity);
 
+        yield return new WaitForSeconds(0.5f);
+
         int index = 1;
         while (arrow != null && index < waypoints.Length)
         {
-            Vector3 targetPos = waypoints[index] + Vector3.up * 1f;
+            Vector3 targetPos = waypoints[index] + Vector3.up;
 
             while (Vector3.Distance(arrow.transform.position, targetPos) > 0.1f)
             {

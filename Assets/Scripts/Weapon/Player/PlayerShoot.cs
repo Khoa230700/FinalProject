@@ -8,6 +8,7 @@ public class PlayerShoot : MonoBehaviour, IWeapon, IReloadable
     public Transform shootPoint;             // Điểm bắn, dùng cho raycast & PlayClipAtPoint fallback
     public Animator armsAnimator;
     public WeaponUI weaponUI;
+    public ShopUI shopUI;
 
     [Header("Aiming")]
     public CSGOScope csgoScope;              // Nếu có scope ngắm
@@ -51,6 +52,7 @@ public class PlayerShoot : MonoBehaviour, IWeapon, IReloadable
     void Awake()
     {
         upgrade = GetComponent<GunUpgradeState>();
+        shopUI = FindAnyObjectByType<ShopUI>();
     }
 
     public void Initialize()
@@ -128,7 +130,7 @@ public class PlayerShoot : MonoBehaviour, IWeapon, IReloadable
 
     public void ShootOneBullet()
     {
-        if (PauseGameUI.isPause || isReloading) return;
+        if (PauseGameUI.isPause || isReloading || shopUI.isOpen) return;
 
         // Hết đạn: phát "click" và thoát sớm
         if (currentAmmo <= 0)

@@ -21,6 +21,7 @@ public class L4DBotMeleeController : MonoBehaviour
     private void Start()
     {
         animator = GetComponentInChildren<Animator>();
+        player = SelectorSpawner.Instance.Player.transform;
     }
 
     private void Update()
