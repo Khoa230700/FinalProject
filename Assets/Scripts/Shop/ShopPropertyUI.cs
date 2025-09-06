@@ -43,7 +43,7 @@ public class ShopPropertyUI : MonoBehaviour
             textValue.color = new Color(0.392f, 0.698f, 0.812f);
         }
 
-        sliderPreview.gameObject.SetActive(true);
+        // sliderPreview.gameObject.SetActive(true);
     }
 
     public void HidePreview()

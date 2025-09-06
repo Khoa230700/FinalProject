@@ -46,7 +46,7 @@ public class WeaponUI : MonoBehaviour
 
     [HideInInspector] public GunData gunData;
 
-    private List<Image> bulletImages = new();
+    public List<Image> bulletImages = new();
     [HideInInspector] public int lastAmmoCount = 0;
 
     void Awake()
@@ -54,16 +54,46 @@ public class WeaponUI : MonoBehaviour
         DOTween.SetTweensCapacity(500, 200);
     }
 
+    void OnDestroy()
+    {
+        // Kill tất cả tween khi destroy WeaponUI
+        foreach (var bullet in bulletImages)
+        {
+            if (bullet != null)
+            {
+                bullet.DOKill();
+                bullet.transform.DOKill();
+            }
+        }
+
+        if (storageTxt != null)
+        {
+            storageTxt.transform.DOKill();
+        }
+    }
+
     //* Tạo hình ảnh các viên đạn trong UI
     public void CreateBulletUI()
     {
+        // Kill tất cả tween trước khi destroy objects
+        foreach (var bullet in bulletImages)
+        {
+            if (bullet != null)
+            {
+                bullet.DOKill(true); // true = complete tweens immediately
+                bullet.transform.DOKill(true);
+            }
+        }
+
         foreach (Transform child in BulletsGroup.transform)
             Destroy(child.gameObject);
 
         bulletImages.Clear();
         fireMode.FireModeImage.gameObject.SetActive(true);
 
-        for (int i = 0; i < gunData.magazineSize; i++)
+        // Sử dụng magazine size từ upgrade state thay vì gunData
+        int magSize = GetCurrentMagazineSize();
+        for (int i = 0; i < magSize; i++)
         {
             var bullet = Instantiate(BulletImage, BulletsGroup.transform);
             bullet.color = NormalBulletColor;
@@ -71,19 +101,36 @@ public class WeaponUI : MonoBehaviour
         }
 
         // Sync ban đầu = full đạn
-        lastAmmoCount = gunData.magazineSize;
+        lastAmmoCount = magSize;
+    }
+
+    private int GetCurrentMagazineSize()
+    {
+        // Tìm PlayerShoot có gunData này để lấy magazine size hiện tại
+        var playerShoot = FindAnyObjectByType<PlayerShoot>();
+        if (playerShoot != null && playerShoot.gunData == gunData)
+        {
+            var upgradeState = playerShoot.GetComponent<GunUpgradeState>();
+            if (upgradeState != null)
+                return upgradeState.MagazineSize;
+        }
+        return gunData.magazineSize;
     }
 
     //* Cập nhật UI số lượng đạn
     public void UpdateAmmoUI(int currentAmmo, int totalAmmo)
     {
-        currentAmmo = Mathf.Clamp(currentAmmo, 0, gunData.magazineSize);
+        int magSize = GetCurrentMagazineSize();
+        currentAmmo = Mathf.Clamp(currentAmmo, 0, magSize);
         storageTxt.text = totalAmmo.ToString();
 
-        bool isLowAmmo = currentAmmo <= gunData.magazineSize * (lowAmmoPercent / 100f);
+        bool isLowAmmo = currentAmmo <= magSize * (lowAmmoPercent / 100f);
 
         for (int i = 0; i < bulletImages.Count; i++)
         {
+            // Kiểm tra null trước khi kill tween
+            if (bulletImages[i] == null) continue;
+
             // Kill tween cũ để tránh chồng chéo
             bulletImages[i].DOKill();
             bulletImages[i].transform.DOKill();
@@ -124,16 +171,20 @@ public class WeaponUI : MonoBehaviour
         // Lưu lại ammo count
         lastAmmoCount = currentAmmo;
 
-        // Hiệu ứng cho storage text
-        storageTxt.transform.DOKill();
-        storageTxt.transform.localScale = Vector3.one;
-        storageTxt.transform
-            .DOScale(1.2f, 0.15f)
-            .SetEase(Ease.OutBack)
-            .OnComplete(() =>
-            {
-                storageTxt.transform.DOScale(1f, 0.15f).SetEase(Ease.InBack);
-            });
+        // Hiệu ứng cho storage text (kiểm tra null)
+        if (storageTxt != null)
+        {
+            storageTxt.transform.DOKill();
+            storageTxt.transform.localScale = Vector3.one;
+            storageTxt.transform
+                .DOScale(1.2f, 0.15f)
+                .SetEase(Ease.OutBack)
+                .OnComplete(() =>
+                {
+                    if (storageTxt != null) // Kiểm tra null trong callback
+                        storageTxt.transform.DOScale(1f, 0.15f).SetEase(Ease.InBack);
+                });
+        }
     }
 
     public void ClearUI()

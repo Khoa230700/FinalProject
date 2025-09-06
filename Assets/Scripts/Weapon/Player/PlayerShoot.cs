@@ -75,11 +75,24 @@ public class PlayerShoot : MonoBehaviour, IWeapon, IReloadable
             weaponUI.SetFireMode(gunData.fireMode);
             weaponUI.CreateBulletUI();
             weaponUI.UpdateAmmoUI(currentAmmo, reserveAmmo);
-            weaponUI.lastAmmoCount = currentAmmo; // fix khi đổi vũ khí
+            weaponUI.lastAmmoCount = currentAmmo;
+
+            // Subscribe vào upgrade event
+            if (upgrade != null)
+            {
+                upgrade.OnLevelChanged.RemoveListener(OnGunUpgraded); // Remove trước để tránh duplicate
+                upgrade.OnLevelChanged.AddListener(OnGunUpgraded);
+            }
         }
     }
 
-    public void OnDeselected() { }
+    public void OnDeselected()
+    {
+        // Unsubscribe khi deselect
+        if (upgrade != null)
+            upgrade.OnLevelChanged.RemoveListener(OnGunUpgraded);
+    }
+
     public void StartFiring() => StartShooting();
     public void StopFiring() => StopShooting();
     public void FireOnce() => ShootOneBullet();
@@ -309,4 +322,29 @@ public class PlayerShoot : MonoBehaviour, IWeapon, IReloadable
         int reserveAmmoNeeded = gunData.reserveAmmo - reserveAmmo;
         return Mathf.Max(0, currentAmmoNeeded) + Mathf.Max(0, reserveAmmoNeeded);
     }
+
+private void OnGunUpgraded(int newLevel)
+{
+    if (weaponUI == null) return;
+
+    int oldMagSize = weaponUI.bulletImages?.Count ?? 0;
+    int newMagSize = MagazineSize;
+    
+    // Nếu magazine size thay đổi, recreate UI
+    if (oldMagSize != newMagSize)
+    {
+        weaponUI.CreateBulletUI();
+        
+        // Nếu magazine size tăng và magazine cũ đã full, thêm ammo
+        if (newMagSize > oldMagSize && currentAmmo == oldMagSize)
+        {
+            int additionalAmmo = newMagSize - oldMagSize;
+            int ammoToAdd = Mathf.Min(additionalAmmo, reserveAmmo);
+            currentAmmo += ammoToAdd;
+            reserveAmmo -= ammoToAdd;
+        }
+    }
+    
+    weaponUI.UpdateAmmoUI(currentAmmo, reserveAmmo);
+}
 }
