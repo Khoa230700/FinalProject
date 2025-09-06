@@ -573,7 +573,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 250, y: -688.8902}
+  m_AnchoredPosition: {x: 250, y: -84.905}
   m_SizeDelta: {x: 450, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5633291467782260666
@@ -1127,6 +1127,7 @@ MonoBehaviour:
   statusCompleted: {fileID: 1159469424262696382}
   statusLocked: {fileID: 1915014588812126557}
   bgLocked: {fileID: 5163450667416509937}
+  descriptionText: {fileID: 3479855213229061681}
   sceneName: InGame
   prevScene: 
 --- !u!1 &4652993207157693189
@@ -1257,7 +1258,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 250, y: -629.50525}
+  m_AnchoredPosition: {x: 250, y: -25.52}
   m_SizeDelta: {x: 450, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &9079248212575987202

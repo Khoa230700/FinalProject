@@ -37,6 +37,7 @@ public class PlayerHealthSystem : BaseHealthSystem, IDamageable
     [Header("UI Binding")]
     [SerializeField] private BarUI healthBar;
     [SerializeField] private BarUI shieldBar;
+    private DeathUI deathUI;
 
     protected override void Start()
     {
@@ -55,6 +56,7 @@ public class PlayerHealthSystem : BaseHealthSystem, IDamageable
 
         healthBar = SelectorSpawner.Instance.HealthBar;
         shieldBar = SelectorSpawner.Instance.ShieldBar;
+        deathUI = FindAnyObjectByType<DeathUI>(FindObjectsInactive.Include);
 
         // NEW — cập nhật UI lần đầu (phòng khi UI bật sau Start)
         HandleHealthChanged(currentHealth, maxHealth);
@@ -190,6 +192,7 @@ public class PlayerHealthSystem : BaseHealthSystem, IDamageable
     {
         Debug.Log("Player Dead!");
         GetComponent<PlayerMovement>().enabled = false; //Test
+        deathUI.Show(false);
         // EventBus.PlayerDied(); // nếu có
         GameManager.Instance.ChangeState(GameManager.GameState.GameOver);
         // Không gọi base.Die() vì base là abstract

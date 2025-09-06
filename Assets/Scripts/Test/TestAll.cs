@@ -2,7 +2,9 @@ using UnityEngine;
 
 public class TestAll : MonoBehaviour
 {
-   public float time = 1f;
+    public float time = 1f;
+    public float maxDamge = 100f;
+
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.T))
@@ -16,9 +18,8 @@ public class TestAll : MonoBehaviour
         var player = GameObject.FindGameObjectWithTag("Player");
         if (player != null)
         {
-            Debug.Log(player.name);
             player.GetComponent<PlayerHealthSystem>()
-                  .TakeDamage(Random.Range(10, 50), transform.position);
+                  .TakeDamage(Random.Range(100, maxDamge), transform.position);
         }
     }
 }

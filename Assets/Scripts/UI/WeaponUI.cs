@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using DG.Tweening;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -46,8 +47,14 @@ public class WeaponUI : MonoBehaviour
     [HideInInspector] public GunData gunData;
 
     private List<Image> bulletImages = new();
+    [HideInInspector] public int lastAmmoCount = 0;
 
-    //* Tạo hình ảnh các viên đạn trong giao diện người dùng
+    void Awake()
+    {
+        DOTween.SetTweensCapacity(500, 200);
+    }
+
+    //* Tạo hình ảnh các viên đạn trong UI
     public void CreateBulletUI()
     {
         foreach (Transform child in BulletsGroup.transform)
@@ -62,38 +69,85 @@ public class WeaponUI : MonoBehaviour
             bullet.color = NormalBulletColor;
             bulletImages.Add(bullet);
         }
+
+        // Sync ban đầu = full đạn
+        lastAmmoCount = gunData.magazineSize;
     }
 
-    //* Cập nhật giao diện người dùng với số lượng đạn hiện tại và tổng số đạn
+    //* Cập nhật UI số lượng đạn
     public void UpdateAmmoUI(int currentAmmo, int totalAmmo)
     {
-        currentAmmo = Mathf.Clamp(currentAmmo, 0, totalAmmo);
+        currentAmmo = Mathf.Clamp(currentAmmo, 0, gunData.magazineSize);
         storageTxt.text = totalAmmo.ToString();
 
         bool isLowAmmo = currentAmmo <= gunData.magazineSize * (lowAmmoPercent / 100f);
 
-        //* Cập nhật màu sắc của các hình ảnh viên đạn dựa trên số lượng đạn hiện tại
         for (int i = 0; i < bulletImages.Count; i++)
         {
-           bulletImages[i].color = i < currentAmmo
-               ? (isLowAmmo ? LowAmmoBulletColor : NormalBulletColor)
-               : BulletConsumedColor;
+            // Kill tween cũ để tránh chồng chéo
+            bulletImages[i].DOKill();
+            bulletImages[i].transform.DOKill();
+
+            if (i < currentAmmo)
+            {
+                // Đạn còn
+                bulletImages[i].DOColor(isLowAmmo ? LowAmmoBulletColor : NormalBulletColor, 0.1f);
+
+                // Đạn mới được nạp
+                if (i >= lastAmmoCount)
+                {
+                    bulletImages[i].transform.localScale = Vector3.one * 0.7f;
+
+                    Sequence reloadSeq = DOTween.Sequence();
+                    reloadSeq.Append(bulletImages[i].DOColor(NormalBulletColor, 0.1f));
+                    reloadSeq.Append(bulletImages[i].DOColor(isLowAmmo ? LowAmmoBulletColor : NormalBulletColor, 0.2f));
+                    reloadSeq.Join(bulletImages[i].transform.DOScale(1.2f, 0.15f).SetEase(Ease.OutBack));
+                    reloadSeq.Append(bulletImages[i].transform.DOScale(1f, 0.1f).SetEase(Ease.InBack));
+                }
+                else
+                {
+                    bulletImages[i].transform.DOScale(1f, 0.1f);
+                }
+            }
+            else
+            {
+                if (bulletImages[i].color != BulletConsumedColor)
+                {
+                    Sequence seq = DOTween.Sequence();
+                    seq.Append(bulletImages[i].DOColor(Color.red, 0.1f));
+                    seq.Append(bulletImages[i].DOColor(BulletConsumedColor, 0.2f));
+                    seq.Join(bulletImages[i].transform.DOScale(0.7f, 0.2f).SetEase(Ease.InBack));
+                }
+            }
         }
+
+        // Lưu lại ammo count
+        lastAmmoCount = currentAmmo;
+
+        // Hiệu ứng cho storage text
+        storageTxt.transform.DOKill();
+        storageTxt.transform.localScale = Vector3.one;
+        storageTxt.transform
+            .DOScale(1.2f, 0.15f)
+            .SetEase(Ease.OutBack)
+            .OnComplete(() =>
+            {
+                storageTxt.transform.DOScale(1f, 0.15f).SetEase(Ease.InBack);
+            });
     }
 
     public void ClearUI()
     {
-        // Xóa tất cả viên đạn UI
         foreach (Transform child in BulletsGroup.transform)
             Destroy(child.gameObject);
         bulletImages.Clear();
 
-        // Xóa text
         storageTxt.text = string.Empty;
 
-        // Xóa chế độ bắn (fire mode)
         if (fireMode.FireModeImage != null)
             fireMode.FireModeImage.gameObject.SetActive(false);
+
+        lastAmmoCount = 0;
     }
 
     public void SetFireMode(GunFireMode mode) => fireMode.SetFireModeSprite(mode);

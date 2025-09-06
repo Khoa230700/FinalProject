@@ -48,15 +48,15 @@ MonoBehaviour:
   - playerPrefab: {fileID: 5790137767768560497, guid: 7f0e382cc42e548479e9f541f92e205f, type: 3}
     avatar: {fileID: 21300000, guid: 4eeae112082cb4945aa755d98e9615d9, type: 3}
     classAvatar: {fileID: 21300000, guid: abcf12fb480efc040b6c02b5240ed995, type: 3}
-    name: Commando
+    name: Aiwing
   - playerPrefab: {fileID: 2273800816668952085, guid: 6ab1b142a1b6eb8488cfeee6ca770091, type: 3}
     avatar: {fileID: 21300000, guid: d8745b2243142784fb213c3ef894e4f5, type: 3}
     classAvatar: {fileID: 21300000, guid: 71c89437e70de75488d361c524d7888b, type: 3}
-    name: Shootguner
+    name: Jacos
   - playerPrefab: {fileID: 2393662489545346051, guid: 889187359a406e24b8f8729bedf082ef, type: 3}
     avatar: {fileID: 21300000, guid: c9b79ed553ff357449eae920441c37bc, type: 3}
     classAvatar: {fileID: 21300000, guid: 7f63825b2fcd0564596cd2274364280c, type: 3}
-    name: Sniper
+    name: Lucas
   healthBar: {fileID: 0}
   shieldBar: {fileID: 0}
   weaponUI: {fileID: 0}
