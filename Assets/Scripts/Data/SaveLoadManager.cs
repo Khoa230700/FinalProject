@@ -25,11 +25,11 @@ public class SaveLoadManager : MonoBehaviour
 
         DiscoverRefs();
         Subscribe();
+        LoadAndApply();
     }
 
     void Start()
     {
-        LoadAndApply();
         if (autoSaveInterval > 0) StartCoroutine(AutoSaveLoop());
     }
 
@@ -203,6 +203,7 @@ public class SaveLoadManager : MonoBehaviour
         {
             CoinManager.Instance.LoadCoins();
         }
+            Debug.Log(data.questData.completedQuestIDs.Count);
 
         // Quests
         if (QuestManager.Instance != null && data.questData != null)
@@ -211,7 +212,7 @@ public class SaveLoadManager : MonoBehaviour
             QuestManager.Instance.completedQuestIDs.Clear();
 
             QuestManager.Instance.completedQuestIDs.AddRange(data.questData.completedQuestIDs);
-
+            Debug.Log(data.questData.completedQuestIDs.Count);
             foreach (var questSave in data.questData.activeQuests)
             {
                 QuestSO questSO = QuestManager.Instance.allQuests.Find(q => q.questID == questSave.questID);

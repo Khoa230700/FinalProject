@@ -32,6 +32,7 @@ public class QuestManager : MonoBehaviour
     private void Start()
     {
         allQuests = Resources.LoadAll("Quests", typeof(QuestSO)).OfType<QuestSO>().ToList();
+        // Debug.Log(completedQuestIDs.Count);
         if (autoStart) StartCoroutine(CheckAutoStartQuests());
         OnWaveSpawned += WaveSpawned;
     }
@@ -72,6 +73,8 @@ public class QuestManager : MonoBehaviour
         if (!CheckQuestRequirements(questSO)) return;
         if (completedQuestIDs.Contains(questID) || activeQuests.Any(q => q.questSO.questID == questID)) return;
 
+        Debug.Log($"{completedQuestIDs.Contains(questID)} {questID}");
+
         Quest newQuest = new Quest(questSO);
         newQuest.status = QuestStatus.Active;
         activeQuests.Add(newQuest);
@@ -83,9 +86,9 @@ public class QuestManager : MonoBehaviour
     }
 
     // CẬP NHẬT TIẾN ĐỘ QUEST
-    public void UpdateQuestProgress(QuestObjectiveType type, string targetID, int amount = 1)
+    public bool UpdateQuestProgress(QuestObjectiveType type, string targetID, int amount = 1)
     {
-        bool hasUpdated = false;
+        bool updated = false;
         List<Quest> questsToComplete = new();
 
         foreach (var quest in activeQuests)
@@ -97,13 +100,14 @@ public class QuestManager : MonoBehaviour
                 if (obj.type == type && obj.targetID == targetID && !obj.isCompleted)
                 {
                     quest.UpdateObjective(obj.objectiveID, amount);
+
                     OnObjectiveUpdated?.Invoke(quest, obj);
-                    hasUpdated = true;
+                    updated = true;
 
                     if (quest.IsCompleted())
                         questsToComplete.Add(quest);
 
-                    break;
+                    break; // chỉ update 1 objective
                 }
             }
         }
@@ -113,7 +117,10 @@ public class QuestManager : MonoBehaviour
             CompleteQuest(quest);
         }
 
-        if (hasUpdated && autoSave) SaveLoadManager.Instance.MarkDirty();
+        if (updated && autoSave)
+            SaveLoadManager.Instance.MarkDirty();
+
+        return updated;
     }
 
     // HOÀN THÀNH QUEST
@@ -150,20 +157,5 @@ public class QuestManager : MonoBehaviour
                 return false;
         }
         return true;
-    }
-
-    // DEBUG
-    [ContextMenu("Clear All Quest")]
-    public void ClearAllQuests()
-    {
-        allQuests.Clear();
-        activeQuests.Clear();
-        completedQuestIDs.Clear();
-    }
-
-    [ContextMenu("Load All Quests")]
-    public void LoadAllQuests()
-    {
-        allQuests = Resources.LoadAll("Quests", typeof(QuestSO)).OfType<QuestSO>().ToList();
     }
 }

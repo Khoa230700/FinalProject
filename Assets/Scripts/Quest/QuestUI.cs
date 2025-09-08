@@ -167,6 +167,11 @@ public class QuestUI : MonoBehaviour
             string progressText = $"{objective.currentAmount}/{objective.requiredAmount}";
             objText.text = $"{objective.description} ({progressText})";
         }
+
+        if (objective.requiredAmount == 0)
+        {
+            objText.text = $"{objective.description}";
+        }
     }
 
     private void UpdateQuestUI(Quest quest)
@@ -182,5 +187,4 @@ public class QuestUI : MonoBehaviour
             }
         }
     }
-
 }

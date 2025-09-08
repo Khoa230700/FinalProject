@@ -42,6 +42,8 @@ public class PlayerShoot : MonoBehaviour, IWeapon, IReloadable
     float SpreadAngle => upgrade ? upgrade.SpreadAngle : gunData.spreadAngle;
     float SemiAutoIv => upgrade ? upgrade.SemiAutoMinInterval : gunData.semiAutoMinInterval;
 
+    private bool didClick = false;
+
     void Awake()
     {
         upgrade = GetComponent<GunUpgradeState>();
@@ -139,6 +141,11 @@ public class PlayerShoot : MonoBehaviour, IWeapon, IReloadable
         {
             PlayAtGun(emptyMagSound);
             return;
+        }
+
+        if (!didClick && QuestManager.Instance.UpdateQuestProgress(QuestObjectiveType.Interact, "TutorialShoot"))
+        {
+            didClick = true;
         }
 
         if (Time.frameCount == _lastShotFrame) return;

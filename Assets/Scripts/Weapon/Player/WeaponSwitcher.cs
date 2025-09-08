@@ -19,6 +19,7 @@ public class WeaponSwitcher : MonoBehaviour
 
     private int currentWeaponIndex = 0;
     private bool isSwitching = false;
+    private bool didSwitch = false;
 
     public IWeapon Current
         => (weapons.Count > 0 &&
@@ -59,14 +60,25 @@ public class WeaponSwitcher : MonoBehaviour
     {
         if (isSwitching || weapons.Count == 0) return;
 
-        if (Input.GetKeyDown(KeyCode.Alpha1)) StartCoroutine(SwitchWeaponRoutine(0));
-        if (Input.GetKeyDown(KeyCode.Alpha2)) StartCoroutine(SwitchWeaponRoutine(1));
-        if (Input.GetKeyDown(KeyCode.Alpha3)) StartCoroutine(SwitchWeaponRoutine(2));
+        // Đổi vũ khí
+        if (Input.GetKeyDown(KeyCode.Alpha1)) SwitchKey(0);
+        if (Input.GetKeyDown(KeyCode.Alpha2)) SwitchKey(1);
+        if (Input.GetKeyDown(KeyCode.Alpha3)) SwitchKey(2);
 
         // Bắn / Đánh
         if (Input.GetMouseButtonDown(0)) Current?.FireOnce();
         if (Input.GetMouseButton(0)) Current?.StartFiring();
         if (Input.GetMouseButtonUp(0)) Current?.StopFiring();
+    }
+
+    private void SwitchKey(int index)
+    {
+        StartCoroutine(SwitchWeaponRoutine(index));
+
+        if (!didSwitch && QuestManager.Instance.UpdateQuestProgress(QuestObjectiveType.Interact, "TutorialSwitch"))
+        {
+            didSwitch = true;
+        }
     }
 
     // ---------------- BUILD ----------------
