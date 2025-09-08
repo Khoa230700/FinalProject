@@ -27,15 +27,15 @@ public class QuestUI : MonoBehaviour
         }
 
         // Hiển thị Completed Quests
-        foreach (var questID in QuestManager.Instance.completedQuestIDs)
-        {
-            QuestSO questSO = QuestManager.Instance.allQuests.Find(q => q.questID == questID);
-            if (questSO != null)
-            {
-                Quest completedQuest = new Quest(questSO);
-                CreateQuestItem(completedQuest, true);
-            }
-        }
+        // foreach (var questID in QuestManager.Instance.completedQuestIDs)
+        // {
+        //     QuestSO questSO = QuestManager.Instance.allQuests.Find(q => q.questID == questID);
+        //     if (questSO != null)
+        //     {
+        //         Quest completedQuest = new Quest(questSO);
+        //         CreateQuestItem(completedQuest, true);
+        //     }
+        // }
     }
 
     private void OnDestroy()

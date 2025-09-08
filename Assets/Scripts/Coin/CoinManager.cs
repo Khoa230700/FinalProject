@@ -1,9 +1,10 @@
 using UnityEngine;
 using System;
+using VInspector;
 
-public class CoinManager : MonoBehaviour
+public class CoinManager : MonoBehaviour, ISaveLoad
 {
-    public static CoinManager Instance;
+    public static CoinManager Instance { get; private set; }
 
     [Header("Coin Settings")]
     [SerializeField] private int currentCoins = 0;
@@ -13,20 +14,29 @@ public class CoinManager : MonoBehaviour
 
     private void Awake()
     {
+        if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
-        LoadCoins();
-        sessionCoins = 0; // reset khi bắt đầu session
+    }
+
+    private void Start()
+    {
+        SaveLoadManager.Instance?.Register(this);
+    }
+
+    private void OnDestroy()
+    {
+        SaveLoadManager.Instance?.Unregister(this);
     }
 
     public void AddCoins(int amount)
     {
         if (amount > 0) sessionCoins += amount;
 
-        int newAmount = Mathf.Max(0, currentCoins + amount);
-        OnCoinChanged?.Invoke(currentCoins, newAmount);
+        int oldAmount = currentCoins;
+        currentCoins = Mathf.Max(0, currentCoins + amount);
 
-        currentCoins = newAmount;
-        SaveCoins();
+        OnCoinChanged?.Invoke(oldAmount, currentCoins);
+        SaveLoadManager.Instance?.MarkDirty();
     }
 
     public void RemoveCoins(int amount) => AddCoins(-amount);
@@ -34,23 +44,27 @@ public class CoinManager : MonoBehaviour
     public int GetSessionCoins() => sessionCoins;
     public bool HasEnoughCoins(int amount) => currentCoins >= amount;
 
-    public void SaveCoins()
+    // ISaveLoad
+    public void SaveToData(GameData data)
     {
-        SaveLoadData.Data.coins = currentCoins;
-        SaveLoadManager.Instance?.MarkDirty();
+        data.coins = currentCoins;
     }
 
-    public void LoadCoins()
+    public void LoadFromData(GameData data)
     {
-        int old = currentCoins;
-        currentCoins = SaveLoadData.Data.coins;
+        if (data != null)
+        {
+            int oldAmount = currentCoins;
+            currentCoins = data.coins;
+            sessionCoins = 0;
 
-        OnCoinChanged?.Invoke(old, currentCoins);
+            OnCoinChanged?.Invoke(oldAmount, currentCoins);
+        }
     }
 
-    [ContextMenu("Test")]
-    public void Test()
+    [Button("Add Test Coins")]
+    public void AddTestCoins()
     {
-        AddCoins(UnityEngine.Random.Range(100, 10000));
+        AddCoins(UnityEngine.Random.Range(100, 1000));
     }
 }

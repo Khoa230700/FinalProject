@@ -13,6 +13,7 @@ public class GunSave
 {
     public string gunId; //GunData.gunName 
     public int level;
+    public GunSlot slot; 
 }
 
 [Serializable]

@@ -6,4 +6,5 @@ public class GameData
     // public PlayerData playerData = new();
     public int coins;
     public string saveTime;
+    public string totalPlayTime;
 }

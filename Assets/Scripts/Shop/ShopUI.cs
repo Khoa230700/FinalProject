@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -46,10 +47,10 @@ public class ShopUI : MonoBehaviour
 
     private void CachePlayerComponents()
     {
-        var player = GameObject.FindWithTag("Player");
+        var player = SelectorSpawner.Instance.Player;
         if (player == null) return;
 
-        weapons = player.GetComponentsInChildren<IWeapon>(true);
+        weapons = WeaponManager.Instance.GetWeapons().ToArray();
         playetStats = player.GetComponent<PlayerHealthSystem>();
         playerMovement = player.GetComponent<PlayerMovement>();
         mouseLook = player.GetComponent<MeshMouseLook>();

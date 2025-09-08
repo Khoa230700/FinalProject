@@ -17,13 +17,6 @@ MonoBehaviour:
   description: Tutorial
   objectives:
   - objectiveID: 
-    description: <b>1,2,3</b> for switch.
-    type: 2
-    targetID: TutorialSwitch
-    currentAmount: 0
-    requiredAmount: 0
-    isCompleted: 0
-  - objectiveID: 
     description: Move <b>Mouse</b> for look.
     type: 2
     targetID: TutorialLook
@@ -34,6 +27,13 @@ MonoBehaviour:
     description: <b>Left Click</b> for shoot.
     type: 2
     targetID: TutorialShoot
+    currentAmount: 0
+    requiredAmount: 0
+    isCompleted: 0
+  - objectiveID: 
+    description: <b>1,2,3</b> for switch.
+    type: 2
+    targetID: TutorialSwitch
     currentAmount: 0
     requiredAmount: 0
     isCompleted: 0
@@ -61,6 +61,6 @@ MonoBehaviour:
   prerequisiteQuests: []
   requiredLevel: 0
   expReward: 0
-  coinReward: 0
+  coinReward: 500
   autoStart: 1
   autoStartScene: InGame
