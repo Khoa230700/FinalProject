@@ -37,6 +37,9 @@ public class PlayerMovement : MonoBehaviour
     private Vector3 velocity;
     private bool isGrounded;
     private bool wasGrounded;
+    private bool didMove = false;
+    private bool didRun = false;
+    private bool didJump = false;
 
     private float stepTimer = 0f;
     private int lastFootstepIndex = -1;
@@ -55,6 +58,24 @@ public class PlayerMovement : MonoBehaviour
         // Thiếu dữ liệu input hoặc controller đã tắt -> không xử lý
         if (playerStats == null || KeyBindingManager.Instance == null) return;
         if (!ControllerUsable) return;
+
+        if (isGrounded)
+        {
+            if (!didMove && IsMoving() && QuestManager.Instance.UpdateQuestProgress(QuestObjectiveType.Interact, "TutorialMove"))
+            {
+                didMove = true;
+            }
+
+            if (!didRun && IsRunning() && QuestManager.Instance.UpdateQuestProgress(QuestObjectiveType.Interact, "TutorialRun"))
+            {
+                didRun = true;
+            }
+
+            if (!didJump && KeyBindingManager.Instance.GetKeyDown("Jump") && QuestManager.Instance.UpdateQuestProgress(QuestObjectiveType.Interact, "TutorialJump"))
+            {
+                didJump = true;
+            }
+        }
 
         // Ground check
         isGrounded = controller.isGrounded;

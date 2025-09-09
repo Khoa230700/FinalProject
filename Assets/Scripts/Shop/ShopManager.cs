@@ -32,6 +32,8 @@ public class ShopManager : MonoBehaviour
         if (amount > 0 && applyResource(target, amount))
         {
             CoinManager.Instance.RemoveCoins(actualCost);
+            AudioManager.Instance.PlaySFX("Purchase");
+
             return true;
         }
         return false;
@@ -111,6 +113,9 @@ public class ShopManager : MonoBehaviour
             return false;
 
         CoinManager.Instance.RemoveCoins(upgradeCost);
+        AudioManager.Instance.PlaySFX("Purchase");
+        SaveLoadManager.Instance?.MarkDirty();
+
         gunUpgradeState.LevelUp();
 
         return true;
@@ -144,6 +149,9 @@ public class ShopManager : MonoBehaviour
         if (!CanUpgradeMelee(melee) || !CoinManager.Instance.HasEnoughCoins(upgradeCost)) return false;
 
         CoinManager.Instance.RemoveCoins(upgradeCost);
+        AudioManager.Instance.PlaySFX("Purchase");
+        SaveLoadManager.Instance?.MarkDirty();
+        
         melee.level++;
 
         return true;

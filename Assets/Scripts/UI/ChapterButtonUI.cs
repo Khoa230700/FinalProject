@@ -7,7 +7,7 @@ public class ChapterButtonUI : MonoBehaviour
 {
     [Header("References")]
     public Button button;
-    public GameObject statusNone, statusCompleted, statusLocked, bgLocked;
+    public GameObject statusNone, statusCompleted, statusLocked, bgLocked, descriptionText;
 
     [Header("Settings")]
     public string sceneName;
@@ -35,6 +35,7 @@ public class ChapterButtonUI : MonoBehaviour
             statusLocked.SetActive(true);
             statusNone.SetActive(false);
             statusCompleted.SetActive(false);
+            descriptionText.SetActive(false);
             button.interactable = false;
         }
         else if (completed) //Completed
@@ -43,6 +44,7 @@ public class ChapterButtonUI : MonoBehaviour
             statusNone.SetActive(false);
             statusLocked.SetActive(false);
             bgLocked.SetActive(false);
+            descriptionText.SetActive(true);
             button.interactable = true;
 
             button.onClick.AddListener(() => LoadLevel());
@@ -53,6 +55,7 @@ public class ChapterButtonUI : MonoBehaviour
             statusCompleted.SetActive(false);
             statusLocked.SetActive(false);
             bgLocked.SetActive(false);
+            descriptionText.SetActive(true);
             button.interactable = true;
 
             button.onClick.AddListener(() => LoadLevel());

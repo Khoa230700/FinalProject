@@ -54,7 +54,6 @@ MonoBehaviour:
   progressBar: {fileID: 2344917230393842798}
   spinnerParent: {fileID: 7136513362308312714}
   imageObject: {fileID: 8488704087316160154}
-  animator: {fileID: 6453892166232487333}
   audioSource: {fileID: 5504540153964398811}
   fadeSpeed: 2
   enableRandomHints: 1
@@ -85,7 +84,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 04ae38ec77beb064a978b2c92e4160c8, type: 3}
   - {fileID: 21300000, guid: 75f07914e2814ed45a072f52fc442b1f, type: 3}
   enableVirtualLoading: 1
-  virtualLoadingTimer: 10
+  virtualLoadingTimer: 20
 --- !u!82 &5504540153964398811
 AudioSource:
   m_ObjectHideFlags: 0
@@ -99,7 +98,7 @@ AudioSource:
   m_audioClip: {fileID: 8300000, guid: e7b6535290de1fa4dbc94d6bd1cca600, type: 3}
   m_Resource: {fileID: 8300000, guid: e7b6535290de1fa4dbc94d6bd1cca600, type: 3}
   m_PlayOnAwake: 0
-  m_Volume: 0.5
+  m_Volume: 0
   m_Pitch: 1
   Loop: 1
   Mute: 0
@@ -305,7 +304,7 @@ CanvasGroup:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2286612174848471756}
   m_Enabled: 1
-  m_Alpha: 0
+  m_Alpha: 1
   m_Interactable: 0
   m_BlocksRaycasts: 0
   m_IgnoreParentGroups: 0
@@ -427,7 +426,7 @@ CanvasGroup:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3622331779658811957}
   m_Enabled: 1
-  m_Alpha: 0
+  m_Alpha: 1
   m_Interactable: 0
   m_BlocksRaycasts: 0
   m_IgnoreParentGroups: 0
@@ -1244,7 +1243,7 @@ CanvasGroup:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7924836546964680177}
   m_Enabled: 1
-  m_Alpha: 0
+  m_Alpha: 1
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
@@ -1256,7 +1255,7 @@ Animator:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7924836546964680177}
-  m_Enabled: 1
+  m_Enabled: 0
   m_Avatar: {fileID: 0}
   m_Controller: {fileID: 9100000, guid: 97ce52f402a58a7498ffade0c69f0392, type: 2}
   m_CullingMode: 0

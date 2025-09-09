@@ -29,6 +29,7 @@ public class PlayerHealthSystem : BaseHealthSystem, IDamageable
     [Header("UI Binding")]
     [SerializeField] private BarUI healthBar;
     [SerializeField] private BarUI shieldBar;
+    private DeathUI deathUI;
 
     // -------- Animation / Death ----------
     [Header("Body Animator (optional)")]
@@ -92,6 +93,7 @@ public class PlayerHealthSystem : BaseHealthSystem, IDamageable
             healthBar = SelectorSpawner.Instance.HealthBar ?? healthBar;
             shieldBar = SelectorSpawner.Instance.ShieldBar ?? shieldBar;
         }
+        deathUI = FindAnyObjectByType<DeathUI>(FindObjectsInactive.Include);
 
         // cập nhật UI lần đầu
         HandleHealthChanged(currentHealth, maxHealth);
@@ -302,5 +304,19 @@ public class PlayerHealthSystem : BaseHealthSystem, IDamageable
         }
 
         transform.rotation = targetRot; // chốt góc cuối: nhìn lên trời
+    }
+
+    [ContextMenu("Test")] //Test
+    public void Respawn()
+    {
+        CoinManager.Instance.RemoveCoins(Random.Range(100, 800)); // sự trừng phạt
+
+        currentHealth = maxHealth;
+        BroadcastHealth();
+
+        currentShield = maxShield;
+        BroadcastShield();
+
+        GetComponent<PlayerMovement>().enabled = true; //Test
     }
 }

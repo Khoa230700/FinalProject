@@ -568,7 +568,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   data: {fileID: 11400000, guid: 62b4d60c4bc45754c8098b4d63d130c2, type: 2}
-  level: 20
+  level: 0
   armsAnimator: {fileID: 7796485733909455407}
   swingOrigin: {fileID: 1308769137523631464}
   aimCamera: {fileID: 0}
