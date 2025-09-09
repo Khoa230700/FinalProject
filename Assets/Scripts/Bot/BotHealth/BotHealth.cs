@@ -116,7 +116,7 @@ public class BotHealth : BaseHealthSystem, IDamageable
         if (isDead) return;
         isDead = true;
 
-        Debug.Log($"{transform.root.name} (Bot) Dead!");
+        
 
         GameObject root = transform.root.gameObject;
 

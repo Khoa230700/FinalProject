@@ -7,17 +7,18 @@ public class L4DBotMeleeController : MonoBehaviour
     [Header("References")]
     [SerializeField] Transform player;
     [SerializeField] NavMeshAgent agent;
-    private Animator animator;
+    public Animator animator;
 
     [Header("Combat Settings")]
-    [SerializeField] float attackCooldown ;
-    [SerializeField] float attackRange ;
-    [SerializeField] float visionRange ;
+    [SerializeField] float attackCooldown = 1f;
+    [SerializeField] float attackRange = 2f;
+    [SerializeField] float visionRange = 10f;
 
-    public float lastAttackTime;
-    public int attackCombo;
+    private float lastAttackTime;
+    private int attackCombo;
     private GameObject currentTarget;
     private bool isAttacking = false;
+
     private void Start()
     {
         animator = GetComponentInChildren<Animator>();
@@ -26,60 +27,100 @@ public class L4DBotMeleeController : MonoBehaviour
 
     private void Update()
     {
+        fireAI();
+    }
+
+    private void fireAI()
+    {
         float distToPlayer = Vector3.Distance(transform.position, player.position);
-       
-        // 1. Nếu xa player → chạy lại gần
+
+        // 1. Tìm zombie trước
+        currentTarget = FindNearestVisibleZombie();
+
+        if (currentTarget != null)
+        {
+            float distToTarget = Vector3.Distance(transform.position, currentTarget.transform.position);
+
+            if (distToTarget <= attackRange)
+            {
+                // Đứng lại chém
+                agent.isStopped = true;
+                transform.LookAt(new Vector3(currentTarget.transform.position.x, transform.position.y, currentTarget.transform.position.z));
+
+                animator.SetBool("isMoving", false);
+                animator.SetFloat("Horizontal", 0f);
+                animator.SetFloat("Vertical", 0f);
+
+                TriggerAttack();
+                return;
+            }
+            else
+            {
+                // Di chuyển lại gần zombie
+                agent.isStopped = false;
+                agent.stoppingDistance = attackRange;
+                agent.SetDestination(currentTarget.transform.position);
+
+                Vector3 localVelocity = transform.InverseTransformDirection(agent.velocity);
+                animator.SetBool("isMoving", true);
+                animator.SetFloat("Horizontal", localVelocity.x);
+                animator.SetFloat("Vertical", localVelocity.z);
+                AudioBotManager.Instance.PlayBotSound();
+                return;
+            }
+        }
+
+        // 2. Không có zombie → theo player
+        agent.stoppingDistance = 2f; // đứng gần player
         if (distToPlayer > agent.stoppingDistance)
         {
             agent.isStopped = false;
             agent.SetDestination(player.position);
-            currentTarget = null;
 
             Vector3 localVelocity = transform.InverseTransformDirection(agent.velocity);
             animator.SetBool("isMoving", true);
             animator.SetFloat("Horizontal", localVelocity.x);
             animator.SetFloat("Vertical", localVelocity.z);
             AudioBotManager.Instance.PlayBotSound();
-            return;
         }
-
-        // 2. Player gần → tìm zombie quanh player
-        currentTarget = FindNearestVisibleZombie();
-        
-       if (currentTarget != null)
-{
-    float distToTarget = Vector3.Distance(transform.position, currentTarget.transform.position);
-
-    if (distToTarget <= attackRange)
-    {
-        agent.isStopped = true;
-        transform.LookAt(new Vector3(currentTarget.transform.position.x, transform.position.y, currentTarget.transform.position.z));
-
-        animator.SetBool("isMoving", false);
-        animator.SetFloat("Horizontal", 0f);
-        animator.SetFloat("Vertical", 0f);
-
-               
-        TriggerAttack();
-                
-                return;
-    }
+        else
+        {
+            agent.isStopped = true;
+            animator.SetBool("isMoving", false);
+            animator.SetFloat("Horizontal", 0f);
+            animator.SetFloat("Vertical", 0f);
+            AudioBotManager.Instance.StopBotSound();
         }
-
-        // 3. Không có zombie → đứng cạnh player
-        agent.isStopped = true;
-        animator.SetBool("isMoving", false);
-        animator.SetFloat("Horizontal", 0f);
-        animator.SetFloat("Vertical", 0f);
-        AudioBotManager.Instance.StopBotSound();
     }
 
     private void TriggerAttack()
     {
         if (isAttacking) return; // đang đánh thì ko đánh tiếp
+        if (Time.time - lastAttackTime < attackCooldown) return; // chưa hết cooldown
 
         StartCoroutine(AttackRoutine());
     }
+
+    private IEnumerator AttackRoutine()
+    {
+        isAttacking = true;
+        lastAttackTime = Time.time;
+
+        attackCombo = Random.Range(0, 3);
+        animator.SetInteger("AttackCombo", attackCombo);
+
+        animator.ResetTrigger("Attack");
+        animator.SetTrigger("Attack");
+        AudioBotManager.Instance.MeleeSound();
+
+        Debug.Log($"Melee Attack Triggered with Combo: {attackCombo}");
+
+        // giả sử mỗi đòn đánh mất 1 giây
+        yield return new WaitForSeconds(1f);
+
+        isAttacking = false;
+    }
+
     private GameObject FindNearestVisibleZombie()
     {
         GameObject[] zombies = GameObject.FindGameObjectsWithTag("Enemy");
@@ -125,29 +166,8 @@ public class L4DBotMeleeController : MonoBehaviour
 
         Collider col = target.GetComponent<Collider>();
         if (col != null)
-            return col.bounds.center + Vector3.up * (col.bounds.extents.y * 0.5f);
+            return col.bounds.center;
 
         return target.position;
-    }
-    private IEnumerator AttackRoutine()
-    {
-        isAttacking = true;
-
-        attackCombo = Random.Range(0, 3);
-        animator.SetInteger("AttackCombo", attackCombo);
-
-        animator.ResetTrigger("Attack");   // reset trước
-        animator.SetTrigger("Attack");     // set lại
-        AudioBotManager.Instance.MeleeSound();
-
-        Debug.Log($"Attack Triggered with Combo: {attackCombo}");
-
-        // chờ animator đánh xong (ví dụ giả sử mỗi đòn dài 1s)
-        yield return new WaitForSeconds(1f);
-
-        // sau đó chờ thêm cooldown
-        yield return new WaitForSeconds(attackCooldown);
-
-        isAttacking = false;
     }
 }
