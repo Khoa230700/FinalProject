@@ -13,6 +13,7 @@ public class QuestManager : MonoBehaviour, ISaveLoad
     public List<Quest> activeQuests = new();
     public List<QuestSO> allQuests = new();
     public List<string> completedQuestIDs = new();
+    public bool verbose = true;
 
     // Events
     public Action<Quest> OnQuestStarted;
@@ -54,7 +55,7 @@ public class QuestManager : MonoBehaviour, ISaveLoad
         activeQuests.Add(newQuest);
 
         OnQuestStarted?.Invoke(newQuest);
-        Debug.Log($"Started quest: <b>{questSO.questName}</b>");
+        if(verbose) Debug.Log($"Quest started: <b>{questSO.questName}</b>");
 
         SaveLoadManager.Instance?.MarkDirty();
     }
@@ -103,7 +104,7 @@ public class QuestManager : MonoBehaviour, ISaveLoad
         completedQuestIDs.Add(quest.questSO.questID);
 
         OnQuestCompleted?.Invoke(quest);
-        Debug.Log($"Quest completed: <b>{quest.questSO.questName}</b>");
+        if(verbose) Debug.Log($"Quest completed: <b>{quest.questSO.questName}</b>");
 
         SaveLoadManager.Instance?.MarkDirty();
     }
@@ -114,7 +115,10 @@ public class QuestManager : MonoBehaviour, ISaveLoad
         //     Debug.Log($"Received {quest.questSO.expReward} EXP");
 
         if (quest.questSO.coinReward > 0)
+        {
             CoinManager.Instance.AddCoins(quest.questSO.coinReward);
+            if(verbose) Debug.Log(quest.questSO.coinReward + " coins");
+        }
     }
 
     // HELPER

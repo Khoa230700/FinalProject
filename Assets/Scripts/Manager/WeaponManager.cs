@@ -7,6 +7,7 @@ public class WeaponManager : MonoBehaviour, ISaveLoad
 
     private List<IWeapon> weapons = new();
     private GameObject player;
+    private int selectedIndex;
 
     private void Awake()
     {
@@ -17,6 +18,7 @@ public class WeaponManager : MonoBehaviour, ISaveLoad
     private void Start()
     {
         player = SelectorSpawner.Instance?.Player;
+        selectedIndex = PlayerPrefs.GetInt("CharacterHSelector", 0);
         CacheWeapons();
 
         SaveLoadManager.Instance?.Register(this);
@@ -38,17 +40,15 @@ public class WeaponManager : MonoBehaviour, ISaveLoad
     // ISaveLoad
     public void SaveToData(GameData data)
     {
-        if (data.weaponData == null)
-            data.weaponData = new WeaponData();
+        var charData = data.GetCharacterData(selectedIndex);
 
-        data.weaponData.guns.Clear();
-
+        var weaponData = new WeaponData();
         foreach (var weapon in weapons)
         {
             if (weapon is PlayerShoot gun)
             {
                 var upgrade = gun.GetComponent<GunUpgradeState>();
-                data.weaponData.guns.Add(new GunSave
+                weaponData.guns.Add(new GunSave
                 {
                     gunId = gun.gunData.gunName,
                     level = upgrade != null ? upgrade.level : 0,
@@ -57,21 +57,27 @@ public class WeaponManager : MonoBehaviour, ISaveLoad
             }
             else if (weapon is MeleeWeapon melee)
             {
-                data.weaponData.melee = new MeleeSave
+                weaponData.melee = new MeleeSave
                 {
                     meleeId = melee.data.weaponName,
                     level = melee.level
                 };
             }
         }
+
+        charData.weaponData = weaponData;
     }
 
     public void LoadFromData(GameData data)
     {
-        if (data.weaponData == null) return;
+        var charData = data.GetCharacterData(selectedIndex);
 
-        // Guns
-        foreach (var save in data.weaponData.guns)
+        if (charData.weaponData == null) return;
+
+        var weaponData = charData.weaponData;
+
+        // Load guns
+        foreach (var save in weaponData.guns)
         {
             foreach (var weapon in weapons)
             {
@@ -83,8 +89,8 @@ public class WeaponManager : MonoBehaviour, ISaveLoad
             }
         }
 
-        // Melee
-        var meleeSave = data.weaponData.melee;
+        // Load melee
+        var meleeSave = weaponData.melee;
         if (meleeSave != null && !string.IsNullOrEmpty(meleeSave.meleeId))
         {
             foreach (var weapon in weapons)

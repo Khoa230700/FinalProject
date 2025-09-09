@@ -93,13 +93,13 @@ public static class SaveLoadData
                     Data = JsonUtility.FromJson<GameData>(json);
                     if (Data != null)
                     {
-                        Debug.Log($"Game loaded from: {path}");
+                        Debug.Log($"Game loaded: {path}");
                         return Data;
                     }
                 }
                 catch (Exception e)
                 {
-                    Debug.LogError($"Load failed from {path}: {e.Message}");
+                    Debug.LogError($"Load failed: {e.Message}");
                 }
             }
 

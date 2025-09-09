@@ -20,6 +20,7 @@ public class SaveLoadManager : MonoBehaviour
     {
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
+        LoadNow();
     }
 
     void Start()
@@ -77,6 +78,8 @@ public class SaveLoadManager : MonoBehaviour
     // CORE
     private void SaveDataFromManagers()
     {
+        if (saveableObjects.Count <= 0) return;
+
         var gameData = SaveLoadData.Data ?? new GameData();
 
         foreach (var saveableObject in saveableObjects)
@@ -100,17 +103,19 @@ public class SaveLoadManager : MonoBehaviour
 
     private void LoadDataToManagers(GameData data)
     {
+        if (saveableObjects.Count <= 0) return;
+        
         foreach (var saveableObject in saveableObjects)
-        {
-            try
             {
-                saveableObject.LoadFromData(data);
+                try
+                {
+                    saveableObject.LoadFromData(data);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError($"[SaveLoadManager] Error loading {saveableObject.GetType().Name}: {e.Message}");
+                }
             }
-            catch (Exception e)
-            {
-                Debug.LogError($"[SaveLoadManager] Error loading {saveableObject.GetType().Name}: {e.Message}");
-            }
-        }
     }
 
     IEnumerator AutoSaveLoop()

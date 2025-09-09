@@ -1,6 +1,5 @@
 using UnityEngine;
 using System;
-using VInspector;
 
 public class CoinManager : MonoBehaviour, ISaveLoad
 {
@@ -62,7 +61,7 @@ public class CoinManager : MonoBehaviour, ISaveLoad
         }
     }
 
-    [Button("Add Test Coins")]
+    [ContextMenu("Add Coins")]
     public void AddTestCoins()
     {
         AddCoins(UnityEngine.Random.Range(100, 1000));
