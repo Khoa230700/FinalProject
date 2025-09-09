@@ -1,5 +1,4 @@
-﻿// PlayerMovement.cs
-using UnityEngine;
+﻿using UnityEngine;
 
 [RequireComponent(typeof(CharacterController))]
 public class PlayerMovement : MonoBehaviour
@@ -21,10 +20,10 @@ public class PlayerMovement : MonoBehaviour
     public AudioClip landSound;
 
     [Header("Footstep Volume")]
-    [Range(0f, 3f)] public float footstepVolume = 1.0f;     // tăng/giảm to nhỏ bước chân
+    [Range(0f, 3f)] public float footstepVolume = 1.0f;       // tăng/giảm to nhỏ bước chân
     [Range(0f, 3f)] public float runVolumeMultiplier = 1.25f; // chạy to hơn đi bộ
-    [Range(0f, 3f)] public float jumpVolume = 1.0f;          // âm lượng nhảy
-    [Range(0f, 3f)] public float landVolume = 1.0f;          // âm lượng tiếp đất
+    [Range(0f, 3f)] public float jumpVolume = 1.0f;           // âm lượng nhảy
+    [Range(0f, 3f)] public float landVolume = 1.0f;           // âm lượng tiếp đất
 
     [Header("Footstep Timing")]
     [Tooltip("Khoảng thời gian giữa 2 bước chân khi đi bộ.")]
@@ -45,6 +44,10 @@ public class PlayerMovement : MonoBehaviour
     private float stepTimer = 0f;
     private int lastFootstepIndex = -1;
 
+    // NEW: Helper kiểm tra controller usable để tránh lỗi khi controller bị tắt
+    private bool ControllerUsable =>
+        controller != null && controller.enabled && controller.gameObject.activeInHierarchy;
+
     void Start()
     {
         controller = GetComponent<CharacterController>();
@@ -52,8 +55,9 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
-        if (playerStats == null || KeyBindingManager.Instance == null)
-            return;
+        // Thiếu dữ liệu input hoặc controller đã tắt -> không xử lý
+        if (playerStats == null || KeyBindingManager.Instance == null) return;
+        if (!ControllerUsable) return;
 
         if (isGrounded)
         {
@@ -94,17 +98,9 @@ public class PlayerMovement : MonoBehaviour
         bool shiftHeld = KeyBindingManager.Instance.GetKey("Run");
 
         // Chọn tốc độ
-        float currentSpeed;
-        if (isAiming)
-        {
-            currentSpeed = playerStats.walkSpeed;
-        }
-        else
-        {
-            currentSpeed = (shiftHeld && isMoving)
-                           ? playerStats.runSpeed
-                           : playerStats.walkSpeed;
-        }
+        float currentSpeed = isAiming
+            ? playerStats.walkSpeed
+            : ((shiftHeld && isMoving) ? playerStats.runSpeed : playerStats.walkSpeed);
 
         // Di chuyển phẳng
         controller.Move(move * currentSpeed * Time.deltaTime);
@@ -129,7 +125,6 @@ public class PlayerMovement : MonoBehaviour
         // Land sound (vừa chạm đất)
         if (!wasGrounded && isGrounded)
         {
-            // Tránh phát khi vừa spawn đã ở mặt đất: kiểm tra vận tốc rơi đủ lớn sẽ “đã” hơn
             if (Mathf.Abs(velocity.y) > 0.1f)
                 PlayOneShot(landSound, landVolume);
 
@@ -172,13 +167,13 @@ public class PlayerMovement : MonoBehaviour
         while (idx == lastFootstepIndex && footstepClips.Length > 1);
 
         lastFootstepIndex = idx;
-        audioSource.PlayOneShot(footstepClips[idx], volume); // <-- dùng volumeScale
+        audioSource.PlayOneShot(footstepClips[idx], volume); // dùng volumeScale
     }
 
     private void PlayOneShot(AudioClip clip, float volumeScale = 1f)
     {
         if (clip == null || audioSource == null) return;
-        audioSource.PlayOneShot(clip, volumeScale); // <-- dùng volumeScale
+        audioSource.PlayOneShot(clip, volumeScale); // dùng volumeScale
     }
 
     // API cho Animator/controller dùng lại

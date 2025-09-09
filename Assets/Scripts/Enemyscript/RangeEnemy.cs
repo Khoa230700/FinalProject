@@ -35,6 +35,10 @@ public class RangeEnemy : MonoBehaviour
         player = SelectorSpawner.Instance.Player.transform;
 
         soundController = GetComponent<EnemySoundController>();
+        if (player == null)
+        {
+            player = GameObject.FindWithTag("Player").transform;
+        }
     }
 
     void Update()
