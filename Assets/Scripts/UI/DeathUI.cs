@@ -45,12 +45,12 @@ public class DeathUI : MonoBehaviour
     {
         float t = timer;
 
+        while (t > 0f)
         {
-            while (t > 0f)
-                t -= Time.unscaledDeltaTime;
+            t -= Time.unscaledDeltaTime;
 
             countdown.value = t;
-            number.text = t.ToString("F0");
+            number.text = Mathf.CeilToInt(t).ToString();
 
             yield return null;
         }
@@ -75,14 +75,13 @@ public class DeathUI : MonoBehaviour
 
         if (isMissionFailed)
         {
-            // SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
             Debug.Log("Mission Failed");
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         }
         else
         {
             Debug.Log("Death");
-
-            // SelectorSpawner.Instance.Player.GetComponent<PlayerHealthSystem>().Respawn();
+            SelectorSpawner.Instance.Player.GetComponent<PlayerHealthSystem>().Respawn();
         }
 
         pauseCanvas.SetActive(true);

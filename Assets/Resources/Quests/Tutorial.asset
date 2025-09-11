@@ -61,6 +61,6 @@ MonoBehaviour:
   prerequisiteQuests: []
   requiredLevel: 0
   expReward: 0
-  coinReward: 500
+  coinReward: 750
   autoStart: 1
   autoStartScene: InGame
