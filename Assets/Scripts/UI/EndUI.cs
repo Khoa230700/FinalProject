@@ -1,6 +1,7 @@
 using UnityEngine;
 using TMPro;
 using DG.Tweening;
+using UnityEngine.SceneManagement;
 
 public class EndUI : MonoBehaviour
 {
@@ -83,5 +84,14 @@ public class EndUI : MonoBehaviour
             buttonsGroup.SetActive(true);
         })
         .Play();
+    }
+
+    public void SetEndMap()
+    {
+        string sceneName = SceneManager.GetActiveScene().name;
+        string key = sceneName + "_Completed";
+
+        PlayerPrefs.SetInt(key, 1);
+        PlayerPrefs.Save();
     }
 }
