@@ -128,7 +128,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   encryption: 0
-  autoSaveInterval: 60
+  autoSaveInterval: 0
   verbose: 0
 --- !u!1001 &3115285646308583470
 PrefabInstance:

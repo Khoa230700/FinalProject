@@ -63,6 +63,7 @@ public class PlayerHealthSystem : BaseHealthSystem, IDamageable
     private CharacterController _cc;
     private bool _dead = false;
     private Vector3 _lastHitDir = Vector3.zero; // lưu hướng đòn gần nhất (dùng nếu muốn mở rộng)
+    private int deathCount = 0;
 
     // ------------- lifecycle -----------
     void Awake()
@@ -98,6 +99,8 @@ public class PlayerHealthSystem : BaseHealthSystem, IDamageable
         // cập nhật UI lần đầu
         HandleHealthChanged(currentHealth, maxHealth);
         HandleShieldChanged(currentShield, maxShield);
+
+        deathCount = 0;
     }
 
     private void OnDisable()
@@ -217,6 +220,8 @@ public class PlayerHealthSystem : BaseHealthSystem, IDamageable
         _dead = true;
         Debug.Log("Player Dead!");
 
+        deathCount++;
+
         // 1) Tắt input/CC theo cấu hình
         if (disableCharacterControllerOnDeath && _cc) _cc.enabled = false;
         if (disableOnDeath != null)
@@ -250,9 +255,9 @@ public class PlayerHealthSystem : BaseHealthSystem, IDamageable
         if (simpleQuarterFall)
             StartCoroutine(SimpleQuarterFallRoutine());
 
-        // 5) Game Over
-        if (GameManager.Instance != null)
-            GameManager.Instance.ChangeState(GameManager.GameState.GameOver);
+        // // 5) Game Over
+        // if (GameManager.Instance != null)
+        //     GameManager.Instance.ChangeState(GameManager.GameState.GameOver);
     }
 
     // -------- Respawn ----------
@@ -304,19 +309,15 @@ public class PlayerHealthSystem : BaseHealthSystem, IDamageable
         }
 
         transform.rotation = targetRot; // chốt góc cuối: nhìn lên trời
+        deathUI.Show(true);
     }
+
+    public int GetDeathCount() => deathCount;
 
     [ContextMenu("Test")] //Test
     public void Respawn()
     {
         CoinManager.Instance.RemoveCoins(Random.Range(100, 800)); // sự trừng phạt
-
-        currentHealth = maxHealth;
-        BroadcastHealth();
-
-        currentShield = maxShield;
-        BroadcastShield();
-
-        GetComponent<PlayerMovement>().enabled = true; //Test
+        Respawn(transform.position, transform.rotation, true);
     }
 }
