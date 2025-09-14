@@ -12,7 +12,7 @@ public class BossAi : MonoBehaviour
     public float detectRange = 20f;
     public float meleeRange = 2f;
     public float slamRange = 15f;
-    public float triggerRange = 10f;
+    public float triggerRange = 15f;
 
     [Header("Cooldowns")]
     public float rangeAttackCooldown = 5f;
@@ -27,6 +27,7 @@ public class BossAi : MonoBehaviour
     [Header("Fire Breath")]
     public float channelTime = 3f;
     public float damagePerSecond = 10f;
+    public float minFireBreathDistance = 5f;
     public ParticleSystem fireFX;
     public Collider fireDamageArea;
     private bool isChanneling = false;
@@ -85,6 +86,8 @@ public class BossAi : MonoBehaviour
 
     private void Update()
     {
+        //Debug.Log($"Distance: {distance:F2} | CanFire: {canFire} | LOS: {HasLineOfSight()} | Time: {Time.time} | NextFireTime: {nextFireTime} | isAttacking: {isAttacking}");
+        //Debug.DrawRay(transform.position + Vector3.up, (player.position - transform.position).normalized * triggerRange, Color.red);
         if (Input.GetKeyDown(KeyCode.H))
         {
             bossHealth.TakeDamage(30);
@@ -98,14 +101,16 @@ public class BossAi : MonoBehaviour
 
         float distance = Vector3.Distance(transform.position, player.position);
 
-        //if (distance > detectRange)
-        //{
-        //    agent.isStopped = true;
-        //    return;
-        //}
+        
 
         bool canSlam = distance <= slamRange && Time.time - lastSlamAttackTime >= slamAttackCooldown;
-        bool canFire = distance <= triggerRange && HasLineOfSight() && Time.time >= nextFireTime;
+        bool canFire = distance <= triggerRange /*&& HasLineOfSight()*/ && Time.time >= nextFireTime;
+        //bool canFire = distance >= fireBreathMinRange && distance <= triggerRange && HasLineOfSight() && Time.time >= nextFireTime;
+        //bool canFire = distance >= minFireBreathDistance &&
+        //       distance <= triggerRange &&
+        //       HasLineOfSight() &&
+        //       Time.time >= nextFireTime &&
+        //       !isAttacking;
         bool canShout = isPhase2 && distance <= Shoutrange && Time.time - lastShoutTime >= Shoutcooldown;
         bool canMelee = distance <= meleeRange;
         bool canRange = Time.time - lastRangeAttackTime >= rangeAttackCooldown;
@@ -118,6 +123,7 @@ public class BossAi : MonoBehaviour
         }
         else if (canFire)
         {
+            Debug.Log("Fire breath conditions met, starting...");
             agent.isStopped = true;
             StartFireBreath();
             nextFireTime = Time.time + fireCooldown;
@@ -222,6 +228,7 @@ public class BossAi : MonoBehaviour
             return hit.collider.CompareTag("Player");
         }
         return false;
+        
     }
 
     void RotateTowardsTarget()
