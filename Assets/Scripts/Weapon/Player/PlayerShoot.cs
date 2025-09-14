@@ -4,23 +4,20 @@ using System.Collections;
 public class PlayerShoot : MonoBehaviour, IWeapon, IReloadable
 {
     [Header("Data & References")]
-    public GunData gunData;                  // Chứa damage, range, fire mode, v.v... (đang dùng)
-    public Transform shootPoint;             // Điểm bắn, dùng cho raycast & PlayClipAtPoint fallback
+    public GunData gunData;
+    public Transform shootPoint;
     public Animator armsAnimator;
     public WeaponUI weaponUI;
     public ShopUI shopUI;
 
     [Header("Aiming")]
-    public CSGOScope csgoScope;              // Nếu có scope ngắm
+    public CSGOScope csgoScope;
 
     [SerializeField] private ParticleSystem muzzleFlashParticle;
 
     [Header("Audio")]
-    [Tooltip("AudioSource gắn trên prefab súng (khuyến nghị). Nếu để trống sẽ fallback sang PlayClipAtPoint tại shootPoint).")]
     public AudioSource gunAudioSource;
-    [Tooltip("Âm thanh khi nạp đạn.")]
     public AudioClip reloadSound;
-    [Tooltip("Âm thanh khi bóp cò nhưng hết đạn.")]
     public AudioClip emptyMagSound;
 
     [HideInInspector] public int currentAmmo;
@@ -32,22 +29,20 @@ public class PlayerShoot : MonoBehaviour, IWeapon, IReloadable
     private Coroutine shotResetCoroutine;
     public bool IsReadyToShoot { get; private set; } = true;
 
-    public static System.Action<Vector3> OnAnyHit; // point
+    public static System.Action<Vector3> OnAnyHit;
 
-    // guard to avoid double-shot in same frame
     private int _lastShotFrame = -1;
     private bool initialized = false;
-
-    // NEW: optional upgrade state
     private GunUpgradeState upgrade;
 
-    // --------- Helpers (đọc stat đã nâng cấp nếu có) ---------
     int MagazineSize => upgrade ? upgrade.MagazineSize : gunData.magazineSize;
     float Damage => upgrade ? upgrade.Damage : gunData.damage;
     float Range => upgrade ? upgrade.Range : gunData.range;
     float ReloadTime => upgrade ? upgrade.ReloadTime : gunData.reloadTime;
     float SpreadAngle => upgrade ? upgrade.SpreadAngle : gunData.spreadAngle;
     float SemiAutoIv => upgrade ? upgrade.SemiAutoMinInterval : gunData.semiAutoMinInterval;
+
+    private bool didClick = false;
 
     void Awake()
     {
@@ -58,17 +53,17 @@ public class PlayerShoot : MonoBehaviour, IWeapon, IReloadable
     public void Initialize()
     {
         if (initialized) return;
-        currentAmmo = MagazineSize;         // dùng magazine size đã nâng cấp
-        reserveAmmo = gunData.reserveAmmo;  // reserve theo data gốc (tuỳ design)
+        currentAmmo = MagazineSize;
+        reserveAmmo = gunData.reserveAmmo;
         initialized = true;
     }
 
     void Start()
     {
-        // Khởi tạo đạn với magazine size đã nâng cấp
         currentAmmo = MagazineSize;
         reserveAmmo = gunData.reserveAmmo;
         weaponUI?.UpdateAmmoUI(currentAmmo, reserveAmmo);
+        if (weaponUI != null) weaponUI.lastAmmoCount = currentAmmo; // sync ban đầu
     }
 
     // --------- IWeapon adapters ---------
@@ -82,15 +77,27 @@ public class PlayerShoot : MonoBehaviour, IWeapon, IReloadable
             weaponUI.SetFireMode(gunData.fireMode);
             weaponUI.CreateBulletUI();
             weaponUI.UpdateAmmoUI(currentAmmo, reserveAmmo);
+            weaponUI.lastAmmoCount = currentAmmo;
+
+            // Subscribe vào upgrade event
+            if (upgrade != null)
+            {
+                upgrade.OnLevelChanged.RemoveListener(OnGunUpgraded); // Remove trước để tránh duplicate
+                upgrade.OnLevelChanged.AddListener(OnGunUpgraded);
+            }
         }
     }
 
-    public void OnDeselected() { }
+    public void OnDeselected()
+    {
+        // Unsubscribe khi deselect
+        if (upgrade != null)
+            upgrade.OnLevelChanged.RemoveListener(OnGunUpgraded);
+    }
 
     public void StartFiring() => StartShooting();
     public void StopFiring() => StopShooting();
     public void FireOnce() => ShootOneBullet();
-
     public Coroutine SwitchOut(MonoBehaviour runner) => runner.StartCoroutine(SwitchOutRoutine());
     public Coroutine SwitchIn(MonoBehaviour runner) => runner.StartCoroutine(SwitchInRoutine());
 
@@ -118,12 +125,10 @@ public class PlayerShoot : MonoBehaviour, IWeapon, IReloadable
     public void StopShooting()
     {
         if (!IsShooting) return;
-
-        // Đánh dấu đã dừng bắn, nhưng KHÔNG cắt ngang nếu clip Shot/AimingShot còn đang chạy
         IsShooting = false;
 
         if (IsShotAnimPlaying())
-            return; // để ResetShotAnimation đưa về Idle khi clip kết thúc
+            return;
 
         CrossfadeToIdle();
     }
@@ -132,19 +137,22 @@ public class PlayerShoot : MonoBehaviour, IWeapon, IReloadable
     {
         if (PauseGameUI.isPause || isReloading || shopUI.isOpen) return;
 
-        // Hết đạn: phát "click" và thoát sớm
         if (currentAmmo <= 0)
         {
             PlayAtGun(emptyMagSound);
             return;
         }
 
-        // prevent multiple calls in the same frame
+        if (!didClick && QuestManager.Instance.UpdateQuestProgress(QuestObjectiveType.Interact, "TutorialShoot"))
+        {
+            didClick = true;
+        }
+
         if (Time.frameCount == _lastShotFrame) return;
         _lastShotFrame = Time.frameCount;
 
         if (!IsReadyToShoot) return;
-        IsReadyToShoot = false; // khoá bắn ngay lập tức
+        IsReadyToShoot = false;
 
         currentAmmo--;
 
@@ -154,11 +162,9 @@ public class PlayerShoot : MonoBehaviour, IWeapon, IReloadable
         armsAnimator.SetBool("Run", false);
         armsAnimator.Play(anim, 0, 0f);
 
-        // Hiệu ứng & âm thanh bắn
         muzzleFlashParticle?.Play();
         PlayAtGun(gunData.shootSound);
 
-        // Raycast (pellets cho shotgun)
         int pellets = (gunData.gunType == GunType.Shotgun) ? gunData.pelletCount : 1;
         for (int i = 0; i < pellets; i++)
         {
@@ -176,8 +182,7 @@ public class PlayerShoot : MonoBehaviour, IWeapon, IReloadable
                     if (hb.hitboxType == Hitbox.HitboxType.Head) dmg *= 2f;
                     hb.ownerHealthSystem.TakeDamage(dmg);
                     hb.OnHit(dmg, hit.point);
-
-                    OnAnyHit?.Invoke(hit.point); // <--- phát tín hiệu
+                    OnAnyHit?.Invoke(hit.point);
                 }
             }
         }
@@ -187,7 +192,6 @@ public class PlayerShoot : MonoBehaviour, IWeapon, IReloadable
         if (shotResetCoroutine != null) StopCoroutine(shotResetCoroutine);
         shotResetCoroutine = StartCoroutine(ResetShotAnimation());
 
-        // cooldown cho SemiAuto (giữ nguyên logic khoá bắn của bạn trong GunData)
         float cooldown = 0f;
         if (gunData.fireMode == GunFireMode.SemiAuto)
         {
@@ -198,11 +202,9 @@ public class PlayerShoot : MonoBehaviour, IWeapon, IReloadable
         StartCoroutine(ShotCooldown(cooldown));
     }
 
-    // ==================== Helpers cho Cách A ====================
     private bool IsShotAnimPlaying()
     {
         var st = armsAnimator.GetCurrentAnimatorStateInfo(0);
-        // normalizedTime < 1 tức là clip chưa chạy xong
         return (st.IsName("Shot") || st.IsName("AimingShot")) && st.normalizedTime < 0.98f;
     }
 
@@ -213,20 +215,16 @@ public class PlayerShoot : MonoBehaviour, IWeapon, IReloadable
         else
             armsAnimator.CrossFade("Idle", 0.08f);
     }
-    // ===========================================================
 
     private void PlayAtGun(AudioClip clip)
     {
         if (clip == null) return;
-
-        // Ưu tiên AudioSource gắn trên súng để kiểm soát volume/spatial
         if (gunAudioSource != null)
         {
             gunAudioSource.PlayOneShot(clip);
         }
         else
         {
-            // Fallback: phát tại vị trí shootPoint (3D)
             var pos = (shootPoint != null) ? shootPoint.position : transform.position;
             AudioSource.PlayClipAtPoint(clip, pos);
         }
@@ -247,19 +245,14 @@ public class PlayerShoot : MonoBehaviour, IWeapon, IReloadable
 
     private IEnumerator ResetShotAnimation()
     {
-        // Chờ đến khi state Shot/AimingShot thực sự được play
         while (!armsAnimator.GetCurrentAnimatorStateInfo(0).IsName("Shot")
             && !armsAnimator.GetCurrentAnimatorStateInfo(0).IsName("AimingShot"))
             yield return null;
 
-        // Chờ hết thời lượng state hiện tại
         var st = armsAnimator.GetCurrentAnimatorStateInfo(0);
-        float wait = st.length / Mathf.Max(0.0001f, st.speed); // tránh chia 0
+        float wait = st.length / Mathf.Max(0.0001f, st.speed);
         yield return new WaitForSeconds(wait);
 
-        // Clip đã xong:
-        // - Nếu vẫn giữ chuột và là FullAuto, để vòng lặp bắn tiếp quản lý (không ép về Idle).
-        // - Ngược lại, đưa về Idle/AimingIdle.
         bool stillHolding = Input.GetMouseButton(0);
         if (!(stillHolding && gunData.fireMode == GunFireMode.FullAuto))
         {
@@ -273,8 +266,6 @@ public class PlayerShoot : MonoBehaviour, IWeapon, IReloadable
             return;
 
         isReloading = true;
-
-        // Phát âm thanh nạp đạn ngay khi bắt đầu (tuỳ chỉnh lại thời điểm nếu animation yêu cầu)
         PlayAtGun(reloadSound);
 
         armsAnimator.SetTrigger("Recharge");
@@ -283,7 +274,6 @@ public class PlayerShoot : MonoBehaviour, IWeapon, IReloadable
 
     private IEnumerator ReloadRoutine()
     {
-        // Chờ đúng thời lượng reload để add đạn
         yield return new WaitForSeconds(ReloadTime);
 
         int need = MagazineSize - currentAmmo;
@@ -310,14 +300,12 @@ public class PlayerShoot : MonoBehaviour, IWeapon, IReloadable
 
         int bulletsAdded = 0;
 
-        // Add vào băng đạn hiện tại (dựa theo MagazineSize đã upgrade)
         int magazineSpace = MagazineSize - currentAmmo;
         int toMagazine = Mathf.Min(amount, magazineSpace);
         currentAmmo += toMagazine;
         bulletsAdded += toMagazine;
         amount -= toMagazine;
 
-        // Add vào reserve (giữ capacity theo gunData.reserveAmmo)
         if (amount > 0)
         {
             int reserveSpace = gunData.reserveAmmo - reserveAmmo;
@@ -341,4 +329,29 @@ public class PlayerShoot : MonoBehaviour, IWeapon, IReloadable
         int reserveAmmoNeeded = gunData.reserveAmmo - reserveAmmo;
         return Mathf.Max(0, currentAmmoNeeded) + Mathf.Max(0, reserveAmmoNeeded);
     }
+
+private void OnGunUpgraded(int newLevel)
+{
+    if (weaponUI == null) return;
+
+    int oldMagSize = weaponUI.bulletImages?.Count ?? 0;
+    int newMagSize = MagazineSize;
+    
+    // Nếu magazine size thay đổi, recreate UI
+    if (oldMagSize != newMagSize)
+    {
+        weaponUI.CreateBulletUI();
+        
+        // Nếu magazine size tăng và magazine cũ đã full, thêm ammo
+        if (newMagSize > oldMagSize && currentAmmo == oldMagSize)
+        {
+            int additionalAmmo = newMagSize - oldMagSize;
+            int ammoToAdd = Mathf.Min(additionalAmmo, reserveAmmo);
+            currentAmmo += ammoToAdd;
+            reserveAmmo -= ammoToAdd;
+        }
+    }
+    
+    weaponUI.UpdateAmmoUI(currentAmmo, reserveAmmo);
+}
 }

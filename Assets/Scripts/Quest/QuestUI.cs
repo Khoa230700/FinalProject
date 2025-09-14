@@ -27,15 +27,15 @@ public class QuestUI : MonoBehaviour
         }
 
         // Hiển thị Completed Quests
-        foreach (var questID in QuestManager.Instance.completedQuestIDs)
-        {
-            QuestSO questSO = QuestManager.Instance.allQuests.Find(q => q.questID == questID);
-            if (questSO != null)
-            {
-                Quest completedQuest = new Quest(questSO);
-                CreateQuestItem(completedQuest, true);
-            }
-        }
+        // foreach (var questID in QuestManager.Instance.completedQuestIDs)
+        // {
+        //     QuestSO questSO = QuestManager.Instance.allQuests.Find(q => q.questID == questID);
+        //     if (questSO != null)
+        //     {
+        //         Quest completedQuest = new Quest(questSO);
+        //         CreateQuestItem(completedQuest, true);
+        //     }
+        // }
     }
 
     private void OnDestroy()
@@ -167,6 +167,11 @@ public class QuestUI : MonoBehaviour
             string progressText = $"{objective.currentAmount}/{objective.requiredAmount}";
             objText.text = $"{objective.description} ({progressText})";
         }
+
+        if (objective.requiredAmount == 0)
+        {
+            objText.text = $"{objective.description}";
+        }
     }
 
     private void UpdateQuestUI(Quest quest)
@@ -182,5 +187,4 @@ public class QuestUI : MonoBehaviour
             }
         }
     }
-
 }

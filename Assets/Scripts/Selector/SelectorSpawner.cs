@@ -19,6 +19,8 @@ public class SelectorSpawner : MonoBehaviour
     public BarUI ShieldBar => shieldBar;
     public WeaponUI WeaponUI => weaponUI;
 
+    private int selectedIndex;
+
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -28,10 +30,10 @@ public class SelectorSpawner : MonoBehaviour
         }
         Instance = this;
 
-        // Spawn player
-        int selectedIndex = PlayerPrefs.GetInt("CharacterHSelector", 0);
+        selectedIndex = PlayerPrefs.GetInt("CharacterHSelector", 0);
         if (selectedIndex < 0 || selectedIndex >= playerPfs.Length) selectedIndex = 0;
 
+        // Spawn player
         Player = Instantiate(playerPfs[selectedIndex].playerPrefab, transform.position, transform.rotation);
 
         playerClassNameUI.UpdateUI(playerPfs[selectedIndex]);

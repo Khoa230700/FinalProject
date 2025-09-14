@@ -25,6 +25,7 @@ public class CoinUI : MonoBehaviour
 
     private void UpdateCoin(int oldValue, int newValue)
     {
+        Canvas.ForceUpdateCanvases();
         int diff = newValue - oldValue;
         if (diff == 0) return;
 

@@ -10,6 +10,8 @@ public class MeshMouseLook : MonoBehaviour
     private float pitch = 0f; // X - nhìn lên/xuống
     private float yaw = 0f;   // Y - quay trái/phải
     private bool isShow = true;
+    float delta = 0f;
+    private bool didLook = false;
 
     void Start()
     {
@@ -23,6 +25,20 @@ public class MeshMouseLook : MonoBehaviour
         float mouseX = Input.GetAxis("Mouse X") * sensitivityX;
         float mouseY = Input.GetAxis("Mouse Y") * sensitivityY;
 
+        if (!didLook)
+        {
+            delta += (mouseX * mouseX) + (mouseY * mouseY);
+
+            if (delta >= 100f)
+            {
+                if (QuestManager.Instance.UpdateQuestProgress(QuestObjectiveType.Interact, "TutorialLook"))
+                {
+                    didLook = true;
+                }
+            }
+        }
+
+        // Quay camera (luôn hoạt động)
         yaw += mouseX;
         pitch -= mouseY;
         pitch = Mathf.Clamp(pitch, minPitch, maxPitch);
@@ -32,14 +48,14 @@ public class MeshMouseLook : MonoBehaviour
 
     public void Show()
     {
-        Cursor.lockState = CursorLockMode.None; // Hiện và khoá chuột vào giữa màn hình
+        Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
         isShow = true;
     }
 
     public void Hide()
     {
-        Cursor.lockState = CursorLockMode.Locked; // Ẩn và khoá chuột vào giữa màn hình
+        Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
         isShow = false;
     }

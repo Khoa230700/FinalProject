@@ -11,10 +11,10 @@ public enum EncryptionType
     AES
 }
 
-public static class SaveLoadUtils
+public static class SaveLoadData
 {
     private static readonly object locker = new(); // Thread-safety
-    public static GameData Data { get; private set; } = new();
+    public static GameData Data { get; set; } = new();
 
     private static string fileName = "GameData";
     private static int maxBackup = 3;
@@ -28,8 +28,6 @@ public static class SaveLoadUtils
         {
             try
             {
-                Data.saveTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-
                 for (int i = maxBackup - 1; i >= 0; i--)
                 {
                     string oldPath = GetPath(i);
@@ -95,17 +93,17 @@ public static class SaveLoadUtils
                     Data = JsonUtility.FromJson<GameData>(json);
                     if (Data != null)
                     {
-                        Debug.Log($"Game loaded from: {path}");
+                        Debug.Log($"Game loaded: {path}");
                         return Data;
                     }
                 }
                 catch (Exception e)
                 {
-                    Debug.LogWarning($"Load failed from {path}: {e.Message}");
+                    Debug.LogError($"Load failed: {e.Message}");
                 }
             }
 
-            Debug.LogWarning("No valid save file found.");
+            Debug.Log("No valid save file found.");
             return Data = new GameData();
         }
     }

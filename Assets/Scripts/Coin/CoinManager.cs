@@ -1,9 +1,9 @@
 using UnityEngine;
 using System;
 
-public class CoinManager : MonoBehaviour
+public class CoinManager : MonoBehaviour, ISaveLoad
 {
-    public static CoinManager Instance;
+    public static CoinManager Instance { get; private set; }
 
     [Header("Coin Settings")]
     [SerializeField] private int currentCoins = 0;
@@ -13,56 +13,57 @@ public class CoinManager : MonoBehaviour
 
     private void Awake()
     {
+        if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
+    }
 
-        LoadCoins();
-        sessionCoins = 0;//Test
+    private void Start()
+    {
+        SaveLoadManager.Instance?.Register(this);
+    }
+
+    private void OnDestroy()
+    {
+        SaveLoadManager.Instance?.Unregister(this);
     }
 
     public void AddCoins(int amount)
     {
-        if (amount > 0)
+        if (amount > 0) sessionCoins += amount;
+
+        int oldAmount = currentCoins;
+        currentCoins = Mathf.Max(0, currentCoins + amount);
+
+        OnCoinChanged?.Invoke(oldAmount, currentCoins);
+        SaveLoadManager.Instance?.MarkDirty();
+    }
+
+    public void RemoveCoins(int amount) => AddCoins(-amount);
+    public int GetCoins() => currentCoins;
+    public int GetSessionCoins() => sessionCoins;
+    public bool HasEnoughCoins(int amount) => currentCoins >= amount;
+
+    // ISaveLoad
+    public void SaveToData(GameData data)
+    {
+        data.coins = currentCoins;
+    }
+
+    public void LoadFromData(GameData data)
+    {
+        if (data != null)
         {
-            sessionCoins += amount;
+            int oldAmount = currentCoins;
+            currentCoins = data.coins;
+            sessionCoins = 0;
+
+            OnCoinChanged?.Invoke(oldAmount, currentCoins);
         }
-
-        int newAmount = Mathf.Max(0, currentCoins + amount);
-
-        OnCoinChanged?.Invoke(currentCoins, newAmount);
-
-        currentCoins = newAmount;
-        SaveCoins();
     }
 
-
-    public void RemoveCoins(int amount)
+    [ContextMenu("Add Coins")]
+    public void AddTestCoins()
     {
-        AddCoins(-amount);
-    }
-
-    public int GetCoins()
-    {
-        return currentCoins;
-    }
-
-    public int GetSessionCoins()
-    {
-        return sessionCoins;
-    }
-
-    public bool HasEnoughCoins(int amount)
-    {
-        return currentCoins >= amount;
-    }
-
-    private void SaveCoins()
-    {
-        PlayerPrefs.SetInt("PlayerCoins", currentCoins);
-        PlayerPrefs.Save();
-    }
-
-    private void LoadCoins()
-    {
-        currentCoins = PlayerPrefs.GetInt("PlayerCoins", 0);
+        AddCoins(UnityEngine.Random.Range(100, 1000));
     }
 }
