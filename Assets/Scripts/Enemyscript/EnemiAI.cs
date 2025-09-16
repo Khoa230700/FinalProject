@@ -9,7 +9,7 @@ public class EnemiAI : MonoBehaviour
 {
     public float attackRange = 2f;
     public float attackCooldown = 1.5f;
-    public int damage = 5;
+    public float damage = 2;
 
     private float lastAttackTime;
     public Animator enemyAnimation;
