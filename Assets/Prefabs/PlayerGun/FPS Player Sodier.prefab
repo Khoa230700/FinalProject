@@ -24197,6 +24197,7 @@ GameObject:
   - component: {fileID: 1313218774189592259}
   - component: {fileID: 8764838343534785366}
   - component: {fileID: 2203927700193005670}
+  - component: {fileID: 455085578893985127}
   m_Layer: 8
   m_Name: FPS Player Sodier
   m_TagString: Player
@@ -24481,6 +24482,14 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!81 &455085578893985127
+AudioListener:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5790137767768560497}
+  m_Enabled: 1
 --- !u!1 &5858557603524245266
 GameObject:
   m_ObjectHideFlags: 0
