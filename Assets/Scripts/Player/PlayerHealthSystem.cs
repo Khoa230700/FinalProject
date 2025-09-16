@@ -309,7 +309,7 @@ public class PlayerHealthSystem : BaseHealthSystem, IDamageable
         }
 
         transform.rotation = targetRot; // chốt góc cuối: nhìn lên trời
-        deathUI.Show(true);
+        deathUI.Show();
     }
 
     public int GetDeathCount() => deathCount;
