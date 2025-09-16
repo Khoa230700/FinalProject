@@ -27,5 +27,6 @@ MonoBehaviour:
   requiredLevel: 1
   expReward: 0
   coinReward: 500
+  isSaved: 0
   autoStart: 1
   autoStartScene: SceneMainGame

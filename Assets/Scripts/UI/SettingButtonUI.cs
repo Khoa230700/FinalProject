@@ -29,6 +29,7 @@ public class SettingButtonUI : MonoBehaviour, IPointerEnterHandler
         detailIcon.gameObject.SetActive(true);
         detailBackground.gameObject.SetActive(true);
         detailIcon.sprite = iconSprite;
+        detailIcon.enabled = iconSprite != null;
         detailBackground.sprite = iconBackground;
 
         detailTitle.text = title;

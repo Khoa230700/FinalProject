@@ -22,6 +22,7 @@ public class QuestSO : ScriptableObject
     public int coinReward;
 
     [Header("Settings")]
+    public bool isSaved = true;
     public bool autoStart = false;
     public string autoStartScene = "";
 

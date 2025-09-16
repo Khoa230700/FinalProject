@@ -165,6 +165,8 @@ public class QuestManager : MonoBehaviour, ISaveLoad
 
         foreach (var quest in activeQuests)
         {
+            if (!quest.questSO.isSaved) continue;
+
             QuestDataSO questData = new QuestDataSO
             {
                 questID = quest.questSO.questID,
