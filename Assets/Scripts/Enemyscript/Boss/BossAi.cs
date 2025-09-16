@@ -253,7 +253,7 @@ public class BossAi : MonoBehaviour
         {
             if (hit.CompareTag("Player"))
             {
-                hit.GetComponent<PlayerHealth>()?.TakeDamage(15);
+                hit.GetComponent<PlayerHealthSystem>()?.TakeDamage(15);
                 //  trigger a stun, knockback
             }
         }

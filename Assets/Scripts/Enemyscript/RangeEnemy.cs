@@ -32,7 +32,7 @@ public class RangeEnemy : MonoBehaviour
     {
         agent = GetComponent<NavMeshAgent>();
         agent.stoppingDistance = stopDistance;
-        player = SelectorSpawner.Instance.Player.transform;
+        //player = SelectorSpawner.Instance.Player.transform;
 
         soundController = GetComponent<EnemySoundController>();
         if (player == null)

@@ -9,7 +9,7 @@ public class testTrigger : MonoBehaviour
         {
             //Debug.Log("Player inside fire area");
             // Apply damage over time
-            var health = other.GetComponent<PlayerHealth>();
+            var health = other.GetComponent<PlayerHealthSystem>();
             
             if (health != null)
             {
