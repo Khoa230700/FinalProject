@@ -9,7 +9,10 @@ public class EnemyVisibility : MonoBehaviour
 
     void Start()
     {
-        
+        if (player == null)
+        {
+            player = GameObject.FindWithTag("Player").transform;
+        }
         renderers = GetComponentsInChildren<Renderer>();
     }
 
