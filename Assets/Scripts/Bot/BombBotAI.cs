@@ -3,9 +3,9 @@ using UnityEngine;
 
 public class BombBotAI : MonoBehaviour
 {
-    protected Rigidbody rb;
-    protected CapsuleCollider capsuleCollider;
-    protected Animator animator;
+    public Rigidbody rb;
+    public CapsuleCollider capsuleCollider;
+    public Animator animator;
     protected float speed = 5f;
     protected float cooldownBeaten;
     private bool isWalking = true;
@@ -13,9 +13,7 @@ public class BombBotAI : MonoBehaviour
 
     void Start()
     {
-        rb = GetComponent<Rigidbody>();
-        capsuleCollider = GetComponent<CapsuleCollider>();
-        animator = GetComponent<Animator>();
+       
     }
 
 
