@@ -12,6 +12,7 @@ TagManager:
   - EnemyBullet
   - Bot
   - Boss
+  - BotMelee
   layers:
   - Default
   - TransparentFX
