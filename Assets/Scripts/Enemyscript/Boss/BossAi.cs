@@ -154,7 +154,7 @@ public class BossAi : MonoBehaviour
     {
         //agent.isStopped = true;
         //Debug.Log("Boss performs melee attack!");
-        player.GetComponent<testPlayerHealth>()?.TakeDamage(10);
+        player.GetComponent<PlayerHealthSystem>().TakeDamage(5);
     }
 
     //void RangeAttack()
@@ -253,7 +253,7 @@ public class BossAi : MonoBehaviour
         {
             if (hit.CompareTag("Player"))
             {
-                hit.GetComponent<PlayerHealthSystem>()?.TakeDamage(15);
+                hit.GetComponent<PlayerHealthSystem>().TakeDamage(15);
                 //  trigger a stun, knockback
             }
         }

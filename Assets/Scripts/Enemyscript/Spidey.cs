@@ -67,7 +67,7 @@ public class Spidey : MonoBehaviour
         {
             lastAttackTime = Time.time;
             // damage player()
-            player.GetComponent<PlayerHealthSystem>().TakeDamage(30);
+            player.GetComponent<PlayerHealthSystem>().TakeDamage(10);
         }
         animator.SetTrigger("MeleeAttack");
         soundController.PlayAttackSound2();
