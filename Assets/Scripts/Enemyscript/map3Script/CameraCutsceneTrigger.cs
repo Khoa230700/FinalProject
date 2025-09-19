@@ -1,32 +1,18 @@
 using Unity.Cinemachine;
 using UnityEngine;
+using UnityEngine.Playables;
 
 public class CameraCutsceneTrigger : MonoBehaviour
 {
-    public CinemachineVirtualCamera cutsceneCam;
-    public CinemachineVirtualCamera playerCam;
-    public float cutsceneDuration = 5f;
+    public PlayableDirector cutsceneDirector;
+    public GameObject playerCamera;
 
-    private void OnTriggerEnter(Collider other)
+    void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player"))
         {
-            Debug.Log("Player entered cutscene trigger.");
-
-            // Switch camera
-            cutsceneCam.Priority = 20;
-            playerCam.Priority = 10;
-
-            // Revert after duration
-            Invoke(nameof(RevertCamera), cutsceneDuration);
+            playerCamera.SetActive(false); // optional: disable player cam
+            cutsceneDirector.Play();
         }
-    }
-
-    private void RevertCamera()
-    {
-        Debug.Log("Reverting to player camera.");
-
-        cutsceneCam.Priority = 10;
-        playerCam.Priority = 20;
     }
 }
