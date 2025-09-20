@@ -8,14 +8,16 @@ public class RangeEnemy : MonoBehaviour
     public float stopDistance = 10f;
     public float meleeDistance = 2f;
     
-    public float fireRate = 1f;
+    public float fireRate = 2f;
 
     public GameObject rangedProjectile;
     public Transform firePoint;
     public float bulletSpeed = 10f;
-    public float bulletTimelife = 7f;
+    public float bulletTimelife = 5f;
 
-    private float nextFireTime = 0f;
+    public ParticleSystem bulleteff;
+
+    private float nextFireTime = 5f;
     private NavMeshAgent agent;
 
     public Animator animator;
@@ -32,8 +34,8 @@ public class RangeEnemy : MonoBehaviour
     {
         agent = GetComponent<NavMeshAgent>();
         agent.stoppingDistance = stopDistance;
-        //player = SelectorSpawner.Instance.Player.transform;
-
+        player = SelectorSpawner.Instance.Player.transform;
+        bulleteff.Stop();
         soundController = GetComponent<EnemySoundController>();
         if (player == null)
         {
@@ -79,10 +81,11 @@ public class RangeEnemy : MonoBehaviour
             var bullet = Instantiate(rangedProjectile, firePoint.position, firePoint.rotation);
             bullet.GetComponent<Rigidbody>().AddForce(firePoint.forward * bulletSpeed);
             Destroy(bullet, bulletTimelife);
-            
+            bulleteff.Play();
         }
         animator.SetTrigger("rangeattack");
         soundController.PlayAttackSound();
+        
     }
 
     //void MeleeAttack()

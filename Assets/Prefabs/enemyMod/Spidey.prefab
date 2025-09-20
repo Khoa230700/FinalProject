@@ -1476,6 +1476,7 @@ GameObject:
   - component: {fileID: 4988960259651475090}
   - component: {fileID: 5632107628029595848}
   - component: {fileID: 1054992625001706739}
+  - component: {fileID: 4252255775565692298}
   m_Layer: 0
   m_Name: PSpiderHit1 (2)
   m_TagString: HitedEnemy
@@ -1526,7 +1527,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4903349338734848826}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3657ca4cfbb38284c8391949a59cad72, type: 3}
   m_Name: 
@@ -1534,6 +1535,30 @@ MonoBehaviour:
   damage: 25
   Health: {fileID: 1593842359632066974}
   enemyAI: {fileID: 5617251511925398647}
+--- !u!114 &4252255775565692298
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4903349338734848826}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0405504e9ab75343a88002f088d9d05, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ownerHealthSystem: {fileID: 972552845388532186}
+  hitboxType: 0
+  bloodEffect: {fileID: 2360933683143488451, guid: 730678b8a5330c449ada55bde83402ce, type: 3}
+  bloodEffects: []
+  bloodSfx: []
+  spawnCountRange: {x: 1, y: 2}
+  scaleRange: {x: 0.85, y: 1.25}
+  lifetimeRange: {x: 1, y: 2}
+  randomYawOnly: 1
+  alignToSurfaceNormal: 1
+  surfaceOffset: 0.01
+  bloodSfxVolume: 1
 --- !u!1 &4962537834226951931
 GameObject:
   m_ObjectHideFlags: 0
@@ -3350,6 +3375,7 @@ GameObject:
   - component: {fileID: 4903915645084877180}
   - component: {fileID: 5339932701571727427}
   - component: {fileID: 5529626972889206437}
+  - component: {fileID: 5181509529632985196}
   m_Layer: 0
   m_Name: PSpiderHit1
   m_TagString: HitedEnemy
@@ -3400,7 +3426,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5567249841256078834}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3657ca4cfbb38284c8391949a59cad72, type: 3}
   m_Name: 
@@ -3408,6 +3434,30 @@ MonoBehaviour:
   damage: 25
   Health: {fileID: 1593842359632066974}
   enemyAI: {fileID: 5617251511925398647}
+--- !u!114 &5181509529632985196
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5567249841256078834}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0405504e9ab75343a88002f088d9d05, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ownerHealthSystem: {fileID: 972552845388532186}
+  hitboxType: 0
+  bloodEffect: {fileID: 5016170632959171363, guid: c3ed06559a66b724b91c3124e75ddec9, type: 3}
+  bloodEffects: []
+  bloodSfx: []
+  spawnCountRange: {x: 1, y: 2}
+  scaleRange: {x: 0.85, y: 1.25}
+  lifetimeRange: {x: 1, y: 2}
+  randomYawOnly: 1
+  alignToSurfaceNormal: 1
+  surfaceOffset: 0.01
+  bloodSfxVolume: 1
 --- !u!1 &5611413298309231307
 GameObject:
   m_ObjectHideFlags: 0
@@ -3505,6 +3555,7 @@ GameObject:
   - component: {fileID: 5785698847341549215}
   - component: {fileID: 6476372432698319725}
   - component: {fileID: 802737921291751671}
+  - component: {fileID: 3224522061252638947}
   m_Layer: 0
   m_Name: PSpiderHit2
   m_TagString: HitedEnemy
@@ -3555,7 +3606,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5629874936139541017}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3657ca4cfbb38284c8391949a59cad72, type: 3}
   m_Name: 
@@ -3563,6 +3614,30 @@ MonoBehaviour:
   damage: 60
   Health: {fileID: 1593842359632066974}
   enemyAI: {fileID: 5617251511925398647}
+--- !u!114 &3224522061252638947
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5629874936139541017}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0405504e9ab75343a88002f088d9d05, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ownerHealthSystem: {fileID: 972552845388532186}
+  hitboxType: 1
+  bloodEffect: {fileID: 2629016494315086251, guid: 5776aed3bb070e54cb09a11c8a6a5831, type: 3}
+  bloodEffects: []
+  bloodSfx: []
+  spawnCountRange: {x: 1, y: 2}
+  scaleRange: {x: 0.85, y: 1.25}
+  lifetimeRange: {x: 1, y: 2}
+  randomYawOnly: 1
+  alignToSurfaceNormal: 1
+  surfaceOffset: 0.01
+  bloodSfxVolume: 1
 --- !u!1 &5706390449628432266
 GameObject:
   m_ObjectHideFlags: 0
@@ -4204,6 +4279,7 @@ GameObject:
   - component: {fileID: 2901985433396973623}
   - component: {fileID: 5017409052591969186}
   - component: {fileID: 3977557238523550789}
+  - component: {fileID: 7400246225547087918}
   m_Layer: 0
   m_Name: PSpiderHit1 (1)
   m_TagString: HitedEnemy
@@ -4254,7 +4330,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7597295939081889554}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3657ca4cfbb38284c8391949a59cad72, type: 3}
   m_Name: 
@@ -4262,6 +4338,30 @@ MonoBehaviour:
   damage: 25
   Health: {fileID: 1593842359632066974}
   enemyAI: {fileID: 5617251511925398647}
+--- !u!114 &7400246225547087918
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7597295939081889554}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0405504e9ab75343a88002f088d9d05, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ownerHealthSystem: {fileID: 972552845388532186}
+  hitboxType: 0
+  bloodEffect: {fileID: 5016170632959171363, guid: c3ed06559a66b724b91c3124e75ddec9, type: 3}
+  bloodEffects: []
+  bloodSfx: []
+  spawnCountRange: {x: 1, y: 2}
+  scaleRange: {x: 0.85, y: 1.25}
+  lifetimeRange: {x: 1, y: 2}
+  randomYawOnly: 1
+  alignToSurfaceNormal: 1
+  surfaceOffset: 0.01
+  bloodSfxVolume: 1
 --- !u!1 &7765578076014854878
 GameObject:
   m_ObjectHideFlags: 0

@@ -3797,6 +3797,7 @@ GameObject:
   - component: {fileID: 5566470503390317102}
   - component: {fileID: 8268169115523632000}
   - component: {fileID: 5526747672047879291}
+  - component: {fileID: 1341446454323459411}
   m_Layer: 0
   m_Name: FatEnemyHit
   m_TagString: BodyShot
@@ -3862,7 +3863,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5342279618342657807}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9875ca482c081364c934c1012ae0c17b, type: 3}
   m_Name: 
@@ -3870,6 +3871,30 @@ MonoBehaviour:
   enemyM: {fileID: 7253536405624064325}
   blood: {fileID: 2629016494315086251, guid: 5776aed3bb070e54cb09a11c8a6a5831, type: 3}
   bloodLifetime: 1
+--- !u!114 &1341446454323459411
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5342279618342657807}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0405504e9ab75343a88002f088d9d05, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ownerHealthSystem: {fileID: 7253536405624064325}
+  hitboxType: 0
+  bloodEffect: {fileID: 2629016494315086251, guid: 5776aed3bb070e54cb09a11c8a6a5831, type: 3}
+  bloodEffects: []
+  bloodSfx: []
+  spawnCountRange: {x: 1, y: 2}
+  scaleRange: {x: 0.85, y: 1.25}
+  lifetimeRange: {x: 1, y: 2}
+  randomYawOnly: 1
+  alignToSurfaceNormal: 1
+  surfaceOffset: 0.01
+  bloodSfxVolume: 1
 --- !u!1 &5404579482665404375
 GameObject:
   m_ObjectHideFlags: 0
@@ -4273,6 +4298,7 @@ GameObject:
   - component: {fileID: 3023236879376309078}
   - component: {fileID: 6327175895554727557}
   - component: {fileID: 5261255527629390107}
+  - component: {fileID: 566219970668960276}
   m_Layer: 0
   m_Name: FatEnemyHit (7)
   m_TagString: HeadShot
@@ -4338,12 +4364,36 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6170437632353791144}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7391bee94d237cd4aa33d103057a992c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   enemyM: {fileID: 7253536405624064325}
+--- !u!114 &566219970668960276
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6170437632353791144}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0405504e9ab75343a88002f088d9d05, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ownerHealthSystem: {fileID: 7253536405624064325}
+  hitboxType: 1
+  bloodEffect: {fileID: 2360933683143488451, guid: 730678b8a5330c449ada55bde83402ce, type: 3}
+  bloodEffects: []
+  bloodSfx: []
+  spawnCountRange: {x: 1, y: 2}
+  scaleRange: {x: 0.85, y: 1.25}
+  lifetimeRange: {x: 1, y: 2}
+  randomYawOnly: 1
+  alignToSurfaceNormal: 1
+  surfaceOffset: 0.01
+  bloodSfxVolume: 1
 --- !u!1 &6197394405147883369
 GameObject:
   m_ObjectHideFlags: 0
@@ -4361,7 +4411,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &5776735501542217761
 Transform:
   m_ObjectHideFlags: 0
@@ -4425,6 +4475,7 @@ GameObject:
   - component: {fileID: 2651350160422537319}
   - component: {fileID: 3939097107681868208}
   - component: {fileID: 33309312565845245}
+  - component: {fileID: 8834414266185594250}
   m_Layer: 0
   m_Name: FatEnemyHit (1)
   m_TagString: BodyShot
@@ -4490,7 +4541,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6235100459543022019}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9875ca482c081364c934c1012ae0c17b, type: 3}
   m_Name: 
@@ -4498,6 +4549,30 @@ MonoBehaviour:
   enemyM: {fileID: 7253536405624064325}
   blood: {fileID: 2629016494315086251, guid: 5776aed3bb070e54cb09a11c8a6a5831, type: 3}
   bloodLifetime: 1
+--- !u!114 &8834414266185594250
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6235100459543022019}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0405504e9ab75343a88002f088d9d05, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ownerHealthSystem: {fileID: 7253536405624064325}
+  hitboxType: 0
+  bloodEffect: {fileID: 2629016494315086251, guid: 5776aed3bb070e54cb09a11c8a6a5831, type: 3}
+  bloodEffects: []
+  bloodSfx: []
+  spawnCountRange: {x: 1, y: 2}
+  scaleRange: {x: 0.85, y: 1.25}
+  lifetimeRange: {x: 1, y: 2}
+  randomYawOnly: 1
+  alignToSurfaceNormal: 1
+  surfaceOffset: 0.01
+  bloodSfxVolume: 1
 --- !u!1 &6264294629375566313
 GameObject:
   m_ObjectHideFlags: 0
@@ -5229,6 +5304,7 @@ GameObject:
   - component: {fileID: 8737056485604569256}
   - component: {fileID: 8915368379698257188}
   - component: {fileID: 4180936319251788406}
+  - component: {fileID: 3434975530194699732}
   m_Layer: 0
   m_Name: EnemyAttack
   m_TagString: BodyShot
@@ -5266,7 +5342,7 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -5279,11 +5355,35 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8702566757324737510}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e299fb0e7e660004f8e2366a4c6118ce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &3434975530194699732
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8702566757324737510}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0405504e9ab75343a88002f088d9d05, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ownerHealthSystem: {fileID: 7253536405624064325}
+  hitboxType: 0
+  bloodEffect: {fileID: 5170585893340993107, guid: 7b88f11816abaa34c9e02cbaa8485321, type: 3}
+  bloodEffects: []
+  bloodSfx: []
+  spawnCountRange: {x: 1, y: 2}
+  scaleRange: {x: 0.85, y: 1.25}
+  lifetimeRange: {x: 1, y: 2}
+  randomYawOnly: 1
+  alignToSurfaceNormal: 1
+  surfaceOffset: 0.01
+  bloodSfxVolume: 1
 --- !u!1 &8972912882699489584
 GameObject:
   m_ObjectHideFlags: 0
