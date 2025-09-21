@@ -82,6 +82,10 @@ public class BossAi : MonoBehaviour
         bossHealth.OnPhase2Enter += EnterPhase2;
 
         soundController = GetComponent<EnemySoundController>();
+        if (player == null)
+        {
+            player = GameObject.FindWithTag("Player").transform;
+        }
     }
 
     private void Update()
