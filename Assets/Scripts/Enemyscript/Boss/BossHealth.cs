@@ -26,6 +26,7 @@ public class BossHealth : MonoBehaviour
 
     public void TakeDamage(float amount)
     {
+        Debug.Log("Boss ăn dmg");
         currentHealth -= amount;
         currentHealth = Mathf.Max(currentHealth, 0f);
 
