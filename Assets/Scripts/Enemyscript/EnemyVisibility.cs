@@ -11,7 +11,7 @@ public class EnemyVisibility : MonoBehaviour
     {
         if (player == null)
         {
-            player = GameObject.FindWithTag("Player").transform;
+            player = GameObject.FindWithTag("BotMelee").transform;
         }
         renderers = GetComponentsInChildren<Renderer>();
     }

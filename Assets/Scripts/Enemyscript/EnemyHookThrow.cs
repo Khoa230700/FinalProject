@@ -20,32 +20,32 @@ public class EnemyHookThrow : MonoBehaviour
 
     private IEnumerator PullPlayer(Transform player)
     {
-        //Rigidbody playerRb = player.GetComponent<Rigidbody>();
-        //playerRb.isKinematic = true;  // Optional: disable physics during pull
-
-        //while (Vector3.Distance(player.position, transform.position) > 1.5f)
-        //{
-        //    player.position = Vector3.MoveTowards(player.position, transform.position, pullSpeed * Time.deltaTime);
-        //    yield return null;
-        //}
-
-        //playerRb.isKinematic = false;  // Re-enable physics
-
-        CharacterController controller = player.GetComponent<CharacterController>();
-
-        if (controller == null)
-        {
-            Debug.LogError("Player does not have a CharacterController!");
-            yield break;
-        }
-
-        // Optionally disable player input or movement script here
+        Rigidbody playerRb = player.GetComponent<Rigidbody>();
+        playerRb.isKinematic = true;  // Optional: disable physics during pull
 
         while (Vector3.Distance(player.position, transform.position) > 1.5f)
         {
-            Vector3 direction = (transform.position - player.position).normalized;
-            controller.Move(direction * pullSpeed * Time.deltaTime);
-            yield return null;
+           player.position = Vector3.MoveTowards(player.position, transform.position, pullSpeed * Time.deltaTime);
+           yield return null;
         }
+
+        playerRb.isKinematic = false;  // Re-enable physics
+
+        // CharacterController controller = player.GetComponent<CharacterController>();
+
+        // if (controller == null)
+        // {
+        //     Debug.LogError("Player does not have a CharacterController!");
+        //     yield break;
+        // }
+
+        // // Optionally disable player input or movement script here
+
+        // while (Vector3.Distance(player.position, transform.position) > 1.5f)
+        // {
+        //     Vector3 direction = (transform.position - player.position).normalized;
+        //     controller.Move(direction * pullSpeed * Time.deltaTime);
+        //     yield return null;
+        // }
     }
 }

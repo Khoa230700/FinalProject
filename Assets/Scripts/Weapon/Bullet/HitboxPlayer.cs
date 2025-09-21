@@ -2,11 +2,17 @@
 
 public class Hitbox : MonoBehaviour
 {
-    [Header("Owner")]
-    public EnemyM ownerHealthSystem;
+    [Header("Owner (quái thường)")]
+    public EnemyM ownerHealthSystem;              // để trống nếu là Boss
 
     public enum HitboxType { Body, Head }
-    public HitboxType hitboxType;
+    public HitboxType hitboxType = HitboxType.Body;
+
+    [Header("Damage")]
+    [Tooltip("Nhân sát thương cho headshot.")]
+    public float headshotMultiplier = 2f;
+    [Tooltip("Bật để Hitbox tự relay sát thương lên BossHealth/EnemyM.")]
+    public bool relayDamage = true;
 
     [Header("Blood FX (Backward compatible)")]
     [Tooltip("Nếu bloodEffects trống, sẽ dùng prefab này.")]
@@ -20,22 +26,11 @@ public class Hitbox : MonoBehaviour
     public AudioClip[] bloodSfx;
 
     [Header("Randomize Settings")]
-    [Tooltip("Số lượng effect spawn (min..max) mỗi lần trúng.")]
     public Vector2Int spawnCountRange = new Vector2Int(1, 2);
-
-    [Tooltip("Khoảng scale ngẫu nhiên áp dụng lên prefab.")]
     public Vector2 scaleRange = new Vector2(0.85f, 1.25f);
-
-    [Tooltip("Thời gian sống (Destroy) ngẫu nhiên của prefab (nếu prefab không tự hủy).")]
     public Vector2 lifetimeRange = new Vector2(1.0f, 2.0f);
-
-    [Tooltip("Xoay ngẫu nhiên quanh trục Y (đủ dùng cho particle billboard).")]
     public bool randomYawOnly = true;
-
-    [Tooltip("Nếu true, sẽ cố gắng xoay theo normal (nếu nhận được). Với method OnHit có normal.")]
     public bool alignToSurfaceNormal = true;
-
-    [Tooltip("Đẩy nhẹ ra khỏi bề mặt để tránh z-fighting (nếu có normal).")]
     public float surfaceOffset = 0.01f;
 
     [Header("Audio Settings")]
@@ -43,17 +38,58 @@ public class Hitbox : MonoBehaviour
 
     // =================== API được gọi từ súng/đòn đánh ===================
 
-    // Giữ tương thích với code cũ (PlayerShoot/MeleeWeapon đang gọi hàm này):
+    // Giữ tương thích code cũ:
     public void OnHit(float damage, Vector3 hitPoint)
     {
-        // Không có normal → chỉ spawn tại vị trí, hướng ngẫu nhiên (hoặc yaw-only)
+        RelayDamageIfNeeded(damage);
         SpawnBloodFX(hitPoint, Vector3.zero, hasNormal: false);
     }
 
-    // Bản mở rộng: nếu bạn muốn xoay dính sát bề mặt, gọi hàm này (sửa call-site để truyền hit.normal).
+    // Có normal để dán FX theo bề mặt:
     public void OnHit(float damage, Vector3 hitPoint, Vector3 hitNormal)
     {
+        RelayDamageIfNeeded(damage);
         SpawnBloodFX(hitPoint, hitNormal, hasNormal: true);
+    }
+
+    // =================== Relay Damage (KHÔNG sửa BossHealth) ===================
+
+    void RelayDamageIfNeeded(float damage)
+    {
+        if (!relayDamage) return;
+
+        float finalDamage = (hitboxType == HitboxType.Head) ? damage * headshotMultiplier : damage;
+
+        // 1) Ưu tiên: BossHealth ở parent (boss)
+        if (TryGetComponentInParents(out BossHealth boss))
+        {
+            boss.TakeDamage(finalDamage);     // GỌI TRỰC TIẾP, KHÔNG SỬA BossHealth
+            return;
+        }
+
+        // 2) Quái thường: EnemyM nếu có
+        if (ownerHealthSystem != null)
+        {
+            ownerHealthSystem.TakeDamage(finalDamage);
+            return;
+        }
+
+        // 3) Fallback: Gửi message "TakeDamage(float)" nếu có component khác xử lý
+        transform.root.SendMessage("TakeDamage", finalDamage, SendMessageOptions.DontRequireReceiver);
+    }
+
+    bool TryGetComponentInParents<T>(out T comp) where T : Component
+    {
+        comp = GetComponent<T>();
+        if (comp) return true;
+        var p = transform.parent;
+        while (p)
+        {
+            comp = p.GetComponent<T>();
+            if (comp) return true;
+            p = p.parent;
+        }
+        return false;
     }
 
     // =================== Triển khai FX ===================
@@ -64,44 +100,27 @@ public class Hitbox : MonoBehaviour
 
         for (int i = 0; i < spawnCount; i++)
         {
-            // 1) Chọn prefab
             GameObject prefab = PickBloodPrefab();
             if (prefab == null) continue;
 
-            // 2) Tính rotation
             Quaternion rot;
             if (alignToSurfaceNormal && hasNormal && normal != Vector3.zero)
-            {
-                // quay mặt (forward) theo normal để bám bề mặt
                 rot = Quaternion.LookRotation(normal);
-            }
             else
-            {
-                if (randomYawOnly)
-                    rot = Quaternion.Euler(0f, Random.Range(0f, 360f), 0f);
-                else
-                    rot = Random.rotationUniform;
-            }
+                rot = randomYawOnly ? Quaternion.Euler(0f, Random.Range(0f, 360f), 0f) : Random.rotationUniform;
 
-            // 3) Tính vị trí (đẩy nhẹ theo normal nếu có)
             Vector3 pos = (alignToSurfaceNormal && hasNormal && normal != Vector3.zero)
                         ? point + normal * surfaceOffset
                         : point;
 
-            // 4) Tạo effect
             GameObject fx = Instantiate(prefab, pos, rot);
 
-            // 5) Random scale
-            float s = Random.Range(Mathf.Min(scaleRange.x, scaleRange.y),
-                                   Mathf.Max(scaleRange.x, scaleRange.y));
+            float s = Random.Range(Mathf.Min(scaleRange.x, scaleRange.y), Mathf.Max(scaleRange.x, scaleRange.y));
             fx.transform.localScale *= s;
 
-            // 6) Phát âm thanh (nếu có)
             PlayBloodSfx(pos);
 
-            // 7) Hủy sau lifetime (nếu prefab không tự hủy)
-            float life = Random.Range(Mathf.Min(lifetimeRange.x, lifetimeRange.y),
-                                      Mathf.Max(lifetimeRange.x, lifetimeRange.y));
+            float life = Random.Range(Mathf.Min(lifetimeRange.x, lifetimeRange.y), Mathf.Max(lifetimeRange.x, lifetimeRange.y));
             Destroy(fx, life);
         }
     }
@@ -110,7 +129,6 @@ public class Hitbox : MonoBehaviour
     {
         if (bloodEffects != null && bloodEffects.Length > 0)
         {
-            // lọc phần tử null (nếu lỡ để slot trống)
             int guard = 0;
             while (guard++ < 8)
             {
@@ -126,7 +144,6 @@ public class Hitbox : MonoBehaviour
         if (bloodSfx == null || bloodSfx.Length == 0) return;
         int idx = Random.Range(0, bloodSfx.Length);
         var clip = bloodSfx[idx];
-        if (clip != null)
-            AudioSource.PlayClipAtPoint(clip, pos, bloodSfxVolume);
+        if (clip != null) AudioSource.PlayClipAtPoint(clip, pos, bloodSfxVolume);
     }
 }

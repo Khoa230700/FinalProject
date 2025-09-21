@@ -26,7 +26,7 @@ public class Spidey : MonoBehaviour
         soundController = GetComponent<EnemySoundController>();
         if (player == null)
         {
-            player = GameObject.FindWithTag("Player").transform;
+            player = GameObject.FindWithTag("BotMelee").transform;
         }
     }
 
@@ -67,7 +67,7 @@ public class Spidey : MonoBehaviour
         {
             lastAttackTime = Time.time;
             // damage player()
-            player.GetComponent<PlayerHealthSystem>().TakeDamage(10);
+            player.GetComponent<BaseHealthSystem>().TakeDamage(30);
         }
         animator.SetTrigger("MeleeAttack");
         soundController.PlayAttackSound2();
