@@ -13,7 +13,7 @@ public class SpawnSetupMap2 : MonoBehaviour
         {
             enemies = new List<EnemySpawnInfo>
             {
-                new EnemySpawnInfo { enemyType = EnemyType.Nor, count = 15 },
+                new EnemySpawnInfo { enemyType = EnemyType.Nor, count = 10 },
                 new EnemySpawnInfo { enemyType = EnemyType.Fat, count = 5 }
             }
         });
@@ -22,7 +22,7 @@ public class SpawnSetupMap2 : MonoBehaviour
         {
             enemies = new List<EnemySpawnInfo>
             {
-                new EnemySpawnInfo { enemyType = EnemyType.Nor, count = 15 },
+                new EnemySpawnInfo { enemyType = EnemyType.Nor, count = 10 },
                 new EnemySpawnInfo { enemyType = EnemyType.Fat, count = 5 }
             }
         });
