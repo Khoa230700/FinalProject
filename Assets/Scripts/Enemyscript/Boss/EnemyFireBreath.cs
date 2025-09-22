@@ -3,7 +3,7 @@ using UnityEngine;
 public class EnemyFireBreath : MonoBehaviour
 {
     public float channelTime = 3f;
-    public float damagePerSecond = 10f;
+    public float damagePerSecond = 1f;
     public ParticleSystem fireFX;
     public Collider fireDamageArea;
 
