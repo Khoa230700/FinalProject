@@ -11,10 +11,18 @@ public class WaveManager : MonoBehaviour
 
     [Header("UI References")]
     [SerializeField] private TimerUI timerUI;
-    [SerializeField] private GameObject gameOverObject;
+    [SerializeField] private GameObject endUIGO;
 
-    private int  currentWaveIndex = 0;
-    public bool isBetweenWaves   = false;
+    private int currentWaveIndex = 0;
+    public bool isBetweenWaves = false;
+
+    private void Update()
+    {
+        if (isBetweenWaves && Input.GetKeyDown(KeyCode.J))
+        {
+            SkipBreak();
+        }
+    }
 
     public void SetWaves(List<WaveData> newWaves) => waves = newWaves;
 
@@ -29,7 +37,7 @@ public class WaveManager : MonoBehaviour
             timerUI.SetVisible(false);
         }
 
-        if(shopSpawner != null) shopSpawner.HideShop();
+        if (shopSpawner != null) shopSpawner.HideShop();
 
         StartCoroutine(HandleWave());
     }
@@ -73,9 +81,10 @@ public class WaveManager : MonoBehaviour
             currentWaveIndex++;
         }
 
-        if (gameOverObject != null)
+        if (endUIGO != null)
         {
-            gameOverObject.SetActive(true);  // Kích hoạt gameObject bạn đã tham chiếu ở trên
+            yield return new WaitForSeconds(3f);
+            endUIGO.SetActive(true);
         }
     }
 
@@ -98,6 +107,20 @@ public class WaveManager : MonoBehaviour
 
     public void SkipBreak()
     {
-        if (isBetweenWaves) isBetweenWaves = false;
+        if (isBetweenWaves)
+        {
+            isBetweenWaves = false;
+
+            // Tắt Shop
+            if (shopSpawner != null)
+                shopSpawner.HideShop();
+
+            // Reset / tắt Timer UI
+            if (timerUI != null)
+            {
+                timerUI.HideUI();
+                timerUI.SetVisible(false);
+            }
+        }
     }
 }

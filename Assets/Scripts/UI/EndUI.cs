@@ -20,8 +20,11 @@ public class EndUI : MonoBehaviour
         PauseGameUI.Instance.Pause();
     }
 
+    [ContextMenu("Show Gain")]
     public void ShowGain()
     {
+        SetEndMap();
+
         int sessionCoins = CoinManager.Instance.GetSessionCoins();
         int deathCount = SelectorSpawner.Instance.Player.GetComponent<PlayerHealthSystem>().GetDeathCount();
         int killCount = 0;
@@ -50,7 +53,7 @@ public class EndUI : MonoBehaviour
         sequence.SetUpdate(true);
 
         // Coin
-        if (sessionCoins > 0)
+        if (sessionCoins >= 0)
         {
             sequence.AppendCallback(() => coinGroup.SetActive(true));
             sequence.Append(
@@ -65,7 +68,7 @@ public class EndUI : MonoBehaviour
         }
 
         // Death
-        if (deathCount > 0)
+        if (deathCount >= 0)
         {
             sequence.AppendCallback(() => deathGroup.SetActive(true));
             sequence.Append(
