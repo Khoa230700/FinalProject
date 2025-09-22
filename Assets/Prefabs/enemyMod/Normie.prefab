@@ -2224,7 +2224,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   attackRange: 2.5
   attackCooldown: 1.5
-  damage: 10
+  damage: 1
   enemyAnimation: {fileID: 4440705263268147471}
   detectionRadius: 100
   moveSpeed: 4
