@@ -17,8 +17,8 @@ public class TailBulltet : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            //other.GetComponent<PlayerHealthSystem>().TakeDamage(10);
-            other.GetComponent<testPlayerHealth>().TakeDamage(10);
+            other.GetComponent<PlayerHealthSystem>().TakeDamage(1);
+            //other.GetComponent<testPlayerHealth>().TakeDamage(10);
         }
     }
 }
