@@ -17704,14 +17704,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   player: {fileID: 0}
   firePoint: {fileID: 7088050623866143815}
-  bulletPrefab: {fileID: 5406233457063356828, guid: d52bd64184b36634b818446a4ae66655, type: 3}
   bulletParticleSystem: {fileID: 19800000}
   wFX_LightFlicker: {fileID: 11400000}
   hitdame: {fileID: 0}
   detectionRange: 15
   fireRate: 1.5
   bulletSpeed: 25
-  fireCooldown: 3
+  followPlayerDistance: 8
+  combatStoppingDistance: 0
 --- !u!114 &2209449373284245874
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -17937,8 +17937,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d4ff2b05588cc4f4ea6cd862bd3c9ce7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 100
-  armor: 0
+  maxHealth: 500
+  armor: 500
   OnTakeDamage:
     m_PersistentCalls:
       m_Calls: []

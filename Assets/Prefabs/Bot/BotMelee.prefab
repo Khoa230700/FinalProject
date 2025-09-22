@@ -388,6 +388,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: df64daffb2a75dc4b958bdc48380b8bd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  rb: {fileID: 0}
+  capsuleCollider: {fileID: 0}
+  animator: {fileID: 0}
 --- !u!114 &6581119235468300611
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -400,8 +403,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d4ff2b05588cc4f4ea6cd862bd3c9ce7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 100
-  armor: 0
+  maxHealth: 500
+  armor: 500
   OnTakeDamage:
     m_PersistentCalls:
       m_Calls: []
@@ -1020,11 +1023,10 @@ MonoBehaviour:
   attackRange: 0.22
   attackRadius: 1.41
   cooldown: 1
+  swingOrigin: {fileID: 2801550588296635517}
   enemyMask:
     serializedVersion: 2
     m_Bits: 64
-  swingOrigin: {fileID: 2801550588296635517}
-  drawGizmos: 1
 --- !u!65 &6590447101737242600
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -3303,11 +3305,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   player: {fileID: 0}
   agent: {fileID: 5924586812206501642}
+  animator: {fileID: 0}
   attackCooldown: 1
   attackRange: 3
   visionRange: 20
-  lastAttackTime: 0
-  attackCombo: 0
 --- !u!195 &5924586812206501642
 NavMeshAgent:
   m_ObjectHideFlags: 0
