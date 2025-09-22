@@ -84,7 +84,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 04ae38ec77beb064a978b2c92e4160c8, type: 3}
   - {fileID: 21300000, guid: 75f07914e2814ed45a072f52fc442b1f, type: 3}
   enableVirtualLoading: 1
-  virtualLoadingTimer: 20
+  virtualLoadingTimer: 10
 --- !u!82 &5504540153964398811
 AudioSource:
   m_ObjectHideFlags: 0
