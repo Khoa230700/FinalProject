@@ -59,7 +59,7 @@ MonoBehaviour:
   enableRandomHints: 1
   enableRandomImages: 1
   hintTimer: 3
-  imageTimer: 3
+  imageTimer: 2.5
   hintFadeDuration: 1
   imageFadingSpeed: 1.5
   hintList:
