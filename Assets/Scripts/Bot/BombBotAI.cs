@@ -6,7 +6,7 @@ public class BombBotAI : MonoBehaviour
     public Rigidbody rb;
     public CapsuleCollider capsuleCollider;
     public Animator animator;
-    protected float speed = 5f;
+    protected float speed = 2f;
     protected float cooldownBeaten;
     private bool isWalking = true;
 

@@ -1299,6 +1299,7 @@ GameObject:
   - component: {fileID: -3733984237469163191}
   - component: {fileID: -4253897285731601526}
   - component: {fileID: 512548131727642712}
+  - component: {fileID: -7324221204450362004}
   m_Layer: 6
   m_Name: Normie
   m_TagString: Enemy
@@ -2314,6 +2315,29 @@ MonoBehaviour:
   attackClip: {fileID: 8300000, guid: 1b22e4677ed29764db64f1dfe206d6a6, type: 3}
   attackClip2: {fileID: 8300000, guid: 3d16d133484a4894fb502843c12fa7c5, type: 3}
   deathClip: {fileID: 8300000, guid: bd7472212695a3b4f8bf101927a45278, type: 3}
+--- !u!136 &-7324221204450362004
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3738223141133144338}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.5
+  m_Height: 1
+  m_Direction: 1
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &3777046724730365686
 GameObject:
   m_ObjectHideFlags: 0
