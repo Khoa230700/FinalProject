@@ -173,16 +173,28 @@ public class PlayerShoot : MonoBehaviour, IWeapon, IReloadable
                 : GetSpreadDirection(shootPoint.forward, SpreadAngle);
 
             Ray ray = new Ray(shootPoint.position, dir);
-            if (Physics.Raycast(ray, out RaycastHit hit, Range))
+            if (Physics.Raycast(ray, out RaycastHit hit, Range, ~0, QueryTriggerInteraction.Collide))
             {
-                var hb = hit.collider.GetComponent<Hitbox>();
-                if (hb != null && hb.ownerHealthSystem != null)
+                var hb = hit.collider.GetComponent<Hitbox>() ?? hit.collider.GetComponentInParent<Hitbox>();
+                if (hb != null)
                 {
-                    float dmg = Damage;
-                    if (hb.hitboxType == Hitbox.HitboxType.Head) dmg *= 2f;
-                    hb.ownerHealthSystem.TakeDamage(dmg);
-                    hb.OnHit(dmg, hit.point);
+                    float dmg = Damage; // để Hitbox quyết định headshot multiplier
+                    hb.OnHit(dmg, hit.point, hit.normal);
                     OnAnyHit?.Invoke(hit.point);
+                }
+                else
+                {
+                    // Fallback: nếu vật thể không có Hitbox, thử gọi trực tiếp
+                    var boss = hit.collider.GetComponentInParent<BossHealth>();
+                    if (boss != null)
+                    {
+                        boss.TakeDamage(Damage);
+                    }
+                    else
+                    {
+                        var enemy = hit.collider.GetComponentInParent<EnemyM>();
+                        if (enemy != null) enemy.TakeDamage(Damage);
+                    }
                 }
             }
         }
