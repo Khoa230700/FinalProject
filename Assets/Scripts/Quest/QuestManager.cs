@@ -159,12 +159,16 @@ public class QuestManager : MonoBehaviour, ISaveLoad
     {
         data.questData = new QuestData
         {
-            completedQuestIDs = new List<string>(completedQuestIDs),
+            completedQuestIDs = completedQuestIDs
+        .Where(id => allQuests.Any(q => q.questID == id && q.isSaved))
+        .ToList(),
             activeQuests = new List<QuestDataSO>()
         };
 
         foreach (var quest in activeQuests)
         {
+            if (!quest.questSO.isSaved) continue;
+
             QuestDataSO questData = new QuestDataSO
             {
                 questID = quest.questSO.questID,

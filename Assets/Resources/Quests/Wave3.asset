@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 19c1a55a65e88f44280c5bd48b9fe731, type: 3}
   m_Name: Wave3
   m_EditorClassIdentifier: 
-  questID: K7db0596a-3709-496b-9098-42c293b829e1
+  questID: Wave3
   questName: Kill all enemies!
   description: 
   objectives:
@@ -43,5 +43,6 @@ MonoBehaviour:
   requiredLevel: 1
   expReward: 0
   coinReward: 1000
+  isSaved: 0
   autoStart: 1
   autoStartScene: SceneMainGame
