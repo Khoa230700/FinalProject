@@ -759,7 +759,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ownerHealthSystem: {fileID: 639718399531827442}
   hitboxType: 0
+  headshotMultiplier: 2
+  relayDamage: 1
   bloodEffect: {fileID: 4152240900433254336, guid: 6d3629f845b40e24fb51d381e84bbc77, type: 3}
+  bloodEffects: []
+  bloodSfx: []
+  spawnCountRange: {x: 1, y: 2}
+  scaleRange: {x: 0.85, y: 1.25}
+  lifetimeRange: {x: 1, y: 2}
+  randomYawOnly: 1
+  alignToSurfaceNormal: 1
+  surfaceOffset: 0.01
+  bloodSfxVolume: 1
 --- !u!1 &2569850507247370088
 GameObject:
   m_ObjectHideFlags: 0
@@ -1078,7 +1089,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ownerHealthSystem: {fileID: 639718399531827442}
   hitboxType: 1
+  headshotMultiplier: 2
+  relayDamage: 1
   bloodEffect: {fileID: 8967264388286551387, guid: 75f2e05292738d242a060d01657a4ce5, type: 3}
+  bloodEffects: []
+  bloodSfx: []
+  spawnCountRange: {x: 1, y: 2}
+  scaleRange: {x: 0.85, y: 1.25}
+  lifetimeRange: {x: 1, y: 2}
+  randomYawOnly: 1
+  alignToSurfaceNormal: 1
+  surfaceOffset: 0.01
+  bloodSfxVolume: 1
 --- !u!1 &3314240867215492325
 GameObject:
   m_ObjectHideFlags: 0
@@ -2293,7 +2315,7 @@ CapsuleCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
@@ -2559,7 +2581,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ownerHealthSystem: {fileID: 639718399531827442}
   hitboxType: 0
+  headshotMultiplier: 2
+  relayDamage: 1
   bloodEffect: {fileID: 4288107571095694937, guid: c3f8938673a07704e93ac52eee18f410, type: 3}
+  bloodEffects: []
+  bloodSfx: []
+  spawnCountRange: {x: 1, y: 2}
+  scaleRange: {x: 0.85, y: 1.25}
+  lifetimeRange: {x: 1, y: 2}
+  randomYawOnly: 1
+  alignToSurfaceNormal: 1
+  surfaceOffset: 0.01
+  bloodSfxVolume: 1
 --- !u!1 &4432494124507783346
 GameObject:
   m_ObjectHideFlags: 0
@@ -3575,7 +3608,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ownerHealthSystem: {fileID: 639718399531827442}
   hitboxType: 0
+  headshotMultiplier: 2
+  relayDamage: 1
   bloodEffect: {fileID: 1172649150807526450, guid: 696ec32829bb413498cef4215a2a1926, type: 3}
+  bloodEffects: []
+  bloodSfx: []
+  spawnCountRange: {x: 1, y: 2}
+  scaleRange: {x: 0.85, y: 1.25}
+  lifetimeRange: {x: 1, y: 2}
+  randomYawOnly: 1
+  alignToSurfaceNormal: 1
+  surfaceOffset: 0.01
+  bloodSfxVolume: 1
 --- !u!1 &6768120555724237328
 GameObject:
   m_ObjectHideFlags: 0
@@ -3975,7 +4019,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ownerHealthSystem: {fileID: 639718399531827442}
   hitboxType: 0
+  headshotMultiplier: 2
+  relayDamage: 1
   bloodEffect: {fileID: 5371219466416337994, guid: f9e099178c81bee439a79eecec91dacb, type: 3}
+  bloodEffects: []
+  bloodSfx: []
+  spawnCountRange: {x: 1, y: 2}
+  scaleRange: {x: 0.85, y: 1.25}
+  lifetimeRange: {x: 1, y: 2}
+  randomYawOnly: 1
+  alignToSurfaceNormal: 1
+  surfaceOffset: 0.01
+  bloodSfxVolume: 1
 --- !u!1 &8231442395666744071
 GameObject:
   m_ObjectHideFlags: 0
