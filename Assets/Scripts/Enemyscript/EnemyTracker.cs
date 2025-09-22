@@ -5,6 +5,8 @@ public class EnemyTracker : MonoBehaviour
     // public Action OnDeath;
     private QuestTracker questTracker;
 
+    public System.Action OnDeath { get; internal set; }
+
     private void Start()
     {
         questTracker = GetComponent<QuestTracker>();
