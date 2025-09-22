@@ -20,11 +20,8 @@ public class EndUI : MonoBehaviour
         PauseGameUI.Instance.Pause();
     }
 
-    [ContextMenu("Show Gain")]
     public void ShowGain()
     {
-        SetEndMap();
-
         int sessionCoins = CoinManager.Instance.GetSessionCoins();
         int deathCount = SelectorSpawner.Instance.Player.GetComponent<PlayerHealthSystem>().GetDeathCount();
         int killCount = 0;
