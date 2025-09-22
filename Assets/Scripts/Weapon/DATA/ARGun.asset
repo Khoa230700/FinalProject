@@ -18,7 +18,7 @@ MonoBehaviour:
   gunSprite: {fileID: 21300000, guid: ac85248f1c5cec54cbce0be0c0bdea9d, type: 3}
   gunSpriteFullColor: {fileID: 21300000, guid: f03105c21d53a8f488d3a25bc1c79050, type: 3}
   damage: 100
-  range: 10
+  range: 1000
   pelletCount: 1
   spreadAngle: 0
   roundsPerSecond: 5
