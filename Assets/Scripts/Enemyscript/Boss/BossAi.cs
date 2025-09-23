@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.AI;
 using static UnityEngine.GraphicsBuffer;
 
@@ -67,6 +67,14 @@ public class BossAi : MonoBehaviour
 
     private float destinationUpdateRate = 0.5f;
     private float nextDestinationUpdateTime = 0f;
+
+    [Header("Slam Knockback")]
+    public float slamKnockbackForce = 12f;   // tốc độ đẩy lùi ban đầu (m/s)
+    public float slamKnockbackDuration = 0.35f;
+
+    [Header("Fire Breath Burn")]
+    public float burnDps = 5f;               // yêu cầu: 5 dmg/s
+    public float burnDuration = 5f;          // yêu cầu: 5 giây
 
 
 
@@ -173,7 +181,6 @@ public class BossAi : MonoBehaviour
 
     void SlamAttack()
     {
-
         isAttacking = true;
         agent.isStopped = true;
 
@@ -182,13 +189,21 @@ public class BossAi : MonoBehaviour
         collid.GetComponent<Rigidbody>().AddForce(firePoint.forward * bulletSpeed);
         Destroy(partic, particlePrefabTimelife);
         Destroy(collid, colliderPrefabTimelife);
-        //Debug.Log("Boss performs slam attack!");
-        //Collider[] colliders = Physics.OverlapSphere(transform.position, 4f);
-        //foreach (Collider col in colliders)
-        //{
-        //    if (col.GetComponent<PlayerHealth>())
-        //        col.GetComponent<PlayerHealth>().TakeDamage(20);
-        //}
+
+        // === KNOCKBACK PLAYER ===
+        if (player != null)
+        {
+            var ph = player.GetComponent<PlayerHealthSystem>();
+            if (ph != null)
+            {
+                // Đẩy player bay ra phía sau lưng (ngược hướng nhìn của player)
+                ph.ApplyKnockbackBackwards(force: 12f, duration: 0.35f, upForce: 3f);
+
+                // Hoặc đẩy văng ra xa khỏi boss:
+                // ph.ApplyKnockbackFrom(transform.position, 12f, 0.35f, 3f);
+            }
+        }
+
         enemyAnimation.SetTrigger("Slam");
         Invoke(nameof(EndAttack), 2f);
         soundController.PlayAttackSound();
@@ -208,6 +223,21 @@ public class BossAi : MonoBehaviour
         enemyAnimation.SetBool("FireBreath",true);
 
         soundController.PlayAttackSound2();
+
+        // Khi đang phun lửa, nếu Player nằm trong vùng fireDamageArea → áp Burn
+        if (isChanneling && fireDamageArea && player)
+        {
+            // kiểm tra bằng khoảng cách tới collider (ổn cho trigger/non-trigger)
+            Vector3 closest = fireDamageArea.ClosestPoint(player.position);
+            float dist = Vector3.Distance(closest, player.position);
+
+            // Nếu điểm gần nhất chính là player.position, tức là đang "bên trong" vùng
+            if (dist <= 0.05f)
+            {
+                var ph = player.GetComponent<PlayerHealthSystem>();
+                if (ph) ph.ApplyBurn(5f, 5f); // làm mới timer nếu trúng lại
+            }
+        }
     }
 
     void StopFireBreath()
