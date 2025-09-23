@@ -305,7 +305,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   musicSounds:
-  - name: Test
+  - name: T
     clip: {fileID: 8300000, guid: 3a4828c8bdf534142b3ea60d566d2d98, type: 3}
   sfxSounds:
   - name: Click
