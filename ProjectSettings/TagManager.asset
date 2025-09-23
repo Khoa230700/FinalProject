@@ -13,6 +13,9 @@ TagManager:
   - Bot
   - Boss
   - BotMelee
+  - Spidey
+  - Failed
+  - QuestBox
   layers:
   - Default
   - TransparentFX

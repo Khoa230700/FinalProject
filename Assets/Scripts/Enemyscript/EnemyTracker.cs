@@ -15,7 +15,7 @@ public class EnemyTracker : MonoBehaviour
     public void Die()
     {
         // OnDeath?.Invoke();
-        questTracker.OnKilled();
+        questTracker?.OnKilled();
         SpawnManager.Instance.OnEnemyDeath();
         CoinManager.Instance.AddCoins(Random.Range(5, 15)); // Thêm 5-15 coin khi enemy chết
         // Debug.Log($"{gameObject.name} has died.");

@@ -5,7 +5,7 @@ public class Spidey : MonoBehaviour
 {
     public EnemyHookThrow enemy;
 
-    private NavMeshAgent agent;
+    // private NavMeshAgent agent;
     public Transform player;
 
     public float lastAttackTime = 0f;
@@ -21,8 +21,8 @@ public class Spidey : MonoBehaviour
     private EnemySoundController soundController;
     void Start()
     {
-        agent = GetComponent<NavMeshAgent>();
-        agent.stoppingDistance = stopDistance;
+        // agent = GetComponent<NavMeshAgent>();
+        // agent.stoppingDistance = stopDistance;
         soundController = GetComponent<EnemySoundController>();
         if (player == null)
         {
@@ -37,19 +37,19 @@ public class Spidey : MonoBehaviour
 
         if (distance <= meleeDistance)
         {
-            agent.isStopped = true;
+            // agent.isStopped = true;
             MeleeAttack();
         }
         else if (distance <= stopDistance)
         {
-            agent.isStopped = true;
+            // agent.isStopped = true;
             HookAttack();
         }
-        else
-        {
-            agent.isStopped = false;
-            agent.SetDestination(player.position);
-        }
+        // else
+        // {
+        //     // agent.isStopped = false;
+        //     // agent.SetDestination(player.position);
+        // }
 
         Vector3 direction = (player.position - transform.position).normalized;
         direction.y = 0;
@@ -71,7 +71,7 @@ public class Spidey : MonoBehaviour
         }
         animator.SetTrigger("MeleeAttack");
         soundController.PlayAttackSound2();
-        Debug.Log("hit");
+        // Debug.Log("hit");
     }
 
     void HookAttack()

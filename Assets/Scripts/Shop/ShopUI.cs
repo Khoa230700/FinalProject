@@ -21,7 +21,7 @@ public class ShopUI : MonoBehaviour
 
     // Cached player components
     private IWeapon[] weapons;
-    private PlayerHealthSystem playetStats;
+    private PlayerHealthSystem playerStats;
     private PlayerMovement playerMovement;
     private MeshMouseLook mouseLook;
 
@@ -31,13 +31,13 @@ public class ShopUI : MonoBehaviour
         pressKeyEvent = canvasSetting?.GetComponent<PressKeyEvent>();
         descriptionsUI = FindAnyObjectByType<ShopEquipDescriptionsUI>();
         waveManager = FindAnyObjectByType<WaveManager>();
+        CoinManager.Instance.OnCoinChanged += OnCoinsChanged;
 
         CachePlayerComponents();
     }
 
     private void OnEnable()
     {
-        CoinManager.Instance.OnCoinChanged += OnCoinsChanged;
     }
 
     private void OnDisable()
@@ -49,9 +49,9 @@ public class ShopUI : MonoBehaviour
     {
         var player = SelectorSpawner.Instance.Player;
         if (player == null) return;
-
+        
         weapons = WeaponManager.Instance.GetWeapons().ToArray();
-        playetStats = player.GetComponent<PlayerHealthSystem>();
+        playerStats = player.GetComponent<PlayerHealthSystem>();
         playerMovement = player.GetComponent<PlayerMovement>();
         mouseLook = player.GetComponent<MeshMouseLook>();
     }
@@ -102,11 +102,13 @@ public class ShopUI : MonoBehaviour
         {
             if (slot != null)
                 slot.UpdateSlot(null, null);
+            Debug.Log("Cleared slot");
         }
 
         // Update weapon slots
         foreach (var weapon in weapons)
         {
+            Debug.Log($"[WeaponManager] Found weapon: {weapon.GetType().Name}");
             if (weapon is PlayerShoot gun)
             {
                 if (gun.currentAmmo == 0 && gun.reserveAmmo == 0) gun.Initialize();
@@ -123,8 +125,8 @@ public class ShopUI : MonoBehaviour
         }
 
         // Update stat slots
-        itemSlots[3]?.UpdateSlot(playetStats, "Health");
-        itemSlots[4]?.UpdateSlot(playetStats, "Shield");
+        itemSlots[3]?.UpdateSlot(playerStats, "Health");
+        itemSlots[4]?.UpdateSlot(playerStats, "Shield");
 
         RefreshAllSlots();
     }

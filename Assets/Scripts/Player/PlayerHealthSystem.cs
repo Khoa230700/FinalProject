@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Linq;
 using System.Collections.Generic;
+
 
 public class PlayerHealthSystem : BaseHealthSystem, IDamageable
 {
@@ -31,6 +33,7 @@ public class PlayerHealthSystem : BaseHealthSystem, IDamageable
     [SerializeField] private BarUI healthBar;
     [SerializeField] private BarUI shieldBar;
     private DeathUI deathUI;
+    private EndUI failedUI;
 
     // -------- Animation / Death ----------
     [Header("Body Animator (optional)")]
@@ -115,7 +118,6 @@ public class PlayerHealthSystem : BaseHealthSystem, IDamageable
             healthBar = SelectorSpawner.Instance.HealthBar ?? healthBar;
             shieldBar = SelectorSpawner.Instance.ShieldBar ?? shieldBar;
         }
-        deathUI = FindAnyObjectByType<DeathUI>(FindObjectsInactive.Include);
 
         // cập nhật UI lần đầu
         HandleHealthChanged(currentHealth, maxHealth);
@@ -484,7 +486,21 @@ public class PlayerHealthSystem : BaseHealthSystem, IDamageable
         }
 
         transform.rotation = targetRot; // chốt góc cuối: nhìn lên trời
-        if (deathUI) deathUI.Show();
+        string sceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+        if (sceneName == "Map2")
+        {
+            deathUI = FindAnyObjectByType<DeathUI>(FindObjectsInactive.Include);
+            Debug.Log(deathUI);
+            deathUI.Show();
+        }
+        else
+        {
+            failedUI = FindObjectsByType<EndUI>(FindObjectsInactive.Include,
+                                                FindObjectsSortMode.None)
+                                                .FirstOrDefault(e => e.CompareTag("Failed"));
+            Debug.Log(failedUI);
+            failedUI.gameObject.SetActive(true);
+        }
     }
 
     public int GetDeathCount() => deathCount;

@@ -55,12 +55,14 @@ public class EnemyM : MonoBehaviour
 
     IEnumerator Die()
     {
-        if (animator != null)
-            animator.SetBool("isAlive", false);
+        animator.SetBool("isAlive", false);
+
+        Debug.Log("Here1");
 
         GetComponent<EnemyTracker>().Die();
         yield return new WaitForSeconds(2f);
 
+        Debug.Log("Here3");
         gameObject.SetActive(false);
         soundController.PlayDeathSound();
     }

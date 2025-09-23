@@ -46,7 +46,7 @@ public class QuestTracker : MonoBehaviour
     //GỌI KHI ĐẾN VỊ TRÍ
     private void OnTriggerEnter(Collider other)
     {
-        if (trackingType == QuestObjectiveType.Reach && other.CompareTag("Player"))
+        if (trackingType == QuestObjectiveType.Reach && other.CompareTag("QuestBox"))
         {
             QuestManager.Instance.UpdateQuestProgress(QuestObjectiveType.Reach, targetID);
         }

@@ -5,13 +5,13 @@ using UnityEngine.Playables;
 public class CameraCutsceneTrigger : MonoBehaviour
 {
     public PlayableDirector cutsceneDirector;
-    public GameObject playerCamera;
+    public GameObject canvasUI;
 
     void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player"))
         {
-            playerCamera.SetActive(false); // optional: disable player cam
+            canvasUI.SetActive(false);
             cutsceneDirector.Play();
         }
     }
