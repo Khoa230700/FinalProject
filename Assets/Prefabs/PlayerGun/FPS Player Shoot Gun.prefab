@@ -7719,6 +7719,142 @@ Transform:
   - {fileID: 8620519358580404172}
   m_Father: {fileID: 580630977800708063}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &2226141246048580457
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1158149703122223203}
+  - component: {fileID: 7760489605115458377}
+  - component: {fileID: 5767581144095773188}
+  - component: {fileID: 7367791061219991450}
+  m_Layer: 8
+  m_Name: FlashLight (1)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1158149703122223203
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2226141246048580457}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.10452837, y: 0, z: 0, w: 0.9945219}
+  m_LocalPosition: {x: 0, y: 0.15, z: 1.6099997}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2473540229389520567}
+  m_LocalEulerAnglesHint: {x: -12, y: 0, z: 0}
+--- !u!108 &7760489605115458377
+Light:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2226141246048580457}
+  m_Enabled: 1
+  serializedVersion: 11
+  m_Type: 0
+  m_Color: {r: 1, g: 1, b: 0.83137256, a: 1}
+  m_Intensity: 40
+  m_Range: 40
+  m_SpotAngle: 50
+  m_InnerSpotAngle: 30
+  m_CookieSize: 10
+  m_Shadows:
+    m_Type: 0
+    m_Resolution: -1
+    m_CustomResolution: -1
+    m_Strength: 1
+    m_Bias: 0.05
+    m_NormalBias: 0.4
+    m_NearPlane: 0.2
+    m_CullingMatrixOverride:
+      e00: 1
+      e01: 0
+      e02: 0
+      e03: 0
+      e10: 0
+      e11: 1
+      e12: 0
+      e13: 0
+      e20: 0
+      e21: 0
+      e22: 1
+      e23: 0
+      e30: 0
+      e31: 0
+      e32: 0
+      e33: 1
+    m_UseCullingMatrixOverride: 0
+  m_Cookie: {fileID: 0}
+  m_DrawHalo: 0
+  m_Flare: {fileID: 0}
+  m_RenderMode: 0
+  m_CullingMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_RenderingLayerMask: 1
+  m_Lightmapping: 4
+  m_LightShadowCasterMode: 0
+  m_AreaSize: {x: 1, y: 1}
+  m_BounceIntensity: 1
+  m_ColorTemperature: 6570
+  m_UseColorTemperature: 0
+  m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
+  m_UseBoundingSphereOverride: 0
+  m_UseViewFrustumForShadowCasterCull: 1
+  m_ForceVisible: 0
+  m_ShadowRadius: 0
+  m_ShadowAngle: 0
+  m_LightUnit: 1
+  m_LuxAtDistance: 1
+  m_EnableSpotReflector: 1
+--- !u!114 &5767581144095773188
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2226141246048580457}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 474bcb49853aa07438625e644c072ee6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Version: 3
+  m_UsePipelineSettings: 1
+  m_AdditionalLightsShadowResolutionTier: 2
+  m_LightLayerMask: 1
+  m_RenderingLayers: 1
+  m_CustomShadowLayers: 0
+  m_ShadowLayerMask: 1
+  m_ShadowRenderingLayers: 1
+  m_LightCookieSize: {x: 1, y: 1}
+  m_LightCookieOffset: {x: 0, y: 0}
+  m_SoftShadowQuality: 0
+--- !u!114 &7367791061219991450
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2226141246048580457}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 316b33481abaa974d9c63f9e18ce0c81, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  flashlight: {fileID: 7760489605115458377}
+  toggleKey: 108
 --- !u!1 &2273800816668952085
 GameObject:
   m_ObjectHideFlags: 0
@@ -7734,13 +7870,14 @@ GameObject:
   - component: {fileID: 2380051268329280892}
   - component: {fileID: 9115985790339014979}
   - component: {fileID: 3138122004126851728}
+  - component: {fileID: 2838177765979169654}
   m_Layer: 8
   m_Name: FPS Player Shoot Gun
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &2473540229389520567
 Transform:
   m_ObjectHideFlags: 0
@@ -7759,6 +7896,7 @@ Transform:
   - {fileID: 580630977800708063}
   - {fileID: 2575596718881133086}
   - {fileID: 1189061365128175294}
+  - {fileID: 1158149703122223203}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!143 &6361380385401796531
@@ -7779,7 +7917,7 @@ CharacterController:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Height: 2.45
+  m_Height: 2.5
   m_Radius: 0.5
   m_SlopeLimit: 45.32
   m_StepOffset: 0.3
@@ -7867,8 +8005,8 @@ MonoBehaviour:
   OnTakeDamage:
     m_PersistentCalls:
       m_Calls: []
-  stats: {fileID: 0}
-  playerClass: 1
+  stats: {fileID: 11400000, guid: c67d52847645bee4ea04ca49e724f936, type: 2}
+  playerClass: 2
   maxShield: 0
   currentShield: 0
   shieldRegenPerSecond: 0
@@ -7878,12 +8016,52 @@ MonoBehaviour:
   shieldBar: {fileID: 0}
   animator: {fileID: 0}
   deathTriggerName: DieBack
-  usePhysicsDeath: 1
-  deathBackForce: 6
-  deathUpForce: 2
-  deathTorque: 8
-  disableControllersOnDeath: 1
-  disableOnDeath: []
+  disableCharacterControllerOnDeath: 0
+  disableOnDeath:
+  - {fileID: 1535889337764389916}
+  - {fileID: 1071435618508034051}
+  - {fileID: 2380051268329280892}
+  - {fileID: 8704605179910530586}
+  - {fileID: 5384427802294625511}
+  - {fileID: 8472290513620521099}
+  - {fileID: 1188039941142443262}
+  - {fileID: 5530147689927967390}
+  - {fileID: 5994395153208943293}
+  - {fileID: 3157535414782822884}
+  - {fileID: 2770871971483157546}
+  - {fileID: 4552658579932734323}
+  - {fileID: 5425326131443564564}
+  - {fileID: 4692743570835235307}
+  - {fileID: 6773324282219754052}
+  - {fileID: 3026894709680392677}
+  multi: {fileID: 0}
+  simpleQuarterFall: 1
+  fallDuration: 0.8
+  fallBackDegrees: -90
+  fallEase:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!82 &3138122004126851728
 AudioSource:
   m_ObjectHideFlags: 0
@@ -7981,6 +8159,32 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &2838177765979169654
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2273800816668952085}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0405504e9ab75343a88002f088d9d05, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ownerHealthSystem: {fileID: 0}
+  hitboxType: 0
+  headshotMultiplier: 2
+  relayDamage: 1
+  bloodEffect: {fileID: 0}
+  bloodEffects: []
+  bloodSfx: []
+  spawnCountRange: {x: 1, y: 2}
+  scaleRange: {x: 0.85, y: 1.25}
+  lifetimeRange: {x: 1, y: 2}
+  randomYawOnly: 1
+  alignToSurfaceNormal: 1
+  surfaceOffset: 0.01
+  bloodSfxVolume: 1
 --- !u!1 &2282949895574822345
 GameObject:
   m_ObjectHideFlags: 0
@@ -41558,7 +41762,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 92d32508d9a95304b9f8f090ad2003d0, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 2.6230001
+      value: 0.139
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 92d32508d9a95304b9f8f090ad2003d0, type: 3}
       propertyPath: m_LocalRotation.w
@@ -41594,7 +41798,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 92d32508d9a95304b9f8f090ad2003d0, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6627274960028621651, guid: 92d32508d9a95304b9f8f090ad2003d0, type: 3}
       propertyPath: m_LocalPosition.x
