@@ -6,16 +6,27 @@ public class BombBotAI : MonoBehaviour
     public Rigidbody rb;
     public CapsuleCollider capsuleCollider;
     public Animator animator;
-    protected float speed = 2f;
-    protected float cooldownBeaten;
+    public float speed = 2f;
     private bool isWalking = true;
 
+    private BotHealth botHealth;
 
-    void Start()
+    void Awake()
     {
-       
+        botHealth = GetComponent<BotHealth>();
     }
 
+    void OnEnable()
+    {
+        if (botHealth != null)
+            botHealth.OnDamaged += BeHit;
+    }
+
+    void OnDisable()
+    {
+        if (botHealth != null)
+            botHealth.OnDamaged -= BeHit;
+    }
 
     void Update()
     {
@@ -29,41 +40,36 @@ public class BombBotAI : MonoBehaviour
             rb.isKinematic = false;
             rb.linearVelocity = Vector3.forward * speed;
             animator.SetBool("isMoving", true);
-            animator.SetFloat("Vertical", value: 1f);
+            animator.SetFloat("Vertical", 1f);
             animator.SetBool("Block", false);
         }
-
     }
 
     private void BeHit()
     {
+        isWalking = false;
         animator.SetBool("isMoving", false);
-        animator.SetFloat("Vertical", value: 0f);
-        animator.SetBool("Block",true);
+        animator.SetFloat("Vertical", 0f);
+        animator.SetBool("Block", true);
+
         rb.linearVelocity = Vector3.zero;
         rb.isKinematic = true;
     }
+
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Enemy") )
+        if (other.CompareTag("Enemy"))
         {
             isWalking = false;
-            //rb.isKinematic = true; 
             BeHit();
-       
             Debug.Log("Hit Enemy – Stop");
         }
-        else
+        else if (other.CompareTag("Player"))
         {
-            if (other.CompareTag("Player"))
-            {
-                isWalking = true;
-                //rb.isKinematic = false;
-                
-                Debug.Log("Hit Player – moveon");
-            }
+            isWalking = true;
+            Debug.Log("Hit Player – move on");
         }
     }
-   
+
 }
 

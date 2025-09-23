@@ -7,6 +7,7 @@ public class BotHealth : BaseHealthSystem, IDamageable
     [SerializeField] private float maxShield = 0f;
     [SerializeField] private float currentShield = 0f;
     public float MaxShield => maxShield;
+    public event System.Action OnDamaged;
     public float CurrentShield => currentShield;
 
     [SerializeField] private float shieldRegenPerSecond = 0f;
@@ -97,6 +98,7 @@ public class BotHealth : BaseHealthSystem, IDamageable
         {
             base.TakeDamage(remainingDamage);
         }
+        OnDamaged?.Invoke();
     }
 
     public void AddShield(float amount)
@@ -140,7 +142,9 @@ public class BotHealth : BaseHealthSystem, IDamageable
         // 4. Play animation chết
         if (anim != null)
         {
-            anim.SetTrigger("Dead");
+            anim.ResetTrigger("Dead"); // clear trước
+            anim.SetBool("Block", false); // tắt trạng thái block
+            anim.SetTrigger("Dead");      // chạy anim chết
         }
     }
 
