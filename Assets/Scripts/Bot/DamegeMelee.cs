@@ -44,7 +44,14 @@ public class DamegeMelee : MonoBehaviour
             EnemyM enemy = col.GetComponent<EnemyM>()
              ?? col.GetComponentInChildren<EnemyM>()
              ?? col.GetComponentInParent<EnemyM>();
+            var health = col.GetComponent<EnemyM>();
+            if (health != null) { health.TakeDamage(damage); continue; }
 
+            var boss = col.GetComponent<BossHealth>();
+            if (boss != null) { boss.TakeDamage(damage); continue; }
+
+            var hb = col.GetComponentInChildren<Hitbox>();
+            if (hb != null) { hb.ownerHealthSystem.TakeDamage(damage); hb.OnHit(damage, col.transform.position); continue; }
             if (enemy != null && !damaged.Contains(enemy.gameObject))
             {
                 damaged.Add(enemy.gameObject);
