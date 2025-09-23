@@ -9,12 +9,10 @@ public class DeathUI : MonoBehaviour
     [SerializeField] private CanvasGroup canvasGroup;
     [SerializeField] private Slider countdown;
     [SerializeField] private TextMeshProUGUI number;
-    [SerializeField] private TextMeshProUGUI titleText;
     [SerializeField] private GameObject pauseCanvas;
     [SerializeField] private float timer = 5f;
 
     private Animator animator;
-    private bool isMissionFailed;
 
     void OnEnable()
     {
@@ -23,7 +21,6 @@ public class DeathUI : MonoBehaviour
         countdown.maxValue = timer;
         countdown.value = timer;
         number.text = timer.ToString();
-        titleText.text = isMissionFailed ? "MISSION FAILED" : "YOU DIED";
     }
 
     void Update()
@@ -34,9 +31,8 @@ public class DeathUI : MonoBehaviour
         }
     }
 
-    public void Show(bool missionFailed = false)
+    public void Show()
     {
-        isMissionFailed = missionFailed;
         pauseCanvas.SetActive(false);
         gameObject.SetActive(true);
     }
@@ -72,17 +68,8 @@ public class DeathUI : MonoBehaviour
             float duration = clipInfo[0].clip.length;
             yield return new WaitForSecondsRealtime(duration);
         }
-
-        if (isMissionFailed)
-        {
-            Debug.Log("Mission Failed");
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-        }
-        else
-        {
-            Debug.Log("Death");
-            SelectorSpawner.Instance.Player.GetComponent<PlayerHealthSystem>().Respawn();
-        }
+        
+        SelectorSpawner.Instance.Player.GetComponent<PlayerHealthSystem>().Respawn();
 
         pauseCanvas.SetActive(true);
         gameObject.SetActive(false);
