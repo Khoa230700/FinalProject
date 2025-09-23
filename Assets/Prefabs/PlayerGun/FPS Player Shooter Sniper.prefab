@@ -1973,13 +1973,14 @@ GameObject:
   - component: {fileID: 2746969822871216562}
   - component: {fileID: 6982715678529923871}
   - component: {fileID: 4860074334301435834}
+  - component: {fileID: 1518812194743486829}
   m_Layer: 8
   m_Name: FPS Player Shooter Sniper
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &5782188107627114610
 Transform:
   m_ObjectHideFlags: 0
@@ -2108,8 +2109,8 @@ MonoBehaviour:
   OnTakeDamage:
     m_PersistentCalls:
       m_Calls: []
-  stats: {fileID: 11400000, guid: fa548c9bf05b7a144be146c1d5ab7047, type: 2}
-  playerClass: 0
+  stats: {fileID: 11400000, guid: a22cdaa590623984eac74827e556c660, type: 2}
+  playerClass: 1
   maxShield: 0
   currentShield: 0
   shieldRegenPerSecond: 0
@@ -2118,15 +2119,22 @@ MonoBehaviour:
   healthBar: {fileID: 0}
   shieldBar: {fileID: 0}
   animator: {fileID: 0}
-  deathTriggerName: Hide
-  disableCharacterControllerOnDeath: 1
+  deathTriggerName: DieBack
+  disableCharacterControllerOnDeath: 0
   disableOnDeath:
-  - {fileID: 8575215206317879289}
-  - {fileID: 7414361622151578782}
-  - {fileID: 8544334847368187436}
-  - {fileID: 4599666131355921185}
-  - {fileID: 8544334847368187436}
-  multi: {fileID: 4860074334301435834}
+  - {fileID: 6057439744301582472, guid: 7f0e382cc42e548479e9f541f92e205f, type: 3}
+  - {fileID: 5554607344508544721, guid: 7f0e382cc42e548479e9f541f92e205f, type: 3}
+  - {fileID: 1313218774189592259, guid: 7f0e382cc42e548479e9f541f92e205f, type: 3}
+  - {fileID: 2804734498945459602, guid: 7f0e382cc42e548479e9f541f92e205f, type: 3}
+  - {fileID: 4966433989356348939, guid: 7f0e382cc42e548479e9f541f92e205f, type: 3}
+  - {fileID: 3274791043214755027, guid: 7f0e382cc42e548479e9f541f92e205f, type: 3}
+  - {fileID: 3088135840069331383, guid: 7f0e382cc42e548479e9f541f92e205f, type: 3}
+  - {fileID: 5737682130388948561, guid: 7f0e382cc42e548479e9f541f92e205f, type: 3}
+  - {fileID: 1099547618457403765, guid: 7f0e382cc42e548479e9f541f92e205f, type: 3}
+  - {fileID: 9012762210294987698, guid: 7f0e382cc42e548479e9f541f92e205f, type: 3}
+  - {fileID: 8957340347720912516, guid: 7f0e382cc42e548479e9f541f92e205f, type: 3}
+  - {fileID: 7584314677977833932, guid: 7f0e382cc42e548479e9f541f92e205f, type: 3}
+  multi: {fileID: 0}
   simpleQuarterFall: 1
   fallDuration: 0.8
   fallBackDegrees: -90
@@ -2154,6 +2162,18 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  knockbackGravity: 0.1
+  defaultUpForce: 150
+  disableOnKnockback:
+  - {fileID: 8575215206317879289}
+  - {fileID: 7414361622151578782}
+  - {fileID: 8987884527693232970}
+  - {fileID: 1259983044333161423}
+  - {fileID: 186762147422348795}
+  - {fileID: 8327016805608177140}
+  disableCharacterControllerDuringKnockback: 1
+  constantHorizontalSpeed: 1
+  minBurnTickInterval: 1
 --- !u!82 &6982715678529923871
 AudioSource:
   m_ObjectHideFlags: 0
@@ -2267,6 +2287,14 @@ MonoBehaviour:
   - {fileID: 2228220168125291594}
   - {fileID: 7737834752848102791}
   checkParameterExistence: 1
+--- !u!81 &1518812194743486829
+AudioListener:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2393662489545346051}
+  m_Enabled: 1
 --- !u!1 &2537921353113568113
 GameObject:
   m_ObjectHideFlags: 0
