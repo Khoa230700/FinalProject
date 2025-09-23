@@ -3,7 +3,7 @@ using System.Collections;
 
 public class BossHealth : MonoBehaviour
 {
-    public float maxHealth = 100f;
+    [SerializeField]private float maxHealth = 100f;
     public float currentHealth { get; private set; }
     
     public bool isPhase2 { get; private set; } = false;
