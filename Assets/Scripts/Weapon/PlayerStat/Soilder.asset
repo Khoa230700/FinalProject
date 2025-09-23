@@ -18,6 +18,6 @@ MonoBehaviour:
   gravity: -15
   airControlMultiplier: 0.196
   maxHealth: 100
-  maxShield: 50
+  maxShield: 40
   shieldRegenPerSecond: 0
   shieldRegenDelay: 0

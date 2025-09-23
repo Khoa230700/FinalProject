@@ -1972,6 +1972,7 @@ GameObject:
   - component: {fileID: 7414361622151578782}
   - component: {fileID: 2746969822871216562}
   - component: {fileID: 6982715678529923871}
+  - component: {fileID: 4860074334301435834}
   m_Layer: 8
   m_Name: FPS Player Shooter Sniper
   m_TagString: Player
@@ -1998,6 +1999,7 @@ Transform:
   - {fileID: 500052456234813616}
   - {fileID: 1327565382780329613}
   - {fileID: 2766371617098145508}
+  - {fileID: 447355836281687768}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!143 &5569202818330862282
@@ -2018,7 +2020,7 @@ CharacterController:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Height: 2.45
+  m_Height: 2.5
   m_Radius: 0.5
   m_SlopeLimit: 45.32
   m_StepOffset: 0.3
@@ -2116,14 +2118,42 @@ MonoBehaviour:
   healthBar: {fileID: 0}
   shieldBar: {fileID: 0}
   animator: {fileID: 0}
-  deathTriggerName: DieBack
-  usePhysicsDeath: 1
+  deathTriggerName: Hide
   disableCharacterControllerOnDeath: 1
-  disableOnDeath: []
-  ragdoll: {fileID: 0}
-  deathBackForce: 6
-  deathUpForce: 2
-  deathTorque: 8
+  disableOnDeath:
+  - {fileID: 8575215206317879289}
+  - {fileID: 7414361622151578782}
+  - {fileID: 8544334847368187436}
+  - {fileID: 4599666131355921185}
+  - {fileID: 8544334847368187436}
+  multi: {fileID: 4860074334301435834}
+  simpleQuarterFall: 1
+  fallDuration: 0.8
+  fallBackDegrees: -90
+  fallEase:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!82 &6982715678529923871
 AudioSource:
   m_ObjectHideFlags: 0
@@ -2221,6 +2251,22 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &4860074334301435834
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2393662489545346051}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e010fa927c203f544aa801a5f2150b79, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  animators:
+  - {fileID: 2228220168125291594}
+  - {fileID: 7737834752848102791}
+  checkParameterExistence: 1
 --- !u!1 &2537921353113568113
 GameObject:
   m_ObjectHideFlags: 0
@@ -3471,6 +3517,142 @@ Transform:
   - {fileID: 7278944821397529599}
   m_Father: {fileID: 6367786861773823768}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &4051564817818394210
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 447355836281687768}
+  - component: {fileID: 2734586780506866914}
+  - component: {fileID: 1698036387259567484}
+  - component: {fileID: 4802442703488178387}
+  m_Layer: 8
+  m_Name: FlashLight (1)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &447355836281687768
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4051564817818394210}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.17364825, y: 0, z: 0, w: 0.9848078}
+  m_LocalPosition: {x: 0, y: 0.15, z: -0.1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5782188107627114610}
+  m_LocalEulerAnglesHint: {x: -20, y: 0, z: 0}
+--- !u!108 &2734586780506866914
+Light:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4051564817818394210}
+  m_Enabled: 1
+  serializedVersion: 11
+  m_Type: 0
+  m_Color: {r: 1, g: 1, b: 0.83137256, a: 1}
+  m_Intensity: 40
+  m_Range: 20
+  m_SpotAngle: 50
+  m_InnerSpotAngle: 30
+  m_CookieSize: 10
+  m_Shadows:
+    m_Type: 0
+    m_Resolution: -1
+    m_CustomResolution: -1
+    m_Strength: 1
+    m_Bias: 0.05
+    m_NormalBias: 0.4
+    m_NearPlane: 0.2
+    m_CullingMatrixOverride:
+      e00: 1
+      e01: 0
+      e02: 0
+      e03: 0
+      e10: 0
+      e11: 1
+      e12: 0
+      e13: 0
+      e20: 0
+      e21: 0
+      e22: 1
+      e23: 0
+      e30: 0
+      e31: 0
+      e32: 0
+      e33: 1
+    m_UseCullingMatrixOverride: 0
+  m_Cookie: {fileID: 0}
+  m_DrawHalo: 0
+  m_Flare: {fileID: 0}
+  m_RenderMode: 0
+  m_CullingMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_RenderingLayerMask: 1
+  m_Lightmapping: 4
+  m_LightShadowCasterMode: 0
+  m_AreaSize: {x: 1, y: 1}
+  m_BounceIntensity: 1
+  m_ColorTemperature: 6570
+  m_UseColorTemperature: 0
+  m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
+  m_UseBoundingSphereOverride: 0
+  m_UseViewFrustumForShadowCasterCull: 1
+  m_ForceVisible: 0
+  m_ShadowRadius: 0
+  m_ShadowAngle: 0
+  m_LightUnit: 1
+  m_LuxAtDistance: 1
+  m_EnableSpotReflector: 1
+--- !u!114 &1698036387259567484
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4051564817818394210}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 474bcb49853aa07438625e644c072ee6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Version: 3
+  m_UsePipelineSettings: 1
+  m_AdditionalLightsShadowResolutionTier: 2
+  m_LightLayerMask: 1
+  m_RenderingLayers: 1
+  m_CustomShadowLayers: 0
+  m_ShadowLayerMask: 1
+  m_ShadowRenderingLayers: 1
+  m_LightCookieSize: {x: 1, y: 1}
+  m_LightCookieOffset: {x: 0, y: 0}
+  m_SoftShadowQuality: 0
+--- !u!114 &4802442703488178387
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4051564817818394210}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 316b33481abaa974d9c63f9e18ce0c81, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  flashlight: {fileID: 2734586780506866914}
+  toggleKey: 108
 --- !u!1 &4060170240586208461
 GameObject:
   m_ObjectHideFlags: 0
@@ -5434,7 +5616,7 @@ MonoBehaviour:
   scopeLens: {fileID: 4128772428749821544}
   scopeOverlayUI: {fileID: 424012912021214882}
   csgoScope: {fileID: 5506603170031170302}
-  centerPull: 0.662
+  centerPull: 1
   uiScaleOnScope: 1.15
   uiLerpSpeed: 12
 --- !u!1 &5982616735339148963

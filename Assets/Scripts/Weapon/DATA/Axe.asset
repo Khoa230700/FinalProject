@@ -15,7 +15,7 @@ MonoBehaviour:
   weaponName: Axe
   weaponSprite: {fileID: 21300000, guid: 75386887422a8a547a9a08db92dbc90c, type: 3}
   weaponSpriteFullColor: {fileID: 21300000, guid: 792184f92e74bb745b43f5e135106cf5, type: 3}
-  baseDamage: 1
+  baseDamage: 25
   baseRange: 1
   baseRadius: 5
   baseHitCooldown: 0.5

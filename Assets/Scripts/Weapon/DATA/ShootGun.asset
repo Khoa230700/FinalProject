@@ -17,8 +17,8 @@ MonoBehaviour:
   gunSlot: 0
   gunSprite: {fileID: 21300000, guid: 10b2a74f6f7727e459e29fadd785c556, type: 3}
   gunSpriteFullColor: {fileID: 21300000, guid: 2783a357e1a45834f8f2ef105f57ac40, type: 3}
-  damage: 100
-  range: 20
+  damage: 120
+  range: 30
   pelletCount: 5
   spreadAngle: 20
   roundsPerSecond: 5
@@ -27,7 +27,7 @@ MonoBehaviour:
   burstCooldown: 0.3
   fireMode: 0
   availableFireModes: 00000000
-  semiAutoMinInterval: 0
+  semiAutoMinInterval: 1
   magazineSize: 10
   reserveAmmo: 20
   reloadTime: 1
