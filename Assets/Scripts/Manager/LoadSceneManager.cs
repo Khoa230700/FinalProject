@@ -17,6 +17,13 @@ public class LoadSceneManager : MonoBehaviour
 
     public void ReloadCurrentScene()
     {
+        SceneManager.sceneLoaded += OnSceneLoaded;
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        PauseGameUI.Instance.Resume();
+        SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 }

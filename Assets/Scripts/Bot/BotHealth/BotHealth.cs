@@ -22,6 +22,7 @@ public class BotHealth : BaseHealthSystem, IDamageable
     [Header("UI Binding")]
     [SerializeField] private BarUI healthBar;
     [SerializeField] private BarUI shieldBar;
+    [SerializeField] private GameObject failedUI;
 
     public event System.Action<float, float> OnShieldChanged;
 
@@ -118,8 +119,6 @@ public class BotHealth : BaseHealthSystem, IDamageable
         if (isDead) return;
         isDead = true;
 
-        
-
         GameObject root = transform.root.gameObject;
 
         // 1. Ngắt NavMeshAgent nếu có
@@ -146,6 +145,8 @@ public class BotHealth : BaseHealthSystem, IDamageable
             anim.SetBool("Block", false); // tắt trạng thái block
             anim.SetTrigger("Dead");      // chạy anim chết
         }
+
+        failedUI.SetActive(true);
     }
 
     private void ChangeLayerRecursively(GameObject obj, int newLayer)

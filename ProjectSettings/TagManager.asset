@@ -13,6 +13,7 @@ TagManager:
   - Bot
   - Boss
   - BotMelee
+  - Spidey
   layers:
   - Default
   - TransparentFX
