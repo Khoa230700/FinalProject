@@ -24,6 +24,7 @@ public class LoadSceneManager : MonoBehaviour
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         PauseGameUI.Instance.Resume();
+        SaveLoadManager.Instance.LoadNow();
         SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 }
