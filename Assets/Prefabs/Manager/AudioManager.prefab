@@ -312,6 +312,18 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: 705baf36a9869ff4f85732f080523958, type: 3}
   - name: Hover
     clip: {fileID: 8300000, guid: e780070180b780e4da48c6f6627edf7c, type: 3}
+  - name: Tick
+    clip: {fileID: 8300000, guid: a88bbd03652790744aa2069effbae280, type: 3}
+  - name: Ready
+    clip: {fileID: 8300000, guid: 0d2a72d5e54b68044adc31c51daf6b6d, type: 3}
+  - name: Purchase
+    clip: {fileID: 8300000, guid: 7064a91b0b5fea542bf000b1b45636ad, type: 3}
+  - name: Victory
+    clip: {fileID: 8300000, guid: ceec5ca693e9b4a43a58c84d7496b1e7, type: 3}
+  - name: Failed
+    clip: {fileID: 8300000, guid: 711a4ffcc6157c341b21b3182fee363f, type: 3}
+  - name: CoinCount
+    clip: {fileID: 8300000, guid: f7f4edc94b6a66c48ab5355833e101fa, type: 3}
   musicSource: {fileID: 3377239629321501914}
   sfxSource: {fileID: 3902696456190431477}
   masterSlider: {fileID: 0}

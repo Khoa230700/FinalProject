@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class LoadSceneManager : MonoBehaviour
 {
@@ -12,5 +13,10 @@ public class LoadSceneManager : MonoBehaviour
     {
         LoadingScreenUI.LoadScene(sceneName);
         Debug.Log($"Loading scene: {sceneName}");
+    }
+
+    public void ReloadCurrentScene()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 }

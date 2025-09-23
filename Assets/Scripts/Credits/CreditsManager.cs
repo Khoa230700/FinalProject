@@ -140,8 +140,8 @@ public class CreditsManager : MonoBehaviour
         isOpen = true;
         onOpen.Invoke();
 
-        StopCoroutine("SetInvisible");
-        StartCoroutine("SetVisible");
+        StopCoroutine(SetInvisible());
+        StartCoroutine(SetVisible());
     }
 
     public void ClosePanel()
@@ -152,8 +152,8 @@ public class CreditsManager : MonoBehaviour
         onClose.Invoke();
         isOpen = false;
 
-        StopCoroutine("SetVisible");
-        StartCoroutine("SetInvisible");
+        StopCoroutine(SetVisible());
+        StartCoroutine(SetInvisible());
     }
 
     public void EnableScrolling(bool state)
@@ -176,8 +176,7 @@ public class CreditsManager : MonoBehaviour
 
     IEnumerator SetVisible()
     {
-        StopCoroutine("SetInvisible");
-        gameObject.SetActive(true);
+        StopCoroutine(SetInvisible());
 
         while (canvasGroup.alpha < 0.99f)
         {
@@ -190,7 +189,7 @@ public class CreditsManager : MonoBehaviour
 
     IEnumerator SetInvisible()
     {
-        StopCoroutine("SetVisible");
+        StopCoroutine(SetVisible());
 
         while (canvasGroup.alpha > 0.01f)
         {

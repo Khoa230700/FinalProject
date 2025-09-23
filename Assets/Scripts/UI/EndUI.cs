@@ -12,6 +12,7 @@ public class EndUI : MonoBehaviour
     [SerializeField] private TextMeshProUGUI coinGainText;
     [SerializeField] private TextMeshProUGUI deathCountText;
     [SerializeField] private GameObject buttonsGroup;
+    [SerializeField] private bool isVictory = true;
 
     private Sequence sequence;
 
@@ -53,13 +54,24 @@ public class EndUI : MonoBehaviour
         sequence.SetUpdate(true);
 
         // Coin
-        if (sessionCoins >= 0)
+        if (sessionCoins > 0)
         {
-            sequence.AppendCallback(() => coinGroup.SetActive(true));
+            int lastValue = -1;
+
+            sequence.AppendCallback(() =>
+            {
+                coinGroup.SetActive(true);
+            });
+
             sequence.Append(
                 DOTween.To(() => 0, x =>
                 {
                     coinGainText.text = $" {x:N0}";
+                    if (x != lastValue) // chỉ phát khi số thay đổi
+                    {
+                        AudioManager.Instance.PlaySFX("CoinCount");
+                        lastValue = x;
+                    }
                 },
                 sessionCoins, 1.5f)
                 .SetEase(Ease.OutQuad)
@@ -96,5 +108,11 @@ public class EndUI : MonoBehaviour
 
         PlayerPrefs.SetInt(key, 1);
         PlayerPrefs.Save();
+    }
+
+    public void PlayAudio()
+    {
+        if (isVictory) AudioManager.Instance.PlaySFX("Victory");
+        else AudioManager.Instance.PlaySFX("Failed");
     }
 }
