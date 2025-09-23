@@ -44,7 +44,7 @@ MonoBehaviour:
     items:
     - Huynh Vo Van Khoa
   - headerTitle: Enemies
-    headerTitleKey: CreditsUI
+    headerTitleKey: CreditsEnemies
     items:
     - Tran Huynh Minh Thuan
   - headerTitle: Player
@@ -52,22 +52,33 @@ MonoBehaviour:
     items:
     - Nguyen Cao Son
     - Nguyen Dinh Thai
+  - headerTitle: Systems
+    headerTitleKey: CreditsSystems
+    items:
+    - Pham Thanh Nhat
   - headerTitle: Others
-    headerTitleKey: CreditsUI
+    headerTitleKey: CreditsOthers
     items:
     - Pham Thanh Nhat
   mentions:
+  - ID: VTC Academy
+    icon: {fileID: 21300000, guid: de783cb834731f249bb42fd1d8e4a2dd, type: 3}
+    description: VTC Acedemy
+    descriptionKey: CreditsVTCAcademy
+    descriptionSpacing: 20
+    layoutSpacing: 160
   - ID: Chat GPT
     icon: {fileID: 21300000, guid: f64fb23f586ddee4bbbfc0b49d7dd733, type: 3}
     description: Chat GPT
     descriptionKey: CreditsChatGPT
     descriptionSpacing: 20
     layoutSpacing: 160
-  - ID: VTC Academy
-    icon: {fileID: 21300000, guid: de783cb834731f249bb42fd1d8e4a2dd, type: 3}
-    description: VTC Acedemy
-    descriptionKey: CreditsVTCAcademy
-    descriptionSpacing: 20
+  - ID: Unity Assets Store
+    icon: {fileID: 21300000, guid: d9eeeea3005a560449a5541304389d11, type: 3}
+    description: "Post Apocalyptic World Pack \nVolumetric Blood Fluids\r\nPBR Military
+      (pack)"
+    descriptionKey: CreditsAssetsStore
+    descriptionSpacing: 10
     layoutSpacing: 160
   - ID: Pixalbay
     icon: {fileID: 21300000, guid: 29ea6aa8c82f6504fb5d3f000e3be714, type: 3}

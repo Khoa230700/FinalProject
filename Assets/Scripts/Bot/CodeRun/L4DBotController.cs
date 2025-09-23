@@ -173,6 +173,11 @@ public class L4DBotController : MonoBehaviour
             {
                 health.TakeDamage(20);
             }
+            var healthBoss = hit.collider.GetComponent<BossHealth>();
+            if (healthBoss != null)
+            {
+                healthBoss.TakeDamage(50);
+            }
         }
     }
 

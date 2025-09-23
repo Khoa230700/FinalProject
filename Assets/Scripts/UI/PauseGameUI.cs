@@ -29,5 +29,6 @@ public class PauseGameUI : MonoBehaviour
         Time.timeScale = 0f;
         isPause = true;
         meshMouseLook.Show();
+        AudioManager.Instance.MuteAllExceptManager();
     }
 }

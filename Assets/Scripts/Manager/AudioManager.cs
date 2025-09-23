@@ -20,6 +20,7 @@ public class AudioManager : MonoBehaviour
     private float masterVolume = 1f;
     private float musicVolume = 1f;
     private float sfxVolume = 1f;
+    private AudioSource[] allAudioSources;
 
     private string stringPrefsSlider = "Slider";
 
@@ -33,6 +34,18 @@ public class AudioManager : MonoBehaviour
         SetMasterVolume(PlayerPrefs.GetFloat(masterSlider.sliderTag + stringPrefsSlider, 100f));
         SetMusicVolume(PlayerPrefs.GetFloat(musicSlider.sliderTag + stringPrefsSlider, 100f));
         SetSFXVolume(PlayerPrefs.GetFloat(sfxSlider.sliderTag + stringPrefsSlider, 100f));
+    }
+
+    public void MuteAllExceptManager()
+    {
+        allAudioSources = FindObjectsByType<AudioSource>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+        foreach (var audio in allAudioSources)
+        {
+            if (audio == musicSource || audio == sfxSource)
+                continue;
+
+            audio.mute = true;
+        }
     }
 
     public void SetMasterVolume(float value)
