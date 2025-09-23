@@ -50,6 +50,7 @@ public class BossAi : MonoBehaviour
     //Health ref
     private BossHealth bossHealth;
     private bool isPhase2 = false;
+    public GameObject phase2skill;
 
 
     //Skill Slam
@@ -115,7 +116,7 @@ public class BossAi : MonoBehaviour
         //       HasLineOfSight() &&
         //       Time.time >= nextFireTime &&
         //       !isAttacking;
-        bool canShout = isPhase2 && distance <= Shoutrange && Time.time - lastShoutTime >= Shoutcooldown;
+        //bool canShout = isPhase2 && distance <= Shoutrange && Time.time - lastShoutTime >= Shoutcooldown;
         bool canMelee = distance <= meleeRange;
         bool canRange = Time.time - lastRangeAttackTime >= rangeAttackCooldown;
 
@@ -127,16 +128,16 @@ public class BossAi : MonoBehaviour
         }
         else if (canFire)
         {
-            Debug.Log("Fire breath conditions met, starting...");
+            //Debug.Log("Fire breath conditions met, starting...");
             agent.isStopped = true;
             StartFireBreath();
             nextFireTime = Time.time + fireCooldown;
         }
-        else if (canShout)
-        {
-            Shout();
-            lastShoutTime = Time.time;
-        }
+        //else if (canShout)
+        //{
+        //    Shout();
+        //    lastShoutTime = Time.time;
+        //}
         else if (canMelee)
         {
             MeleeAttack();
@@ -272,7 +273,8 @@ public class BossAi : MonoBehaviour
     void EnterPhase2()
     {
         isPhase2 = true;
-        Debug.Log("Boss has entered Phase 2!");
+        //Debug.Log("Boss has entered Phase 2!");
+        phase2skill.SetActive(true);
     }
 
     void EndAttack()
