@@ -16,7 +16,7 @@ public class EnemyTracker : MonoBehaviour
     {
         // OnDeath?.Invoke();
         questTracker?.OnKilled();
-        if(!gameObject.CompareTag("Spidey")) SpawnManager.Instance.OnEnemyDeath();
+        SpawnManager.Instance.OnEnemyDeath();
         CoinManager.Instance.AddCoins(Random.Range(5, 15)); // Thêm 5-15 coin khi enemy chết
         // Debug.Log($"{gameObject.name} has died.");
         // gameObject.SetActive(false);
