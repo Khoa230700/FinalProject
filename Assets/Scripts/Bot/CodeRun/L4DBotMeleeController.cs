@@ -71,7 +71,7 @@ public class L4DBotMeleeController : MonoBehaviour
         }
 
         // 2. Không có zombie → theo player
-        agent.stoppingDistance = 2f; // đứng gần player
+        agent.stoppingDistance = 12f; // đứng gần player
         if (distToPlayer > agent.stoppingDistance)
         {
             agent.isStopped = false;
