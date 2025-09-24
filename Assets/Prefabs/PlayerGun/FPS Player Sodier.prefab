@@ -24401,6 +24401,7 @@ MonoBehaviour:
   disableCharacterControllerDuringKnockback: 0
   constantHorizontalSpeed: 1
   minBurnTickInterval: 1
+  burnBypassesShield: 1
 --- !u!82 &2203927700193005670
 AudioSource:
   m_ObjectHideFlags: 0

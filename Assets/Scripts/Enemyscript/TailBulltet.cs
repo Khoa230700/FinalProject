@@ -11,13 +11,13 @@ public class TailBulltet : MonoBehaviour
     //        var health = other.GetComponent<PlayerHealth>().TakeDamage(10);
 
             
-    
+    public float damage = 1f;
 
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player"))
         {
-            other.GetComponent<PlayerHealthSystem>().TakeDamage(1);
+            other.GetComponent<PlayerHealthSystem>().TakeDamage(damage);
             //other.GetComponent<testPlayerHealth>().TakeDamage(10);
         }
     }

@@ -6,7 +6,7 @@ public class BossSkillCollision : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            other.GetComponent<PlayerHealthSystem>().TakeDamage(5);
+            other.GetComponent<PlayerHealthSystem>().TakeDamage(20);
         }
     }
 }

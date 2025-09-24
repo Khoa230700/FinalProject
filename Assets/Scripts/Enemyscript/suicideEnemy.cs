@@ -95,7 +95,7 @@ public class suicideEnemy : MonoBehaviour
             Collider[] colliders = Physics.OverlapSphere(transform.position, 4f);
             foreach (Collider collider in colliders)
             {
-                target.TakeDamage(1);
+                target.TakeDamage(attackDamage);
                 lastAttackTime = Time.time;
             }
 

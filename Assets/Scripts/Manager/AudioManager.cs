@@ -34,8 +34,6 @@ public class AudioManager : MonoBehaviour
         SetMasterVolume(PlayerPrefs.GetFloat(masterSlider.sliderTag + stringPrefsSlider, 100f));
         SetMusicVolume(PlayerPrefs.GetFloat(musicSlider.sliderTag + stringPrefsSlider, 100f));
         SetSFXVolume(PlayerPrefs.GetFloat(sfxSlider.sliderTag + stringPrefsSlider, 100f));
-
-        PlayMusic("Test");
     }
 
     public void MuteAllExceptManager(bool mute)
@@ -94,9 +92,27 @@ public class AudioManager : MonoBehaviour
         sfxSource.PlayOneShot(sound.clip, sfxVolume * masterVolume);
     }
 
+    public void StopMusic()
+    {
+        if (musicSource.isPlaying)
+            musicSource.Stop();
+    }
+
+    public void StopSFX()
+    {
+        if (sfxSource.isPlaying)
+            sfxSource.Stop();
+    }
+
+    public void StopAllAudio()
+    {
+        StopMusic();
+        StopSFX();
+    }
+
     public float GetMasterVolume() => masterVolume;
     public float GetMusicVolume() => musicVolume * masterVolume;
-    public float GetSFXVolume() => sfxVolume * masterVolume; 
+    public float GetSFXVolume() => sfxVolume * masterVolume;
 }
 
 [Serializable]
