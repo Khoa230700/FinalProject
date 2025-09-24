@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using Unity.VisualScripting;
 
 public class EnemyM : MonoBehaviour
 {
@@ -31,7 +32,11 @@ public class EnemyM : MonoBehaviour
     private void Update()
     {
         //test
-        if(Input.GetKeyDown(KeyCode.K))
+        if (Input.GetKeyDown(KeyCode.K) && (gameObject.tag != "Spidey"))
+        {
+            TakeDamage(1000);
+        }
+        if(Input.GetKeyDown(KeyCode.M) && (gameObject.tag == "Spidey"))
         {
             TakeDamage(1000);
         }
