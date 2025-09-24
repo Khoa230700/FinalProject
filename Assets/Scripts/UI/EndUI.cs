@@ -111,6 +111,7 @@ public class EndUI : MonoBehaviour
 
     public void PlayAudio()
     {
+        AudioManager.Instance.StopAllAudio();
         if (isVictory) AudioManager.Instance.PlaySFX("Victory");
         else AudioManager.Instance.PlaySFX("Failed");
     }

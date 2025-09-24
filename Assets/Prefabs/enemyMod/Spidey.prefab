@@ -3195,6 +3195,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemy: {fileID: 7163044003928416313}
   player: {fileID: 0}
+  damage: 20
   lastAttackTime: 0
   attackCooldown: 2
   lastAttackTime1: 0

@@ -44,6 +44,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8a5e08ebc68173d4984649f4486f4619, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  musicName: 
 --- !u!1 &2880560848946563510
 GameObject:
   m_ObjectHideFlags: 0
@@ -350,8 +351,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   musicSounds:
-  - name: T
-    clip: {fileID: 8300000, guid: 3a4828c8bdf534142b3ea60d566d2d98, type: 3}
+  - name: Map1
+    clip: {fileID: 8300000, guid: f87585dd0f4f7f346a7fcb0e72040312, type: 3}
+  - name: Map2
+    clip: {fileID: 8300000, guid: 3a762299e145b7342a5d212c31fabdc9, type: 3}
+  - name: Map3
+    clip: {fileID: 8300000, guid: a88f52540bc35dd41b92ca4e63556d1a, type: 3}
   sfxSounds:
   - name: Click
     clip: {fileID: 8300000, guid: 705baf36a9869ff4f85732f080523958, type: 3}

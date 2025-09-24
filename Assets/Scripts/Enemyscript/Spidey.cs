@@ -7,7 +7,7 @@ public class Spidey : MonoBehaviour
 
     // private NavMeshAgent agent;
     public Transform player;
-
+    public float damage = 10f;
     public float lastAttackTime = 0f;
     public float attackCooldown = 2f;
 
@@ -67,7 +67,7 @@ public class Spidey : MonoBehaviour
         {
             lastAttackTime = Time.time;
             // damage player()
-            player.GetComponent<BaseHealthSystem>().TakeDamage(2);
+            player.GetComponent<BaseHealthSystem>().TakeDamage(damage);
         }
         animator.SetTrigger("MeleeAttack");
         soundController.PlayAttackSound2();

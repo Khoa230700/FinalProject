@@ -135,7 +135,7 @@ public class PlayerShoot : MonoBehaviour, IWeapon, IReloadable
 
     public void ShootOneBullet()
     {
-        if (!PauseGameUI.isPause || isReloading || shopUI.isOpen) return;
+        if (PauseGameUI.isPause || isReloading || shopUI.isOpen) return;
 
         if (currentAmmo <= 0)
         {
