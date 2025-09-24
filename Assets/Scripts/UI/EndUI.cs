@@ -24,7 +24,7 @@ public class EndUI : MonoBehaviour
     [ContextMenu("Show Gain")]
     public void ShowGain()
     {
-        SetEndMap();
+        if(isVictory) SetEndMap();
 
         int sessionCoins = CoinManager.Instance.GetSessionCoins();
         int deathCount = SelectorSpawner.Instance.Player.GetComponent<PlayerHealthSystem>().GetDeathCount();
