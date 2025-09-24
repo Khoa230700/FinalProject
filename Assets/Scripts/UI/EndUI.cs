@@ -69,7 +69,6 @@ public class EndUI : MonoBehaviour
                     coinGainText.text = $" {x:N0}";
                     if (x != lastValue) // chỉ phát khi số thay đổi
                     {
-                        AudioManager.Instance.PlaySFX("CoinCount");
                         lastValue = x;
                     }
                 },
