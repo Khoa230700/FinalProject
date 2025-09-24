@@ -12,7 +12,7 @@ public class suicideEnemy : MonoBehaviour
 
    
     
-    public int attackDamage = 15;
+    public int attackDamage = 1;
     public float attackSpeed = 1.5f;
     private float nextAttackTime = 0f;
 
