@@ -39,6 +39,8 @@ public class AudioManager : MonoBehaviour
     public void MuteAllExceptManager(bool mute)
     {
         allAudioSources = FindObjectsByType<AudioSource>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+        StopMusic();
+        StopSFX();
         foreach (var audio in allAudioSources)
         {
             if (audio == musicSource || audio == sfxSource)
@@ -92,9 +94,21 @@ public class AudioManager : MonoBehaviour
         sfxSource.PlayOneShot(sound.clip, sfxVolume * masterVolume);
     }
 
+    public void StopMusic()
+    {
+        if (musicSource.isPlaying)
+            musicSource.Stop();
+    }
+
+    public void StopSFX()
+    {
+        if (sfxSource.isPlaying)
+            sfxSource.Stop();
+    }
+
     public float GetMasterVolume() => masterVolume;
     public float GetMusicVolume() => musicVolume * masterVolume;
-    public float GetSFXVolume() => sfxVolume * masterVolume; 
+    public float GetSFXVolume() => sfxVolume * masterVolume;
 }
 
 [Serializable]
