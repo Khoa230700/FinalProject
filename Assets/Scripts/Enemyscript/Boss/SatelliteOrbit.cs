@@ -17,7 +17,7 @@ public class SatelliteOrbit : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            other.GetComponent<testPlayerHealth>().TakeDamage(1);
+            other.GetComponent<testPlayerHealth>().TakeDamage(40);
             Debug.Log("hit");
         }
     }
