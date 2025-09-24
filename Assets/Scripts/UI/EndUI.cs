@@ -80,7 +80,7 @@ public class EndUI : MonoBehaviour
         }
 
         // Death
-        if (deathCount >= 0)
+        if (deathCount > 1)
         {
             sequence.AppendCallback(() => deathGroup.SetActive(true));
             sequence.Append(

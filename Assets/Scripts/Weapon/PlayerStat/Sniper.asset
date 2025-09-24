@@ -19,5 +19,5 @@ MonoBehaviour:
   airControlMultiplier: 0.5
   maxHealth: 100
   maxShield: 10
-  shieldRegenPerSecond: 15
-  shieldRegenDelay: 3
+  shieldRegenPerSecond: 0
+  shieldRegenDelay: 0

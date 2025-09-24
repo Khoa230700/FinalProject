@@ -4,6 +4,8 @@ using System.Collections;
 public class BossHealth : MonoBehaviour
 {
     [SerializeField]private float maxHealth = 100f;
+    [SerializeField]private GameObject endUI;
+    [SerializeField]private BarUI healthBar;
     public float currentHealth { get; private set; }
     
     public bool isPhase2 { get; private set; } = false;
@@ -20,6 +22,8 @@ public class BossHealth : MonoBehaviour
     private void Start()
     {
         currentHealth = maxHealth;
+        healthBar.SetValue(currentHealth);
+        healthBar.SetMaxValue(maxHealth);
         soundController = GetComponent<EnemySoundController>();
     }
     
@@ -29,6 +33,7 @@ public class BossHealth : MonoBehaviour
         Debug.Log("Boss ăn dmg");
         currentHealth -= amount;
         currentHealth = Mathf.Max(currentHealth, 0f);
+        healthBar.SetValue(currentHealth);
 
         if (!isPhase2 && currentHealth <= maxHealth / 2f)
         {
@@ -72,7 +77,8 @@ public class BossHealth : MonoBehaviour
 
         yield return new WaitForSeconds(3f);
 
-       
+
+        endUI.SetActive(true);
         gameObject.SetActive(false);
     }
 }

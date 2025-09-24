@@ -9,6 +9,7 @@ public class ShopPoint : MonoBehaviour
     [SerializeField] private GameObject arrowPrefab;
     [SerializeField] private float arrowSpeed = 10f;
     [SerializeField] private float pathInterval = 1f;
+    [SerializeField] private bool isPathActive = true;
 
     private bool playerInRange = false;
     private Transform player;
@@ -16,6 +17,7 @@ public class ShopPoint : MonoBehaviour
 
     private void OnEnable()
     {
+        if(isPathActive)
         pathCoroutine = StartCoroutine(PathLoop());
     }
 

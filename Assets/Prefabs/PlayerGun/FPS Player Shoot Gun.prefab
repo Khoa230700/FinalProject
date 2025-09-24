@@ -7871,13 +7871,14 @@ GameObject:
   - component: {fileID: 9115985790339014979}
   - component: {fileID: 3138122004126851728}
   - component: {fileID: 2838177765979169654}
+  - component: {fileID: 6193557124682961068}
   m_Layer: 8
   m_Name: FPS Player Shoot Gun
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &2473540229389520567
 Transform:
   m_ObjectHideFlags: 0
@@ -8062,6 +8063,21 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  knockbackGravity: 0.1
+  defaultUpForce: 150
+  disableOnKnockback:
+  - {fileID: 8704605179910530586}
+  - {fileID: 5384427802294625511}
+  - {fileID: 8472290513620521099}
+  - {fileID: 3157535414782822884}
+  - {fileID: 2770871971483157546}
+  - {fileID: 4552658579932734323}
+  - {fileID: 4692743570835235307}
+  - {fileID: 6773324282219754052}
+  - {fileID: 3026894709680392677}
+  disableCharacterControllerDuringKnockback: 0
+  constantHorizontalSpeed: 1
+  minBurnTickInterval: 1
 --- !u!82 &3138122004126851728
 AudioSource:
   m_ObjectHideFlags: 0
@@ -8185,6 +8201,14 @@ MonoBehaviour:
   alignToSurfaceNormal: 1
   surfaceOffset: 0.01
   bloodSfxVolume: 1
+--- !u!81 &6193557124682961068
+AudioListener:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2273800816668952085}
+  m_Enabled: 1
 --- !u!1 &2282949895574822345
 GameObject:
   m_ObjectHideFlags: 0

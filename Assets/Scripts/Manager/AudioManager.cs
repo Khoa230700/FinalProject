@@ -34,9 +34,11 @@ public class AudioManager : MonoBehaviour
         SetMasterVolume(PlayerPrefs.GetFloat(masterSlider.sliderTag + stringPrefsSlider, 100f));
         SetMusicVolume(PlayerPrefs.GetFloat(musicSlider.sliderTag + stringPrefsSlider, 100f));
         SetSFXVolume(PlayerPrefs.GetFloat(sfxSlider.sliderTag + stringPrefsSlider, 100f));
+
+        PlayMusic("Test");
     }
 
-    public void MuteAllExceptManager()
+    public void MuteAllExceptManager(bool mute)
     {
         allAudioSources = FindObjectsByType<AudioSource>(FindObjectsInactive.Include, FindObjectsSortMode.None);
         foreach (var audio in allAudioSources)
@@ -44,7 +46,7 @@ public class AudioManager : MonoBehaviour
             if (audio == musicSource || audio == sfxSource)
                 continue;
 
-            audio.mute = true;
+            audio.mute = mute;
         }
     }
 

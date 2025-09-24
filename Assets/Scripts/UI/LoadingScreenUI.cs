@@ -82,6 +82,7 @@ public class LoadingScreenUI : MonoBehaviour
         if (instance.isProcessingLoad) return; // Ngăn trùng lặp
 
         instance.gameObject.SetActive(true);
+        AudioManager.Instance.MuteAllExceptManager(false);
         instance.StartCoroutine(instance.LoadSceneRoutine(targetScene));
     }
     #endregion

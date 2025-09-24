@@ -44,7 +44,7 @@ public class suicideEnemy : MonoBehaviour
     void Update()
     {
         
-        enemyAnimation.SetFloat("speed", agent.velocity.magnitude);
+        // enemyAnimation.SetFloat("speed", agent.velocity.magnitude);
 
         
 

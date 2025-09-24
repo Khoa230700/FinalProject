@@ -1,5 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Linq;
+using System.Collections.Generic;
+
 
 public class PlayerHealthSystem : BaseHealthSystem, IDamageable
 {
@@ -30,6 +33,7 @@ public class PlayerHealthSystem : BaseHealthSystem, IDamageable
     [SerializeField] private BarUI healthBar;
     [SerializeField] private BarUI shieldBar;
     private DeathUI deathUI;
+    private EndUI failedUI;
 
     // -------- Animation / Death ----------
     [Header("Body Animator (optional)")]
@@ -57,6 +61,27 @@ public class PlayerHealthSystem : BaseHealthSystem, IDamageable
     public float fallBackDegrees = -90f;
     [Tooltip("Đường cong easing cho chuyển động.")]
     public AnimationCurve fallEase = AnimationCurve.EaseInOut(0, 0, 1, 1);
+
+    // ==== KNOCKBACK ====
+    [Header("Knockback")]
+    [SerializeField] private float knockbackGravity = 20f;
+    [SerializeField] private float defaultUpForce = 3f;     // lực hất lên
+    [SerializeField] private List<Behaviour> disableOnKnockback = new List<Behaviour>(); // KÉO SCRIPT VÀO ĐÂY
+    [SerializeField] private bool disableCharacterControllerDuringKnockback = false;
+
+    [Tooltip("Nếu bật: tốc độ ngang (force) được giữ không đổi trong suốt thời gian knockback -> điều khiển quãng đường dễ hơn.")]
+    [SerializeField] private bool constantHorizontalSpeed = true;
+
+    private Coroutine knockbackCo;
+    private bool _inKnockback;
+
+    // ==== BURN (Damage over Time) ====
+    [Header("Damage Over Time")]
+    [SerializeField] private float minBurnTickInterval = 1f; // (không dùng nữa nếu bạn chuyển sang liên tục)
+    [SerializeField] private bool burnBypassesShield = true; // BẬT ở Inspector
+    private Coroutine burnCo;
+    private float burnDps;
+    private float burnRemain;
 
     // ------------- runtime -------------
     private float _lastDamageTime = -999f;
@@ -94,7 +119,6 @@ public class PlayerHealthSystem : BaseHealthSystem, IDamageable
             healthBar = SelectorSpawner.Instance.HealthBar ?? healthBar;
             shieldBar = SelectorSpawner.Instance.ShieldBar ?? shieldBar;
         }
-        deathUI = FindAnyObjectByType<DeathUI>(FindObjectsInactive.Include);
 
         // cập nhật UI lần đầu
         HandleHealthChanged(currentHealth, maxHealth);
@@ -213,6 +237,179 @@ public class PlayerHealthSystem : BaseHealthSystem, IDamageable
 
     private void BroadcastShield() => OnShieldChanged?.Invoke(currentShield, maxShield);
 
+    // =================== KNOCKBACK PUBLIC API ===================
+
+    /// <summary>Đẩy ra phía sau lưng player (ngược hướng nhìn).</summary>
+    public void ApplyKnockbackBackwards(float force, float duration, float upForce = -1f)
+    {
+        if (upForce < 0f) upForce = defaultUpForce;
+        Vector3 dir = -(transform.forward);
+        ApplyKnockback(dir, force, duration, upForce);
+    }
+
+    /// <summary>Đẩy xa khỏi một nguồn (ví dụ: vị trí boss).</summary>
+    public void ApplyKnockbackFrom(Vector3 sourcePosition, float force, float duration, float upForce = -1f)
+    {
+        if (upForce < 0f) upForce = defaultUpForce;
+        Vector3 dir = (transform.position - sourcePosition);
+        dir.y = 0f;
+        if (dir.sqrMagnitude > 0.0001f) dir.Normalize();
+        else dir = -(transform.forward);
+        ApplyKnockback(dir, force, duration, upForce);
+    }
+
+    /// <summary>Knockback với đầu vào là tốc độ ngang (m/s). Nếu bật constantHorizontalSpeed, speed giữ nguyên trong suốt duration.</summary>
+    public void ApplyKnockback(Vector3 direction, float speed, float duration, float upForce = -1f)
+    {
+        if (speed <= 0f || duration <= 0f) return;
+        if (upForce < 0f) upForce = defaultUpForce;
+
+        if (knockbackCo != null) StopCoroutine(knockbackCo);
+        knockbackCo = StartCoroutine(KnockbackRoutine(direction.normalized, speed, duration, upForce));
+    }
+
+    /// <summary>Knockback theo QUÃNG ĐƯỜNG mục tiêu (m), nội suy ra tốc độ = distance/duration.</summary>
+    public void ApplyKnockbackDistance(Vector3 direction, float distance, float duration, float upForce = -1f)
+    {
+        float speed = distance / Mathf.Max(0.0001f, duration);
+        ApplyKnockback(direction, speed, duration, upForce);
+    }
+
+    public void ApplyKnockbackBackwardsDistance(float distance, float duration, float upForce = -1f)
+    {
+        Vector3 dir = -(transform.forward);
+        ApplyKnockbackDistance(dir, distance, duration, upForce);
+    }
+
+    public void ApplyKnockbackFromDistance(Vector3 sourcePosition, float distance, float duration, float upForce = -1f)
+    {
+        Vector3 dir = (transform.position - sourcePosition);
+        dir.y = 0f;
+        dir = (dir.sqrMagnitude > 0.0001f) ? dir.normalized : -(transform.forward);
+        ApplyKnockbackDistance(dir, distance, duration, upForce);
+    }
+
+    // =================== KNOCKBACK CORE ===================
+
+    private IEnumerator KnockbackRoutine(Vector3 dir, float speed, float duration, float upForce)
+    {
+        _inKnockback = true;
+        SetBehavioursEnabled(disableOnKnockback, false);
+
+        if (_cc == null) _cc = GetComponent<CharacterController>();
+        bool prevCCEnabled = _cc != null ? _cc.enabled : false;
+        if (disableCharacterControllerDuringKnockback && _cc) _cc.enabled = false;
+
+        float t = 0f;
+        float vy = upForce; // nảy lên một chút
+
+        while (t < duration)
+        {
+            t += Time.deltaTime;
+
+            // --- THÀNH PHẦN NGANG ---
+            Vector3 horiz;
+            if (constantHorizontalSpeed)
+            {
+                // Giữ tốc độ ngang không đổi -> quãng đường ≈ speed * duration
+                horiz = dir * speed;
+            }
+            else
+            {
+                // Giảm dần (ease-out) như phiên bản cũ
+                float k = 1f - Mathf.Clamp01(t / duration);
+                horiz = dir * (speed * k);
+            }
+
+            // --- THÀNH PHẦN DỌC (trọng lực) ---
+            vy -= knockbackGravity * Time.deltaTime;
+
+            Vector3 delta = (horiz + Vector3.up * vy) * Time.deltaTime;
+
+            // --- DỊCH CHUYỂN ---
+            if (_cc != null && !disableCharacterControllerDuringKnockback && _cc.enabled)
+                _cc.Move(delta);
+            else
+                transform.position += delta;
+
+            yield return null;
+        }
+
+        // hồi lại
+        if (disableCharacterControllerDuringKnockback && _cc) _cc.enabled = prevCCEnabled;
+        SetBehavioursEnabled(disableOnKnockback, true);
+        _inKnockback = false;
+    }
+
+    private void SetBehavioursEnabled(List<Behaviour> list, bool enabled)
+    {
+        if (list == null) return;
+        for (int i = 0; i < list.Count; i++)
+        {
+            if (list[i] == null) continue;
+            list[i].enabled = enabled;
+        }
+    }
+
+    // =================== BURN ===================
+
+    // Gọi từ Boss: dps = sát thương mỗi giây, duration = thời gian thiêu đốt
+    public void ApplyBurn(float dps, float duration)
+    {
+        if (dps <= 0f || duration <= 0f) return;
+
+        burnDps = dps;
+        burnRemain = Mathf.Max(burnRemain, duration); // làm mới thời gian
+
+        if (burnCo == null)
+            burnCo = StartCoroutine(BurnRoutine());
+    }
+
+    private IEnumerator BurnRoutine()
+    {
+        while (burnRemain > 0f && !_dead)
+        {
+            float dt = Time.deltaTime;
+            burnRemain -= dt;
+
+            float dmg = burnDps * dt; // ví dụ 5 * 0.0167 ≈ 0.083/khung @60fps
+
+            if (burnBypassesShield)
+                ApplyTrueHealthDamage(dmg); // đốt THẲNG máu
+            else
+                TakeDamage(dmg, Vector3.zero); // giữ hành vi cũ: qua shield trước
+
+            yield return null;
+        }
+
+        burnCo = null;
+    }
+
+    // --- TRUE DAMAGE: đốt thẳng HEALTH, bỏ qua shield/armor ---
+    private void ApplyTrueHealthDamage(float amount)
+    {
+        if (amount <= 0f || _dead) return;
+
+        // để trì hoãn hồi giáp khi đang bị burn
+        _lastDamageTime = Time.time;
+
+        float before = currentHealth;
+        currentHealth = Mathf.Max(0f, currentHealth - amount);
+
+        // ❌ KHÔNG được gọi OnHealthChanged?.Invoke(...) ở lớp con
+        // ✅ Dùng hàm protected của lớp cha để phát event
+        BroadcastHealth();
+
+        // (tuỳ chọn) hiệu ứng hit chung cho animator, nếu bạn muốn
+        if (multi) multi.SetTriggerAll("Hit");
+
+        // UnityEvent kiểu field (không phải C# event) nên gọi được bình thường
+        OnTakeDamage?.Invoke(-amount, Vector3.zero);
+
+        if (before > 0f && currentHealth <= 0f)
+            Die();
+    }
+
     // -------- Death ----------
     protected override void Die()
     {
@@ -309,7 +506,21 @@ public class PlayerHealthSystem : BaseHealthSystem, IDamageable
         }
 
         transform.rotation = targetRot; // chốt góc cuối: nhìn lên trời
-        deathUI.Show();
+        string sceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+        if (sceneName == "Map2")
+        {
+            deathUI = FindAnyObjectByType<DeathUI>(FindObjectsInactive.Include);
+            Debug.Log(deathUI);
+            deathUI.Show();
+        }
+        else
+        {
+            failedUI = FindObjectsByType<EndUI>(FindObjectsInactive.Include,
+                                                FindObjectsSortMode.None)
+                                                .FirstOrDefault(e => e.CompareTag("Failed"));
+            Debug.Log(failedUI);
+            failedUI.gameObject.SetActive(true);
+        }
     }
 
     public int GetDeathCount() => deathCount;
