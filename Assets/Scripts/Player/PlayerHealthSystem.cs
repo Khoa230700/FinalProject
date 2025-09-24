@@ -77,7 +77,8 @@ public class PlayerHealthSystem : BaseHealthSystem, IDamageable
 
     // ==== BURN (Damage over Time) ====
     [Header("Damage Over Time")]
-    [SerializeField] private float minBurnTickInterval = 1f;
+    [SerializeField] private float minBurnTickInterval = 1f; // (không dùng nữa nếu bạn chuyển sang liên tục)
+    [SerializeField] private bool burnBypassesShield = true; // BẬT ở Inspector
     private Coroutine burnCo;
     private float burnDps;
     private float burnRemain;
@@ -358,36 +359,55 @@ public class PlayerHealthSystem : BaseHealthSystem, IDamageable
         if (dps <= 0f || duration <= 0f) return;
 
         burnDps = dps;
-        burnRemain = duration;
+        burnRemain = Mathf.Max(burnRemain, duration); // làm mới thời gian
 
-        if (burnCo == null) burnCo = StartCoroutine(BurnRoutine());
+        if (burnCo == null)
+            burnCo = StartCoroutine(BurnRoutine());
     }
 
     private IEnumerator BurnRoutine()
     {
-        float tickAcc = 0f;
-
         while (burnRemain > 0f && !_dead)
         {
             float dt = Time.deltaTime;
             burnRemain -= dt;
-            tickAcc += dt;
 
-            // Gây sát thương mỗi giây (tick), an toàn với FPS thấp/cao
-            if (tickAcc >= minBurnTickInterval)
-            {
-                float ticks = Mathf.Floor(tickAcc / minBurnTickInterval);
-                float damage = burnDps * ticks; // 5/s * số tick
-                tickAcc -= ticks * minBurnTickInterval;
+            float dmg = burnDps * dt; // ví dụ 5 * 0.0167 ≈ 0.083/khung @60fps
 
-                // Gây dmg "chuẩn" vào hệ shield/health sẵn có
-                TakeDamage(damage, Vector3.zero);
-            }
+            if (burnBypassesShield)
+                ApplyTrueHealthDamage(dmg); // đốt THẲNG máu
+            else
+                TakeDamage(dmg, Vector3.zero); // giữ hành vi cũ: qua shield trước
 
             yield return null;
         }
 
         burnCo = null;
+    }
+
+    // --- TRUE DAMAGE: đốt thẳng HEALTH, bỏ qua shield/armor ---
+    private void ApplyTrueHealthDamage(float amount)
+    {
+        if (amount <= 0f || _dead) return;
+
+        // để trì hoãn hồi giáp khi đang bị burn
+        _lastDamageTime = Time.time;
+
+        float before = currentHealth;
+        currentHealth = Mathf.Max(0f, currentHealth - amount);
+
+        // ❌ KHÔNG được gọi OnHealthChanged?.Invoke(...) ở lớp con
+        // ✅ Dùng hàm protected của lớp cha để phát event
+        BroadcastHealth();
+
+        // (tuỳ chọn) hiệu ứng hit chung cho animator, nếu bạn muốn
+        if (multi) multi.SetTriggerAll("Hit");
+
+        // UnityEvent kiểu field (không phải C# event) nên gọi được bình thường
+        OnTakeDamage?.Invoke(-amount, Vector3.zero);
+
+        if (before > 0f && currentHealth <= 0f)
+            Die();
     }
 
     // -------- Death ----------

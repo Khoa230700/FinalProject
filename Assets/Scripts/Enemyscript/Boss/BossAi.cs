@@ -77,7 +77,6 @@ public class BossAi : MonoBehaviour
     public float burnDuration = 5f;          // yêu cầu: 5 giây
 
 
-
     //Sound
     private EnemySoundController soundController;
     private void Start()
@@ -106,10 +105,23 @@ public class BossAi : MonoBehaviour
             bossHealth.TakeDamage(30);
         }
 
-        if (isChanneling || isAttacking)
+        if (isChanneling)
         {
-            RotateTowardsTarget();
-            return; // Block other logic while attacking
+            RotateTowardsTarget(); // giữ quay mặt vào player
+
+            // Áp burn liên tục khi player ở trong vùng fireDamageArea
+            if (fireDamageArea && player)
+            {
+                Vector3 closest = fireDamageArea.ClosestPoint(player.position);
+                float dist = Vector3.Distance(closest, player.position);
+                if (dist <= 0.05f)
+                {
+                    var ph = player.GetComponent<PlayerHealthSystem>();
+                    if (ph) ph.ApplyBurn(burnDps /*=5*/, burnDuration /*=5*/);
+                }
+            }
+
+            return; // khi channeling, không chạy AI khác
         }
 
         float distance = Vector3.Distance(transform.position, player.position);
@@ -218,9 +230,10 @@ public class BossAi : MonoBehaviour
         isChanneling = true;
         fireFX.Play();
         fireDamageArea.enabled = true;
+        enemyAnimation.SetBool("FireBreath", true);
+        soundController.PlayAttackSound2();
 
         Invoke(nameof(StopFireBreath), channelTime);
-        enemyAnimation.SetBool("FireBreath",true);
 
         soundController.PlayAttackSound2();
 
