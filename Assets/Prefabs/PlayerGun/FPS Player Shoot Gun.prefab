@@ -6430,7 +6430,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   armsAnimator: {fileID: 3028229162289663889}
   playerMovement: {fileID: 1535889337764389916}
-  weaponSwitcher: {fileID: 0}
+  weaponSwitcher: {fileID: 2380051268329280892}
 --- !u!114 &5384427802294625511
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7178,7 +7178,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   armsAnimator: {fileID: 7699473390604045346}
   playerMovement: {fileID: 1535889337764389916}
-  weaponSwitcher: {fileID: 0}
+  weaponSwitcher: {fileID: 2380051268329280892}
 --- !u!114 &2770871971483157546
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7971,7 +7971,6 @@ GameObject:
   - component: {fileID: 2380051268329280892}
   - component: {fileID: 9115985790339014979}
   - component: {fileID: 3138122004126851728}
-  - component: {fileID: 2838177765979169654}
   - component: {fileID: 6193557124682961068}
   m_Layer: 8
   m_Name: FPS Player Shoot Gun
@@ -8038,7 +8037,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f93bbcc436795e5438b92624b16fce2d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerStats: {fileID: 11400000, guid: 8606be53847325644b6794de9ebc91ad, type: 2}
+  playerStats: {fileID: 11400000, guid: c67d52847645bee4ea04ca49e724f936, type: 2}
   csgoScope: {fileID: 0}
   audioSource: {fileID: 3138122004126851728}
   footstepClips:
@@ -8277,32 +8276,6 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!114 &2838177765979169654
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2273800816668952085}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d0405504e9ab75343a88002f088d9d05, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ownerHealthSystem: {fileID: 0}
-  hitboxType: 0
-  headshotMultiplier: 2
-  relayDamage: 1
-  bloodEffect: {fileID: 0}
-  bloodEffects: []
-  bloodSfx: []
-  spawnCountRange: {x: 1, y: 2}
-  scaleRange: {x: 0.85, y: 1.25}
-  lifetimeRange: {x: 1, y: 2}
-  randomYawOnly: 1
-  alignToSurfaceNormal: 1
-  surfaceOffset: 0.01
-  bloodSfxVolume: 1
 --- !u!81 &6193557124682961068
 AudioListener:
   m_ObjectHideFlags: 0
