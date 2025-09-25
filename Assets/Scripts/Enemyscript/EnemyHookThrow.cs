@@ -6,7 +6,7 @@ public class EnemyHookThrow : MonoBehaviour
     public GameObject hookPrefab;
     public Transform firePoint;
     public float pullSpeed = 10f;
-
+    //[SerializeField] private float hookSpeed = 900f;
     public void ThrowHook(Transform player)
     {
         GameObject hook = Instantiate(hookPrefab, firePoint.position, firePoint.rotation);
@@ -21,6 +21,7 @@ public class EnemyHookThrow : MonoBehaviour
     private IEnumerator PullPlayer(Transform player)
     {
         Rigidbody playerRb = player.GetComponent<Rigidbody>();
+        //playerRb.AddForce(firePoint.forward * hookSpeed, )
         playerRb.isKinematic = true;  // Optional: disable physics during pull
 
         while (Vector3.Distance(player.position, transform.position) > 1.5f)

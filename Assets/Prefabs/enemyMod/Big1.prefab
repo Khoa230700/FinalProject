@@ -34059,6 +34059,7 @@ GameObject:
   - component: {fileID: 1653550260721608683}
   - component: {fileID: 2993001763130868375}
   - component: {fileID: 8485301058135774902}
+  - component: {fileID: 9032348943135265820}
   m_Layer: 0
   m_Name: AlfaEnemyHit6
   m_TagString: HitedEnemy
@@ -34075,8 +34076,8 @@ Transform:
   m_GameObject: {fileID: 2113908152538965895}
   serializedVersion: 2
   m_LocalRotation: {x: -0.005844324, y: 0.004727437, z: -0.6714847, w: 0.74098027}
-  m_LocalPosition: {x: 1.0172613, y: 0.10031358, z: -0.045834124}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 1.4626, y: 0.15691, z: -0.075931}
+  m_LocalScale: {x: 1.3594, y: 1.3594, z: 1.3594}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 48879128444145608}
@@ -34119,6 +34120,32 @@ CapsuleCollider:
   m_Height: 1.5276996
   m_Direction: 1
   m_Center: {x: 0.03513823, y: -1.249575, z: 0.064952396}
+--- !u!114 &9032348943135265820
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2113908152538965895}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0405504e9ab75343a88002f088d9d05, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ownerHealthSystem: {fileID: 0}
+  hitboxType: 0
+  headshotMultiplier: 1
+  relayDamage: 1
+  bloodEffect: {fileID: 2947453002819199902, guid: 36f3a525320745c499bfc17e37c1a475, type: 3}
+  bloodEffects: []
+  bloodSfx: []
+  spawnCountRange: {x: 1, y: 2}
+  scaleRange: {x: 0.85, y: 1.25}
+  lifetimeRange: {x: 1, y: 2}
+  randomYawOnly: 1
+  alignToSurfaceNormal: 1
+  surfaceOffset: 0.01
+  bloodSfxVolume: 1
 --- !u!1 &2251079821071154725
 GameObject:
   m_ObjectHideFlags: 0
@@ -44979,8 +45006,8 @@ Transform:
   m_GameObject: {fileID: 6525225825867715556}
   serializedVersion: 2
   m_LocalRotation: {x: -0.00000012665987, y: -0.00000011175869, z: -0.69322956, w: 0.72071695}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 0.68895, y: 0.040688, z: -0.0036767}
+  m_LocalScale: {x: 1.3700224, y: 1.3700224, z: 1.3700224}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 8745630149088080877}
@@ -45040,7 +45067,10 @@ MonoBehaviour:
   headshotMultiplier: 2
   relayDamage: 1
   bloodEffect: {fileID: 2656253210798625995, guid: a78e9ef18b366424b84e0c7410d2fe72, type: 3}
-  bloodEffects: []
+  bloodEffects:
+  - {fileID: 7272547949924221042, guid: 6934f5646186fa846a555cb9c22bbeb7, type: 3}
+  - {fileID: 77058900600929839, guid: acf69c953b1128942940a6232fdd13a4, type: 3}
+  - {fileID: 2793714676743851581, guid: 5689cb22e94d0614abf9412a46ea55ab, type: 3}
   bloodSfx: []
   spawnCountRange: {x: 1, y: 2}
   scaleRange: {x: 0.85, y: 1.25}

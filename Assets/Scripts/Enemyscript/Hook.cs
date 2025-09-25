@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class Hook : MonoBehaviour
 {
-    public float speed = 30f;
+    public float speed = 900f;
     private Transform target;
     private EnemyHookThrow enemy;
 
