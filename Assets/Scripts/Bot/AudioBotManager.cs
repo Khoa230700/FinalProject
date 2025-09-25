@@ -25,6 +25,7 @@ public class AudioBotManager : MonoBehaviour
         if (!botAudioSource.isPlaying && botSounds.Length > 0)
         {
             botAudioSource.clip = botSounds[currentClipIndex];
+            botAudioSource.volume = AudioManager.Instance.GetSFXVolume();
             botAudioSource.Play();
           
             currentClipIndex = (currentClipIndex + 1) % botSounds.Length;
@@ -41,9 +42,9 @@ public class AudioBotManager : MonoBehaviour
     {
         if (shoot != null && shootSoundCooldown <= 0f)
         {
-            botAudioSource.volume = 0.3f;
+            botAudioSource.volume = AudioManager.Instance.GetSFXVolume();
             //botAudioSource.play
-            AudioSource.PlayClipAtPoint(shoot, transform.position);
+            AudioSource.PlayClipAtPoint(shoot, transform.position, AudioManager.Instance.GetSFXVolume());
             shootSoundCooldown = soundCooldownTime;
         }
     }
@@ -56,6 +57,7 @@ public class AudioBotManager : MonoBehaviour
         {
             int randomIndex = Random.Range(0, melee.Length); // Chọn ngẫu nhiên từ 0 đến melee.Length - 1
             botAudioSource.clip = melee[randomIndex];
+            botAudioSource.volume = AudioManager.Instance.GetSFXVolume();
             botAudioSource.Play();
         }
 
