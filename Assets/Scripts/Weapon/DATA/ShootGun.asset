@@ -20,7 +20,7 @@ MonoBehaviour:
   damage: 120
   range: 200
   pelletCount: 5
-  spreadAngle: 20
+  spreadAngle: 10
   roundsPerSecond: 5
   burstCount: 3
   burstFireRate: 0.1
