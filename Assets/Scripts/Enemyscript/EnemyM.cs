@@ -61,14 +61,25 @@ public class EnemyM : MonoBehaviour
     {
         animator.SetBool("isAlive", false);
 
-        Debug.Log("Here1");
+        // Cho AI dừng hoạt động trước (nếu có)
+        var tr = GetComponent<EnemyTracker>();
+        if (tr) tr.Die();
 
-        GetComponent<EnemyTracker>().Die();
-        yield return new WaitForSeconds(2f);
+        // 1) PHÁT TIẾNG CHẾT TRƯỚC
+        float wait = 1.2f; // mặc định fallback
+        if (soundController != null)
+        {
+            soundController.PlayDeathSound();
+            if (soundController.deathClip != null)
+                wait = soundController.deathClip.length;
+        }
 
-        Debug.Log("Here3");
+        // 2) CHỜ THEO REALTIME (tránh kẹt khi pause)
+        float end = Time.realtimeSinceStartup + wait;
+        while (Time.realtimeSinceStartup < end) yield return null;
+
+        // 3) TẮT OBJECT SAU KHI PHÁT XONG
         gameObject.SetActive(false);
-        soundController.PlayDeathSound();
     }
 
     public void StopAttack()

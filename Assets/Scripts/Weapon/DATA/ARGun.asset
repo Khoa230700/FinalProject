@@ -25,7 +25,7 @@ MonoBehaviour:
   burstCount: 3
   burstFireRate: 0.1
   burstCooldown: 0.3
-  fireMode: 1
+  fireMode: 2
   availableFireModes: 0100000002000000
   semiAutoMinInterval: 0
   magazineSize: 30
@@ -36,6 +36,15 @@ MonoBehaviour:
   tracerPrefab: {fileID: 6749693277989217856, guid: dfcafcdd61ac0e447b7e869afc9b8d0c, type: 3}
   shootSound: {fileID: 8300000, guid: 3b632c69fa87d714cb42155e0c91e7ea, type: 3}
   bulletRefillCost: 10
+  recoilPitch: -3
+  recoilYaw: 0
+  recoilRoll: 0.2
+  recoilHorizontalRandom: 0.5
+  recoilReturnSpeed: 20
+  recoilSnappiness: 12
+  recoilMaxPitch: 20
+  recoilMaxYaw: 25
+  recoilMaxRoll: 10
   damageByLevel:
     serializedVersion: 2
     m_Curve:

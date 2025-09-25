@@ -20,6 +20,15 @@ public class PlayerShoot : MonoBehaviour, IWeapon, IReloadable
     public AudioClip reloadSound;
     public AudioClip emptyMagSound;
 
+    [Header("Recoil")]
+    [Tooltip("Đặt empty Transform làm cha của Camera hoặc model tay súng. Script sẽ xoay node này khi giật.")]
+    public Transform recoilPivot;
+
+    // state nội bộ recoil
+    private Vector3 _recoilTarget;   // góc mục tiêu (x=pitch, y=yaw, z=roll)
+    private Vector3 _recoilCurrent;  // góc hiện tại áp lên pivot
+    private Vector3 _recoilVel;      // cho SmoothDampAngle
+
     [HideInInspector] public int currentAmmo;
     [HideInInspector] public int reserveAmmo;
     public bool isReloading { get; private set; }
@@ -64,6 +73,28 @@ public class PlayerShoot : MonoBehaviour, IWeapon, IReloadable
         reserveAmmo = gunData.reserveAmmo;
         weaponUI?.UpdateAmmoUI(currentAmmo, reserveAmmo);
         if (weaponUI != null) weaponUI.lastAmmoCount = currentAmmo; // sync ban đầu
+    }
+
+    void LateUpdate()
+    {
+        // Nếu chưa set pivot thì bỏ qua (an toàn, không crash)
+        if (recoilPivot == null || gunData == null) return;
+
+        // 1) Hồi target về 0 theo thời gian
+        _recoilTarget = Vector3.MoveTowards(
+            _recoilTarget,
+            Vector3.zero,
+            gunData.recoilReturnSpeed * Time.deltaTime
+        );
+
+        // 2) Mượt current → target
+        float smoothT = 1f / Mathf.Max(0.0001f, gunData.recoilSnappiness);
+        _recoilCurrent.x = Mathf.SmoothDampAngle(_recoilCurrent.x, _recoilTarget.x, ref _recoilVel.x, smoothT);
+        _recoilCurrent.y = Mathf.SmoothDampAngle(_recoilCurrent.y, _recoilTarget.y, ref _recoilVel.y, smoothT);
+        _recoilCurrent.z = Mathf.SmoothDampAngle(_recoilCurrent.z, _recoilTarget.z, ref _recoilVel.z, smoothT);
+
+        // 3) Áp lên pivot
+        recoilPivot.localRotation = Quaternion.Euler(_recoilCurrent);
     }
 
     // --------- IWeapon adapters ---------
@@ -165,6 +196,8 @@ public class PlayerShoot : MonoBehaviour, IWeapon, IReloadable
         muzzleFlashParticle?.Play();
         PlayAtGun(gunData.shootSound);
 
+        ApplyRecoilKick();
+
         int pellets = (gunData.gunType == GunType.Shotgun) ? gunData.pelletCount : 1;
         for (int i = 0; i < pellets; i++)
         {
@@ -212,6 +245,24 @@ public class PlayerShoot : MonoBehaviour, IWeapon, IReloadable
                 cooldown = 1f;
         }
         StartCoroutine(ShotCooldown(cooldown));
+    }
+
+    private void ApplyRecoilKick()
+    {
+        if (recoilPivot == null || gunData == null) return;
+
+        // Lệch ngang ngẫu nhiên (trái/phải)
+        float side = (Random.value < 0.5f ? -1f : 1f) * gunData.recoilHorizontalRandom;
+
+        // Kick cơ bản từ GunData
+        float p = gunData.recoilPitch;                  // pitch lên
+        float y = gunData.recoilYaw * (1f + side);      // yaw lệch trái/phải
+        float r = gunData.recoilRoll;                   // roll nghiêng
+
+        // Cộng dồn vào target, kẹp theo clamp
+        _recoilTarget.x = Mathf.Clamp(_recoilTarget.x + p, -gunData.recoilMaxPitch, gunData.recoilMaxPitch);
+        _recoilTarget.y = Mathf.Clamp(_recoilTarget.y + y, -gunData.recoilMaxYaw, gunData.recoilMaxYaw);
+        _recoilTarget.z = Mathf.Clamp(_recoilTarget.z + r, -gunData.recoilMaxRoll, gunData.recoilMaxRoll);
     }
 
     private bool IsShotAnimPlaying()

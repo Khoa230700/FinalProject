@@ -57,6 +57,26 @@ public class GunData : ScriptableObject
     [Header("Shop")]
     public int bulletRefillCost = 10; // cost mỗi viên đạn
 
+    [Header("Recoil")]
+    [Tooltip("Độ đá lên mỗi viên (độ).")]
+    public float recoilPitch = 3.0f;
+    [Tooltip("Độ lệch trái/phải mỗi viên (độ).")]
+    public float recoilYaw = 0.8f;
+    [Tooltip("Độ nghiêng nòng (roll) mỗi viên (độ).")]
+    public float recoilRoll = 0.2f;
+    [Range(0f, 1f), Tooltip("Ngẫu nhiên lệch ngang (0=không ngẫu nhiên, 1=dao động mạnh).")]
+    public float recoilHorizontalRandom = 0.5f;
+
+    [Tooltip("Tốc độ hồi target về 0 (deg/s).")]
+    public float recoilReturnSpeed = 10f;
+    [Tooltip("Độ mượt (snappiness) khi áp current → target (cao = bám nhanh).")]
+    public float recoilSnappiness = 12f;
+
+    [Header("Recoil Clamp (giới hạn tuyệt đối)")]
+    public float recoilMaxPitch = 20f;
+    public float recoilMaxYaw = 25f;
+    public float recoilMaxRoll = 10f;
+
     // ========================= UPGRADE CURVES (giống Melee) =========================
     // Level 0 tương đương level 1 cho người chơi (đây là index), bạn có thể xem curve ở cột X.
     [Header("Upgrade Curves (nhân hệ số theo level)")]

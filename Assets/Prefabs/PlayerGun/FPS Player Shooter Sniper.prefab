@@ -2093,7 +2093,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 5092840944354353179}
+  - {fileID: 8132981624837392599}
   - {fileID: 4598753823603382099}
   - {fileID: 6367786861773823768}
   - {fileID: 500052456234813616}
@@ -2937,6 +2937,7 @@ MonoBehaviour:
   gunAudioSource: {fileID: 1926936187852394843}
   reloadSound: {fileID: 8300000, guid: 018ed895eff3f18499db2b31ea64ed30, type: 3}
   emptyMagSound: {fileID: 0}
+  recoilPivot: {fileID: 8132981624837392599}
   currentAmmo: 0
   reserveAmmo: 0
 --- !u!95 &6418266595371665982
@@ -4023,6 +4024,7 @@ MonoBehaviour:
   gunAudioSource: {fileID: 2371396123406249843}
   reloadSound: {fileID: 8300000, guid: 114af170ae509b948a811968b4248df6, type: 3}
   emptyMagSound: {fileID: 0}
+  recoilPivot: {fileID: 8132981624837392599}
   currentAmmo: 0
   reserveAmmo: 0
 --- !u!95 &5748523995275120256
@@ -7504,11 +7506,11 @@ Transform:
   m_GameObject: {fileID: 8572163405918085907}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.063, y: 0.687, z: -0.191}
+  m_LocalPosition: {x: 0.062999964, y: 0.6869999, z: -0.19099998}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 5782188107627114610}
+  m_Father: {fileID: 8132981624837392599}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!20 &6698248995052356686
 Camera:
@@ -7923,6 +7925,38 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 8926310437412220109}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &8954604413084528752
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8132981624837392599}
+  m_Layer: 8
+  m_Name: Sniper Camera
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8132981624837392599
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8954604413084528752}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 5092840944354353179}
+  m_Father: {fileID: 5782188107627114610}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &9003177200240936430
 GameObject:
