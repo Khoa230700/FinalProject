@@ -10,13 +10,9 @@ public class suicideEnemy : MonoBehaviour
     NavMeshAgent agent;
     Animator enemyAnimation;
 
-   
+    [SerializeField]private int attackDamage = 1;
     
-    public int attackDamage = 1;
-    public float attackSpeed = 1.5f;
-    private float nextAttackTime = 0f;
-
-    public float attackCooldown = 4f;
+    [SerializeField]private float attackCooldown = 9f;
     private float lastAttackTime;
     public float attackRange = 2f;
     public float chaseRange = 10f;
@@ -80,24 +76,35 @@ public class suicideEnemy : MonoBehaviour
     {
         IDamageable target = GetClosestDamageableInRange();
 
-        //if (target != null && Time.time >= lastAttackTime + attackCooldown)
+
+        //if (Time.time - lastAttackTime >= attackCooldown)
         //{
-        //    target.TakeDamage(damage);
         //    lastAttackTime = Time.time;
+        //    // damage player()
+        //    Debug.Log("Enemy attacks the player!");
+
+
+        //    Collider[] colliders = Physics.OverlapSphere(transform.position, 4f);
+        //    foreach (Collider collider in colliders)
+        //    {
+        //        target.TakeDamage(attackDamage);
+        //        lastAttackTime = Time.time;
+        //    }
+
+        //    GameObject explo = Instantiate(explosion, transform.position, transform.rotation);
+        //    Destroy(explo, explosionlifetime);
+        //    enemyAnimation.SetTrigger("attack");
+        //    StartCoroutine(DestroyAfterDelay());
+        //    soundController.PlayAttackSound();
         //}
-        if (Time.time - lastAttackTime >= attackCooldown)
+
+        //fix damage
+        if (target != null && Time.time - lastAttackTime >= attackCooldown)
         {
             lastAttackTime = Time.time;
-            // damage player()
             Debug.Log("Enemy attacks the player!");
 
-
-            Collider[] colliders = Physics.OverlapSphere(transform.position, 4f);
-            foreach (Collider collider in colliders)
-            {
-                target.TakeDamage(attackDamage);
-                lastAttackTime = Time.time;
-            }
+            target.TakeDamage(attackDamage); // Damage only the correct target once
 
             GameObject explo = Instantiate(explosion, transform.position, transform.rotation);
             Destroy(explo, explosionlifetime);
