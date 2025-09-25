@@ -563,7 +563,7 @@ Transform:
   m_GameObject: {fileID: 1696342014742835916}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.181, z: 0.753}
+  m_LocalPosition: {x: -0.008, y: 1.203, z: 0.135}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -915,7 +915,7 @@ Transform:
   m_GameObject: {fileID: 3135330847213841400}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: 1, z: -0, w: 0}
-  m_LocalPosition: {x: 0, y: 0.799, z: 0.775}
+  m_LocalPosition: {x: 0, y: 1.24, z: 0.775}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3219,6 +3219,7 @@ MonoBehaviour:
   hookPrefab: {fileID: 1855514551014697714, guid: 523a55490ced2044d9f1c03f1be1ae53, type: 3}
   firePoint: {fileID: 597667404933724527}
   pullSpeed: 10
+  aimHeightOffset: 0.5
 --- !u!114 &2420646766827667407
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3514,7 +3515,7 @@ Transform:
   m_GameObject: {fileID: 5611413298309231307}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: 1, z: -0, w: 0}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 1.06, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
