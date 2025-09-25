@@ -36,6 +36,15 @@ MonoBehaviour:
   tracerPrefab: {fileID: 6749693277989217856, guid: dfcafcdd61ac0e447b7e869afc9b8d0c, type: 3}
   shootSound: {fileID: 8300000, guid: 0a08d0bbcf2f7c34fb3f78c8db0a7c97, type: 3}
   bulletRefillCost: 10
+  recoilPitch: -10
+  recoilYaw: 2
+  recoilRoll: 1
+  recoilHorizontalRandom: 1
+  recoilReturnSpeed: 10
+  recoilSnappiness: 12
+  recoilMaxPitch: 20
+  recoilMaxYaw: 25
+  recoilMaxRoll: 10
   damageByLevel:
     serializedVersion: 2
     m_Curve:

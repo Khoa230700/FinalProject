@@ -324,6 +324,38 @@ Transform:
   - {fileID: 9194968907925917356}
   m_Father: {fileID: 5919220625691863760}
   m_LocalEulerAnglesHint: {x: -37.41917, y: -134.82558, z: 120.2944}
+--- !u!1 &328242935755130439
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5200036462562893491}
+  m_Layer: 8
+  m_Name: Sodier Cam
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5200036462562893491
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 328242935755130439}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 4194345802640244504}
+  m_Father: {fileID: 6365296034206012781}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &396415132287318887
 GameObject:
   m_ObjectHideFlags: 0
@@ -457,11 +489,11 @@ Transform:
   m_GameObject: {fileID: 521923561464369792}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.84, z: -0.08516693}
+  m_LocalPosition: {x: 0, y: 0.84000003, z: -0.08516693}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 6365296034206012781}
+  m_Father: {fileID: 5200036462562893491}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!20 &1853486128107954165
 Camera:
@@ -12514,6 +12546,7 @@ MonoBehaviour:
   gunAudioSource: {fileID: 1768139399252358845}
   reloadSound: {fileID: 8300000, guid: d240a6fea4d635d4d9598a531417a0ee, type: 3}
   emptyMagSound: {fileID: 0}
+  recoilPivot: {fileID: 5200036462562893491}
   currentAmmo: 0
   reserveAmmo: 0
 --- !u!114 &1099547618457403765
@@ -19383,7 +19416,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 4194345802640244504}
+  - {fileID: 5200036462562893491}
   - {fileID: 6001001764376613334}
   - {fileID: 1420001275818498271}
   - {fileID: 5220391476500340237}
@@ -31691,6 +31724,7 @@ MonoBehaviour:
   gunAudioSource: {fileID: 8017790302251922082}
   reloadSound: {fileID: 8300000, guid: 018ed895eff3f18499db2b31ea64ed30, type: 3}
   emptyMagSound: {fileID: 0}
+  recoilPivot: {fileID: 5200036462562893491}
   currentAmmo: 0
   reserveAmmo: 0
 --- !u!114 &3274791043214755027
