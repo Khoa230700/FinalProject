@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PauseGameUI : MonoBehaviour
 {
@@ -8,6 +9,7 @@ public class PauseGameUI : MonoBehaviour
     private void Awake()
     {
         Instance = this;
+        SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
     private void Start()
@@ -31,5 +33,14 @@ public class PauseGameUI : MonoBehaviour
         isPause = true;
         if (meshMouseLook != null) meshMouseLook.Show();
         AudioManager.Instance.PauseAll(false);
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        if (scene.name == "MainMenu")
+        {
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+        }
     }
 }
