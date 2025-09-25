@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
 
 public class BombBotAI : MonoBehaviour
 {
@@ -58,59 +57,37 @@ public class BombBotAI : MonoBehaviour
 
     private void BeHit()
     {
-        // Khi bị hit thì chạy coroutine block
-        StartCoroutine(BlockRoutine());
-    }
-
-    private IEnumerator BlockRoutine()
-    {
-        isBlocked = true;
-        isWalking = false;
+        isWalking = false;   // dừng lại
+        isBlocked = true;    // đang bị block
 
         rb.linearVelocity = Vector3.zero;
         rb.isKinematic = true;
 
         animator.SetBool("Block", true);
+        animator.SetBool("isMoving", false);
 
-        // Chờ tới khi thật sự vào state Block
-        AnimatorStateInfo info = animator.GetCurrentAnimatorStateInfo(0);
-        while (!info.IsName("Block"))
-        {
-            yield return null;
-            info = animator.GetCurrentAnimatorStateInfo(0);
-        }
-
-        Debug.Log($"[BombBotAI] Bắt đầu Block trong {info.length} giây");
-
-        // Chờ hết thời gian state Block
-        yield return new WaitForSeconds(info.length);
-
-        // Đảm bảo ra khỏi state Block
-        while (info.IsName("Block"))
-        {
-            yield return null;
-            info = animator.GetCurrentAnimatorStateInfo(0);
-        }
-
-        animator.SetBool("Block", false);
-
-        rb.isKinematic = false;
-        isBlocked = false;
-        isWalking = true;
-
-        Debug.Log("[BombBotAI] Kết thúc Block, bot tiếp tục di chuyển");
+        Debug.Log("[BombBotAI] Bot bị hit → vào trạng thái Block");
     }
+
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Enemy"))
         {
             BeHit();
-            Debug.Log("Hit Enemy – Blocked");
+            Debug.Log("Hit Enemy – Bot Blocked");
         }
         else if (other.CompareTag("Player"))
         {
+            // Khi Player chạm → bot trở lại bình thường ngay
             isWalking = true;
-            Debug.Log("Hit Player – Move on");
+            isBlocked = false;
+            rb.isKinematic = false;
+
+            animator.SetBool("Block", false);
+            animator.SetBool("isMoving", true);
+            animator.SetFloat("Vertical", 1f);
+
+            Debug.Log("Hit Player – Bot thoát Block và di chuyển lại");
         }
     }
 }
