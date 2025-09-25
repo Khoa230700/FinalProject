@@ -13,7 +13,6 @@ public class L4DBotController : MonoBehaviour
     [Header("AI Settings")]
     [SerializeField] float detectionRange = 20f;
     [SerializeField] float fireRate = 0.5f;
-    [SerializeField] float bulletSpeed = 50f;
     [SerializeField] float followPlayerDistance = 8f;   // khoảng cách để theo player khi không có zombie
     [SerializeField] float combatStoppingDistance = 0f; // khoảng cách khi bắn zombie
 
@@ -161,22 +160,35 @@ public class L4DBotController : MonoBehaviour
                 wFX_LightFlicker.FlickerOnce();
             }
 
-            var hb = hit.collider.GetComponentInChildren<Hitbox>();
+            // 1. Hitbox (child)
+            var hb = hit.collider.GetComponent<Hitbox>()
+                  ?? hit.collider.GetComponentInChildren<Hitbox>()
+                  ?? hit.collider.GetComponentInParent<Hitbox>();
             if (hb != null)
             {
                 hb.ownerHealthSystem.TakeDamage(20);
                 hb.OnHit(20, hit.point);
+                return; // Ưu tiên hitbox → return luôn
             }
 
-            var health = hit.collider.GetComponent<EnemyM>();
-            if (health != null)
+            // 2. Enemy thường (script ở parent hoặc chính collider)
+            var enemy = hit.collider.GetComponent<EnemyM>()
+                     ?? hit.collider.GetComponentInParent<EnemyM>()
+                     ?? hit.collider.GetComponentInChildren<EnemyM>();
+            if (enemy != null)
             {
-                health.TakeDamage(20);
+                enemy.TakeDamage(20);
+                return;
             }
-            var healthBoss = hit.collider.GetComponent<BossHealth>();
-            if (healthBoss != null)
+
+            // 3. Boss
+            var boss = hit.collider.GetComponent<BossHealth>()
+                     ?? hit.collider.GetComponentInParent<BossHealth>()
+                     ?? hit.collider.GetComponentInChildren<BossHealth>();
+            if (boss != null)
             {
-                healthBoss.TakeDamage(50);
+                boss.TakeDamage(50);
+                return;
             }
         }
     }
