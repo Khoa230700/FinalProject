@@ -19,7 +19,7 @@ public class TestAll : MonoBehaviour
         if (player != null)
         {
             player.GetComponent<PlayerHealthSystem>()
-                  .TakeDamage(Random.Range(100, maxDamge), transform.position);
+                  .TakeDamage(maxDamge, transform.position);
         }
     }
 }
