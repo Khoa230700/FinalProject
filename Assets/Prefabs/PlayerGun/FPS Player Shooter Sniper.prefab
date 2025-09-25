@@ -2914,7 +2914,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   armsAnimator: {fileID: 2228220168125291594}
   playerMovement: {fileID: 8575215206317879289}
-  weaponSwitcher: {fileID: 0}
+  weaponSwitcher: {fileID: 7414361622151578782}
 --- !u!114 &8987884527693232970
 MonoBehaviour:
   m_ObjectHideFlags: 0
