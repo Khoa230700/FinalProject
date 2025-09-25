@@ -1162,6 +1162,7 @@ GameObject:
   - component: {fileID: -5324489661830361494}
   - component: {fileID: -1937878382126220471}
   - component: {fileID: 675162023306379931}
+  - component: {fileID: 358249040994484387}
   m_Layer: 6
   m_Name: Tail
   m_TagString: Enemy
@@ -2549,6 +2550,29 @@ MonoBehaviour:
   attackClip: {fileID: 8300000, guid: b83176a582cf04b46a08167af4c629ca, type: 3}
   attackClip2: {fileID: 8300000, guid: 96adf2b783f50d943857c31629c6808c, type: 3}
   deathClip: {fileID: 8300000, guid: e29eb7c21de9b5f4ba3175139803b45e, type: 3}
+--- !u!136 &358249040994484387
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2340879936498945498}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.5
+  m_Height: 1
+  m_Direction: 1
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &2344813332677895130
 GameObject:
   m_ObjectHideFlags: 0
