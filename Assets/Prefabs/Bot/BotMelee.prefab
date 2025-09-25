@@ -391,6 +391,7 @@ MonoBehaviour:
   rb: {fileID: 0}
   capsuleCollider: {fileID: 0}
   animator: {fileID: 0}
+  speed: 2
 --- !u!114 &6581119235468300611
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -416,6 +417,7 @@ MonoBehaviour:
   anim: {fileID: 5229804335748444862}
   healthBar: {fileID: 0}
   shieldBar: {fileID: 0}
+  failedUI: {fileID: 0}
 --- !u!114 &1884421177641275335
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -932,6 +934,7 @@ GameObject:
   - component: {fileID: 2791836993882437897}
   - component: {fileID: 7638907204070240058}
   - component: {fileID: 6590447101737242600}
+  - component: {fileID: 9086435337682943361}
   m_Layer: 8
   m_Name: Axe
   m_TagString: Untagged
@@ -1020,13 +1023,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   damage: 50
-  attackRange: 0.22
-  attackRadius: 1.41
-  cooldown: 1
-  swingOrigin: {fileID: 2801550588296635517}
-  enemyMask:
-    serializedVersion: 2
-    m_Bits: 64
 --- !u!65 &6590447101737242600
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1044,10 +1040,31 @@ BoxCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 1
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Size: {x: 0.028448112, y: 0.48213378, z: 0.16071181}
   m_Center: {x: -0.000000001876623, y: 0.03642372, z: -0.00000002595624}
+--- !u!135 &9086435337682943361
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2804795984597428175}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 0.13724671
+  m_Center: {x: 0.00000006246749, y: 0.11907968, z: -0.00000009512491}
 --- !u!1 &2862051660240668250
 GameObject:
   m_ObjectHideFlags: 0
