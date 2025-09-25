@@ -22,7 +22,7 @@ public class PauseGameUI : MonoBehaviour
         Time.timeScale = 1f;
         isPause = false;
         if (meshMouseLook != null) meshMouseLook.Hide();
-        AudioManager.Instance.MuteAllExceptManager(false);
+        AudioManager.Instance.ResumeAll();
     }
 
     public void Pause()
@@ -30,6 +30,6 @@ public class PauseGameUI : MonoBehaviour
         Time.timeScale = 0f;
         isPause = true;
         if (meshMouseLook != null) meshMouseLook.Show();
-        AudioManager.Instance.MuteAllExceptManager(true);
+        AudioManager.Instance.PauseAll(false);
     }
 }

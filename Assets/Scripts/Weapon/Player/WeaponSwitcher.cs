@@ -160,9 +160,9 @@ public class WeaponSwitcher : MonoBehaviour
         if (switchSound == null) return;
 
         if (audioSource != null)
-            audioSource.PlayOneShot(switchSound);
+            audioSource.PlayOneShot(switchSound, AudioManager.Instance.GetSFXVolume());
         else
-            AudioSource.PlayClipAtPoint(switchSound, transform.position);
+            AudioSource.PlayClipAtPoint(switchSound, transform.position, AudioManager.Instance.GetSFXVolume());
     }
 
     // ---------------- ACTIVATE ----------------

@@ -19441,7 +19441,7 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 8d337cf7abc3e7b4088a5f312bc2afa8, type: 3}
   jumpSound: {fileID: 8300000, guid: bccc4cc42c95a764b9432e451cc0b719, type: 3}
   landSound: {fileID: 8300000, guid: 43669fdbb2794cd4896669499e81f407, type: 3}
-  footstepVolume: 2.44
+  footstepVolume: 0
   runVolumeMultiplier: 1.64
   jumpVolume: 1
   landVolume: 1

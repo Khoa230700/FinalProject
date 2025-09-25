@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using Unity.Collections;
 using UnityEngine;
 
@@ -21,6 +22,8 @@ public class AudioManager : MonoBehaviour
     private float musicVolume = 1f;
     private float sfxVolume = 1f;
     private AudioSource[] allAudioSources;
+    private bool isFadingMusic;
+    private bool isFadingSFX;
 
     private string stringPrefsSlider = "Slider";
 
@@ -34,18 +37,6 @@ public class AudioManager : MonoBehaviour
         SetMasterVolume(PlayerPrefs.GetFloat(masterSlider.sliderTag + stringPrefsSlider, 100f));
         SetMusicVolume(PlayerPrefs.GetFloat(musicSlider.sliderTag + stringPrefsSlider, 100f));
         SetSFXVolume(PlayerPrefs.GetFloat(sfxSlider.sliderTag + stringPrefsSlider, 100f));
-    }
-
-    public void MuteAllExceptManager(bool mute)
-    {
-        allAudioSources = FindObjectsByType<AudioSource>(FindObjectsInactive.Include, FindObjectsSortMode.None);
-        foreach (var audio in allAudioSources)
-        {
-            if (audio == musicSource || audio == sfxSource)
-                continue;
-
-            audio.mute = mute;
-        }
     }
 
     public void SetMasterVolume(float value)
@@ -68,8 +59,11 @@ public class AudioManager : MonoBehaviour
 
     private void ApplyVolumes()
     {
-        musicSource.volume = musicVolume * masterVolume;
-        sfxSource.volume = sfxVolume * masterVolume;
+        if (!isFadingMusic)
+            musicSource.volume = musicVolume * masterVolume;
+
+        if (!isFadingSFX)
+            sfxSource.volume = sfxVolume * masterVolume;
     }
 
     public void PlayMusic(string name)
@@ -92,22 +86,96 @@ public class AudioManager : MonoBehaviour
         sfxSource.PlayOneShot(sound.clip, sfxVolume * masterVolume);
     }
 
-    public void StopMusic()
+    public void FadeMusic(float duration, bool fadeIn)
     {
-        if (musicSource.isPlaying)
-            musicSource.Stop();
+        StartCoroutine(FadeAudio(musicSource, fadeIn, duration));
     }
 
-    public void StopSFX()
+    public void FadeSFX(float duration, bool fadeIn)
     {
-        if (sfxSource.isPlaying)
-            sfxSource.Stop();
+        StartCoroutine(FadeAudio(sfxSource, fadeIn, duration));
     }
 
-    public void StopAllAudio()
+    private IEnumerator FadeAudio(AudioSource source, bool fadeIn, float duration)
     {
-        StopMusic();
-        StopSFX();
+        bool isMusic = source == musicSource;
+        if (isMusic) isFadingMusic = true;
+        else isFadingSFX = true;
+
+        float time = 0f;
+
+        if (fadeIn && !source.isPlaying)
+            source.Play();
+
+        while (time < duration)
+        {
+            time += Time.deltaTime;
+            float t = time / duration;
+
+            float currentTarget = (source == musicSource)
+                ? musicVolume * masterVolume
+                : sfxVolume * masterVolume;
+
+            float factor = fadeIn ? t : 1f - t;
+
+            source.volume = currentTarget * factor;
+
+            yield return null;
+        }
+
+        if (!fadeIn)
+            source.Stop();
+
+        if (isMusic) isFadingMusic = false;
+        else isFadingSFX = false;
+
+        ApplyVolumes();
+    }
+
+    public void PauseAll(bool stopCompletely)
+    {
+        if (musicSource != null && musicSource.isPlaying)
+        {
+            if (stopCompletely)
+                musicSource.Stop();
+            else
+                musicSource.Pause();
+        }
+
+        if (sfxSource != null && sfxSource.isPlaying)
+        {
+            if (stopCompletely)
+                sfxSource.Stop();
+            else
+                sfxSource.Pause();
+        }
+
+        allAudioSources = FindObjectsByType<AudioSource>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+        foreach (var audio in allAudioSources)
+        {
+            if (audio == musicSource || audio == sfxSource) continue;
+
+            if (stopCompletely)
+                audio.Stop();  
+            else
+                audio.Pause();
+        }
+    }
+
+    public void ResumeAll()
+    {
+        if (musicSource != null)
+            musicSource.UnPause();
+
+        if (sfxSource != null)
+            sfxSource.UnPause();
+
+        allAudioSources = FindObjectsByType<AudioSource>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+        foreach (var audio in allAudioSources)
+        {
+            if (audio == musicSource || audio == sfxSource) continue;
+            audio.UnPause();
+        }
     }
 
     public float GetMasterVolume() => masterVolume;

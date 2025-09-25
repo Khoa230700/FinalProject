@@ -16,7 +16,7 @@ public class EnemySoundController : MonoBehaviour
     public static int CurrentDeathSounds = 0;
     public static int MaxDeathSounds = 2;
 
-    
+
 
     void Awake()
     {
@@ -30,6 +30,7 @@ public class EnemySoundController : MonoBehaviour
         if (!audioSource.isPlaying && !isDead && attackClip != null && CurrentPlayingSounds < MaxPlayingSounds)
         {
             audioSource.clip = attackClip;
+            audioSource.volume = AudioManager.Instance.GetSFXVolume();
             audioSource.Play();
             CurrentPlayingSounds++;
 
@@ -42,6 +43,7 @@ public class EnemySoundController : MonoBehaviour
         if (!audioSource.isPlaying && !isDead && attackClip2 != null && CurrentPlayingSounds < MaxPlayingSounds)
         {
             audioSource.clip = attackClip2;
+            audioSource.volume = AudioManager.Instance.GetSFXVolume();
             audioSource.Play();
             CurrentPlayingSounds++;
 
@@ -57,6 +59,7 @@ public class EnemySoundController : MonoBehaviour
             audioSource.Stop(); // Stop current sound
 
             audioSource.clip = deathClip;
+            audioSource.volume = AudioManager.Instance.GetSFXVolume();
             audioSource.Play();
 
             CurrentPlayingSounds++;

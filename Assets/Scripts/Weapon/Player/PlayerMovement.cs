@@ -20,10 +20,7 @@ public class PlayerMovement : MonoBehaviour
     public AudioClip landSound;
 
     [Header("Footstep Volume")]
-    [Range(0f, 3f)] public float footstepVolume = 1.0f;       // tăng/giảm to nhỏ bước chân
     [Range(0f, 3f)] public float runVolumeMultiplier = 1.25f; // chạy to hơn đi bộ
-    [Range(0f, 3f)] public float jumpVolume = 1.0f;           // âm lượng nhảy
-    [Range(0f, 3f)] public float landVolume = 1.0f;           // âm lượng tiếp đất
 
     [Header("Footstep Timing")]
     [Tooltip("Khoảng thời gian giữa 2 bước chân khi đi bộ.")]
@@ -115,7 +112,7 @@ public class PlayerMovement : MonoBehaviour
             velocity.y = Mathf.Sqrt(2f * g * playerStats.jumpHeight);
 
             // Âm thanh nhảy (dùng volume riêng)
-            PlayOneShot(jumpSound, jumpVolume);
+            PlayOneShot(jumpSound, AudioManager.Instance.GetSFXVolume());
         }
 
         // Gravity
@@ -126,7 +123,7 @@ public class PlayerMovement : MonoBehaviour
         if (!wasGrounded && isGrounded)
         {
             if (Mathf.Abs(velocity.y) > 0.1f)
-                PlayOneShot(landSound, landVolume);
+                PlayOneShot(landSound, AudioManager.Instance.GetSFXVolume());
 
             // Reset stepTimer để nhịp bước chân ko dồn ngay khi vừa tiếp đất
             stepTimer = 0f;
@@ -151,7 +148,7 @@ public class PlayerMovement : MonoBehaviour
         if (stepTimer <= 0f)
         {
             // Tính volume: đi bộ = footstepVolume; chạy = footstepVolume * runVolumeMultiplier
-            float vol = footstepVolume * (isRunning ? runVolumeMultiplier : 1f);
+            float vol = AudioManager.Instance.GetSFXVolume() * (isRunning ? runVolumeMultiplier : 1f);
             PlayRandomFootstep(vol);
             stepTimer = interval;
         }

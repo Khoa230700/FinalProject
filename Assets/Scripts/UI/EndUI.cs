@@ -30,8 +30,6 @@ public class EndUI : MonoBehaviour
         int deathCount = SelectorSpawner.Instance.Player.GetComponent<PlayerHealthSystem>().GetDeathCount();
         int killCount = 0;
 
-        Debug.Log($"Coins: {sessionCoins}, Deaths: {deathCount}, Kills: {killCount}");
-
         if (sessionCoins <= 0 && deathCount <= 0 && killCount <= 0)
         {
             gainPanel.SetActive(false);
@@ -67,9 +65,10 @@ public class EndUI : MonoBehaviour
                 DOTween.To(() => 0, x =>
                 {
                     coinGainText.text = $" {x:N0}";
-                    if (x != lastValue) // chỉ phát khi số thay đổi
+                    if (x != lastValue)
                     {
                         lastValue = x;
+                        AudioManager.Instance.PlaySFX("CoinCount");
                     }
                 },
                 sessionCoins, 1.5f)
@@ -111,7 +110,7 @@ public class EndUI : MonoBehaviour
 
     public void PlayAudio()
     {
-        AudioManager.Instance.StopAllAudio();
+        AudioManager.Instance.PauseAll(true);
         if (isVictory) AudioManager.Instance.PlaySFX("Victory");
         else AudioManager.Instance.PlaySFX("Failed");
     }

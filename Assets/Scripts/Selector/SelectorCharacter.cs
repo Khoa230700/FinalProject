@@ -52,6 +52,7 @@ public class SelectorCharacter : MonoBehaviour
         lastIndex = selectedIndex;
         selectedIndex = index;
         AudioManager.Instance.PlaySFX("Ready");
+        Debug.Log("Selected character: " + previewCharacters[selectedIndex].name);
         UpdatePreview();
     }
 
