@@ -11,7 +11,7 @@ public class TailBulltet : MonoBehaviour
     //        var health = other.GetComponent<PlayerHealth>().TakeDamage(10);
 
             
-    public float damage = 1f;
+    [SerializeField]private float damage = 2f;
 
     private void OnTriggerEnter(Collider other)
     {
