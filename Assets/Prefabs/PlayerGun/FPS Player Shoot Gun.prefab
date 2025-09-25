@@ -570,8 +570,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   data: {fileID: 11400000, guid: 62b4d60c4bc45754c8098b4d63d130c2, type: 2}
   level: 0
-  armsAnimator: {fileID: 0}
-  swingOrigin: {fileID: 0}
+  armsAnimator: {fileID: 7796485733909455407}
+  swingOrigin: {fileID: 1308769137523631464}
   aimCamera: {fileID: 8408050568194425797}
   weaponUI: {fileID: 0}
   audioSource: {fileID: 0}
@@ -624,8 +624,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   armsAnimator: {fileID: 7796485733909455407}
-  playerMovement: {fileID: 0}
-  weaponSwitcher: {fileID: 0}
+  playerMovement: {fileID: 1535889337764389916}
+  weaponSwitcher: {fileID: 2380051268329280892}
 --- !u!82 &60145200209597217
 AudioSource:
   m_ObjectHideFlags: 0
@@ -41895,7 +41895,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 92d32508d9a95304b9f8f090ad2003d0, type: 3}
       propertyPath: m_Name
-      value: Axe
+      value: Axe Shoot Gun
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 92d32508d9a95304b9f8f090ad2003d0, type: 3}
       propertyPath: m_IsActive
