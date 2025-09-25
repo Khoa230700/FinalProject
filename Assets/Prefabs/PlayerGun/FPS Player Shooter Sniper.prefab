@@ -2142,7 +2142,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f93bbcc436795e5438b92624b16fce2d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerStats: {fileID: 11400000, guid: 8606be53847325644b6794de9ebc91ad, type: 2}
+  playerStats: {fileID: 11400000, guid: fa548c9bf05b7a144be146c1d5ab7047, type: 2}
   csgoScope: {fileID: 5506603170031170302}
   audioSource: {fileID: 6982715678529923871}
   footstepClips:
