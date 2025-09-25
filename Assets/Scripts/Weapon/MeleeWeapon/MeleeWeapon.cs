@@ -29,10 +29,6 @@ public class MeleeWeapon : MonoBehaviour, IWeapon
     [Tooltip("Âm hụt, khi không trúng gì.")]
     public AudioClip[] missClips;
 
-    [Range(0f, 2f)] public float swingVolume = 1f;
-    [Range(0f, 2f)] public float hitVolume = 1f;
-    [Range(0f, 2f)] public float missVolume = 1f;
-
     [Header("Audio Options")]
     [Tooltip("Chỉ phát âm trúng 1 lần trong mỗi cú vung để tránh spam.")]
     public bool playHitSfxOncePerSwing = true;
@@ -91,7 +87,7 @@ public class MeleeWeapon : MonoBehaviour, IWeapon
 
         // Âm "whoosh" vung vũ khí (phát ngay khi bắt đầu vung)
         var swingClip = PickOne(swingClips, data ? data.swingSfx : null);
-        PlayAt(swingClip, swingOrigin.position, swingVolume);
+        PlayAt(swingClip, swingOrigin.position, AudioManager.Instance.GetSFXVolume());
 
         // “Damage window”
         yield return new WaitForSeconds(data.swingDelay);
@@ -144,7 +140,7 @@ public class MeleeWeapon : MonoBehaviour, IWeapon
         if (!_anyHitThisSwing)
         {
             var missClip = PickOne(missClips, null);
-            PlayAt(missClip, swingOrigin.position, missVolume);
+            PlayAt(missClip, swingOrigin.position, AudioManager.Instance.GetSFXVolume());
         }
 
         yield return new WaitForSeconds(Mathf.Max(0f, data.GetCooldown(level)));
@@ -231,7 +227,7 @@ public class MeleeWeapon : MonoBehaviour, IWeapon
         var clip = PickOne(hitClips, data ? data.hitSfx : null);
         if (clip == null) return;
 
-        PlayAt(clip, pos, hitVolume);
+        PlayAt(clip, pos, AudioManager.Instance.GetSFXVolume());
         _playedHitThisSwing = true;
     }
     // -----------------------
