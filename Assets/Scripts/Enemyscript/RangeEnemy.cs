@@ -8,7 +8,7 @@ public class RangeEnemy : MonoBehaviour
     public float stopDistance = 10f;
     public float meleeDistance = 2f;
     
-    public float fireRate = 2f;
+    [SerializeField]private float fireRate = 1f;
 
     public GameObject rangedProjectile;
     public Transform firePoint;
@@ -82,32 +82,13 @@ public class RangeEnemy : MonoBehaviour
             bullet.GetComponent<Rigidbody>().AddForce(firePoint.forward * bulletSpeed);
             Destroy(bullet, bulletTimelife);
             bulleteff.Play();
+            animator.SetTrigger("rangeattack");
+            soundController.PlayAttackSound();
         }
-        animator.SetTrigger("rangeattack");
-        soundController.PlayAttackSound();
+        
         
     }
 
-    //void MeleeAttack()
-    //{
-        
-    //    Debug.Log("Enemy uses melee attack!");
-    //    animator.SetTrigger("meleeattack");
-    //    GameObject player = GameObject.FindGameObjectWithTag("Player");
-    //    var health = player.GetComponent<PlayerHealth>();
-    //    health.TakeDamage(0.1f, 0, transform.position);
-
-    //}
-    //void MeleeAttack()
-    //{
-
-    //    Debug.Log("Enemy uses melee attack!");
-    //    animator.SetTrigger("meleeattack");
-    //    GameObject player = GameObject.FindGameObjectWithTag("Player");
-    //    var health = player.GetComponent<testPlayerHealth>();
-    //    health.TakeDamage(1);
-
-    //}
 
     void FindClosestTarget()
     {
