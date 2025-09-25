@@ -233,12 +233,12 @@ public class PlayerShoot : MonoBehaviour, IWeapon, IReloadable
         if (clip == null) return;
         if (gunAudioSource != null)
         {
-            gunAudioSource.PlayOneShot(clip);
+            gunAudioSource.PlayOneShot(clip, AudioManager.Instance.GetSFXVolume());
         }
         else
         {
             var pos = (shootPoint != null) ? shootPoint.position : transform.position;
-            AudioSource.PlayClipAtPoint(clip, pos);
+            AudioSource.PlayClipAtPoint(clip, pos, AudioManager.Instance.GetSFXVolume());
         }
     }
 

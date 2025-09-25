@@ -82,7 +82,7 @@ public class LoadingScreenUI : MonoBehaviour
         if (instance.isProcessingLoad) return; // Ngăn trùng lặp
 
         instance.gameObject.SetActive(true);
-        AudioManager.Instance.MuteAllExceptManager(false);
+        AudioManager.Instance.PauseAll(true);
         instance.StartCoroutine(instance.LoadSceneRoutine(targetScene));
     }
     #endregion
@@ -207,7 +207,7 @@ public class LoadingScreenUI : MonoBehaviour
             loadingProcess.allowSceneActivation = true;
 
         Application.backgroundLoadingPriority = ThreadPriority.Normal;
-        if (Time.timeScale == 0f) Time.timeScale = 1f;
+        if (PauseGameUI.Instance != null) PauseGameUI.Instance.Resume();
 
         // Fade out và hủy
         StartCoroutine(FadeCanvasGroup(1f, 0f, 1f / fadeSpeed, () =>
