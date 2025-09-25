@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3950e800c03673d46b7dc5fad36128ba, type: 3}
   m_Name: Soilder
   m_EditorClassIdentifier: 
-  walkSpeed: 5
+  walkSpeed: 6
   runSpeed: 8
   jumpHeight: 2
   gravity: -15
