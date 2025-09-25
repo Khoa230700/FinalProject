@@ -1,52 +1,42 @@
-using UnityEngine;
-using System.Collections;
+﻿using UnityEngine;
 
 public class EnemyHookThrow : MonoBehaviour
 {
     public GameObject hookPrefab;
     public Transform firePoint;
     public float pullSpeed = 10f;
-    //[SerializeField] private float hookSpeed = 900f;
+    public float aimHeightOffset; // ngắm tầm ngực/đầu
+
     public void ThrowHook(Transform player)
     {
-        GameObject hook = Instantiate(hookPrefab, firePoint.position, firePoint.rotation);
-        hook.GetComponent<Hook>().Init(player, this);
+        Vector3 aimPoint = GetAimPoint(player);
+        Vector3 dir = (aimPoint - firePoint.position).normalized;
+        Quaternion rot = Quaternion.LookRotation(dir, Vector3.up);
+
+        var go = Instantiate(hookPrefab, firePoint.position, rot);
+        go.GetComponent<Hook>().Init(player, this, firePoint, dir); // pass firePoint + dir
     }
 
-    public void StartPull(Transform player)
-    {
-        StartCoroutine(PullPlayer(player));
-    }
+    public void StartPull(Transform player) => StartCoroutine(PullPlayer(player));
 
-    private IEnumerator PullPlayer(Transform player)
+    private System.Collections.IEnumerator PullPlayer(Transform player)
     {
-        Rigidbody playerRb = player.GetComponent<Rigidbody>();
-        //playerRb.AddForce(firePoint.forward * hookSpeed, )
-        playerRb.isKinematic = true;  // Optional: disable physics during pull
+        var rb = player.GetComponent<Rigidbody>();
+        if (rb) rb.isKinematic = true;
 
         while (Vector3.Distance(player.position, transform.position) > 1.5f)
         {
-           player.position = Vector3.MoveTowards(player.position, transform.position, pullSpeed * Time.deltaTime);
-           yield return null;
+            player.position = Vector3.MoveTowards(player.position, transform.position, pullSpeed * Time.deltaTime);
+            yield return null;
         }
 
-        playerRb.isKinematic = false;  // Re-enable physics
+        if (rb) rb.isKinematic = false;
+    }
 
-        // CharacterController controller = player.GetComponent<CharacterController>();
-
-        // if (controller == null)
-        // {
-        //     Debug.LogError("Player does not have a CharacterController!");
-        //     yield break;
-        // }
-
-        // // Optionally disable player input or movement script here
-
-        // while (Vector3.Distance(player.position, transform.position) > 1.5f)
-        // {
-        //     Vector3 direction = (transform.position - player.position).normalized;
-        //     controller.Move(direction * pullSpeed * Time.deltaTime);
-        //     yield return null;
-        // }
+    private Vector3 GetAimPoint(Transform t)
+    {
+        if (t && t.TryGetComponent<CharacterController>(out var cc))
+            return t.position + Vector3.up * (cc.height * 0.5f); // giữa thân
+        return t ? t.position + Vector3.up * aimHeightOffset : firePoint.position;
     }
 }

@@ -1,42 +1,57 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class Hook : MonoBehaviour
 {
     public float speed = 900f;
+    public float lifeTime = 1f;
+
     private Transform target;
     private EnemyHookThrow enemy;
+    private Transform ropeStart;
+    private LineRenderer lr;
 
-    private LineRenderer lineRenderer;
-
+    private Vector3 moveDir;
     private bool isFlying = true;
 
-    public void Init(Transform targetPlayer, EnemyHookThrow enemyRef)
+    // nhận sẵn firePoint + hướng đã tính
+    public void Init(Transform targetPlayer, EnemyHookThrow enemyRef, Transform ropeStartPoint, Vector3 initialDir)
     {
         target = targetPlayer;
         enemy = enemyRef;
-        lineRenderer = GetComponent<LineRenderer>();
+        ropeStart = ropeStartPoint;
+        moveDir = initialDir; // <-- hướng bay cố định theo tia firePoint->player
+
+        lr = GetComponent<LineRenderer>();
+        if (lr)
+        {
+            lr.positionCount = 2;
+            lr.useWorldSpace = true;
+        }
+
+        Destroy(gameObject, lifeTime); // tự hủy nếu không trúng
     }
 
     void Update()
     {
         if (isFlying)
-            transform.position += transform.forward * speed * Time.deltaTime;
-        // update rope position
-        if (lineRenderer != null)
+            transform.position += moveDir * speed * Time.deltaTime;
+
+        if (lr)
         {
-            lineRenderer.SetPosition(0, enemy.transform.position);
-            lineRenderer.SetPosition(1, transform.position);
+            Vector3 startPos = ropeStart ? ropeStart.position : (enemy ? enemy.transform.position : transform.position);
+            lr.SetPosition(0, startPos);
+            lr.SetPosition(1, transform.position);
         }
     }
 
     void OnTriggerEnter(Collider other)
     {
-        if (other.transform == target)
+        // so khớp root để dính cả collider con của Player
+        if (target && other.transform.root == target.root)
         {
-            Debug.Log("hook hit");
             isFlying = false;
-            enemy.StartPull(target);  // Start pulling the player
-            Destroy(gameObject);     // Remove the hook
+            enemy.StartPull(target);
+            Destroy(gameObject);
         }
     }
 }

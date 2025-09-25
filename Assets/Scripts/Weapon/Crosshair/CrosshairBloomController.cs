@@ -25,6 +25,8 @@ public class CrosshairBloomController : MonoBehaviour
     [Range(0f, 30f)] public float gapLerp = 20f;
 
     float _curGap;
+    public void Hide() => SetVisible(false);
+    public void Show() => SetVisible(true);
 
     void Start()
     {
@@ -69,5 +71,14 @@ public class CrosshairBloomController : MonoBehaviour
         if (bottomBar) bottomBar.anchoredPosition = new Vector2(0f, -(_curGap + bottomBar.sizeDelta.y * 0.5f));
         if (leftBar) leftBar.anchoredPosition = new Vector2(-(_curGap + leftBar.sizeDelta.x * 0.5f), 0f);
         if (rightBar) rightBar.anchoredPosition = new Vector2(_curGap + rightBar.sizeDelta.x * 0.5f, 0f);
+    }
+    public void SetVisible(bool v)
+    {
+        enabled = v;
+        if (root) root.gameObject.SetActive(v);
+        if (topBar) topBar.gameObject.SetActive(v);
+        if (bottomBar) bottomBar.gameObject.SetActive(v);
+        if (leftBar) leftBar.gameObject.SetActive(v);
+        if (rightBar) rightBar.gameObject.SetActive(v);
     }
 }
