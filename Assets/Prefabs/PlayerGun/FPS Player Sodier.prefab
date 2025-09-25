@@ -12954,9 +12954,6 @@ MonoBehaviour:
   hitClips:
   - {fileID: 8300000, guid: 35397149b26b1384781b7ad4d6b1e42f, type: 3}
   missClips: []
-  swingVolume: 1
-  hitVolume: 1
-  missVolume: 1
   playHitSfxOncePerSwing: 1
   randomPitchJitter: 0.05
   drawGizmos: 1
@@ -19441,10 +19438,7 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 8d337cf7abc3e7b4088a5f312bc2afa8, type: 3}
   jumpSound: {fileID: 8300000, guid: bccc4cc42c95a764b9432e451cc0b719, type: 3}
   landSound: {fileID: 8300000, guid: 43669fdbb2794cd4896669499e81f407, type: 3}
-  footstepVolume: 0
   runVolumeMultiplier: 1.64
-  jumpVolume: 1
-  landVolume: 1
   stepIntervalWalk: 0.6
   stepIntervalRun: 0.4
   stepSpeedScale: 1

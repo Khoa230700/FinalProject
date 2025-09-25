@@ -206,7 +206,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &9087395425015633033
 Transform:
   m_ObjectHideFlags: 0
@@ -581,9 +581,6 @@ MonoBehaviour:
   hitClips:
   - {fileID: 8300000, guid: 35397149b26b1384781b7ad4d6b1e42f, type: 3}
   missClips: []
-  swingVolume: 1
-  hitVolume: 1
-  missVolume: 1
   playHitSfxOncePerSwing: 1
   randomPitchJitter: 0.05
   drawGizmos: 1
@@ -8047,10 +8044,7 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 8d337cf7abc3e7b4088a5f312bc2afa8, type: 3}
   jumpSound: {fileID: 8300000, guid: bccc4cc42c95a764b9432e451cc0b719, type: 3}
   landSound: {fileID: 8300000, guid: 2f2b99b1dfe891e4c836cedee2fcee21, type: 3}
-  footstepVolume: 1
   runVolumeMultiplier: 1.25
-  jumpVolume: 1
-  landVolume: 1
   stepIntervalWalk: 0.6
   stepIntervalRun: 0.4
   stepSpeedScale: 1
@@ -41899,7 +41893,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 92d32508d9a95304b9f8f090ad2003d0, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6627274960028621651, guid: 92d32508d9a95304b9f8f090ad2003d0, type: 3}
       propertyPath: m_LocalPosition.x
